@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: order
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123
+    url: jdbc:mysql://127.0.0.1:3306/translate?characterEncoding=utf-8&useSell=false&serverTimezone=GMT%2B8
+  jpa:
+    show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+server:
+  port: 8080
+
+file:
+  port: ${server.port}
+  rootPath: "E:"
+  sonPath: /img/
+pay:
+  #支付宝配置
+  zhifubao:
+    #支付宝应用id 商户号
+    appid: 2016092200571547
+    #私钥
+    private_key: MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAJ+N54hdltAnMfN5cR5G4ie3d1TORc8ZMCxljo0mMRhCiycB2VF/6JkUG/zbZDNgbM2c0aG9S9HfRX/AE0yAdNfPvUZF7EBS+7VBGt/Tv9lYwhX8l2K2M5hsQR0zLgEqMFAqmvOpp7oW9IKTwOgOguzb07OQ0K86+4Qld8heKBWXAgMBAAECgYEAhmDhi7wm9JDORR0W5EUW3BRs8IP5z36LUBkIgmCUILaKtAOeoEF2CNci60drkMm5WUKmW+4uGUhOJFYE6v2VaYa1P8RkOyALSvUs91GbjjBqPtEDq1hhbmOnMVK12UoN6KVYZl4Surrm26yjyBoY1xPDw7QPERPH386/GYWK+UECQQDjtfLtWuG/Wit8Xf/CoQlX7IwqgbHMk/AsOxFEKQQSuBOKrzqoSgQgukSdMX5Yo0i7Boy4yNJ66xdpG48KwRb/AkEAs2BTsNtueXrcmfBDH3whX23auspUtWVfUR8M3vnNPxBCLNsjchVV34MtRMJ7u/3NJNnhg/7b+fXz7lz2+wlZaQJBAIHQzsdGEoC2dSgXpqFckSkQ7++jtKs+g6OToQpMn8fULT/ZGgWq/KNzzX4YI0GBBQuqdjs6MdRlhhkj3u5wmh0CQCAa85/KBqHznZxn5nuyKf78mJOqNzMoa8EHP7SBHX1WGaIRruxyaSZSQj32WVMygA9CeBy59wFsRja5qPMRn1ECQQDiDxpSd9ehrbLsqWJe1ZbHZcNtkg7HrXigkgw1gZsHD72XUO5yEe6hFcv9sNN3P5VEhX0ZsVO5l71vv2y2qfHV
+    #公钥
+    ali_public_key: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCfjeeIXZbQJzHzeXEeRuInt3dUzkXPGTAsZY6NJjEYQosnAdlRf+iZFBv822QzYGzNnNGhvUvR30V/wBNMgHTXz71GRexAUvu1QRrf07/ZWMIV/JditjOYbEEdMy4BKjBQKprzqae6FvSCk8DoDoLs29OzkNCvOvuEJXfIXigVlwIDAQAB
+    #支付同步返回地址
+    ali_return_url:
+    #支付异步通知地址
+    ali_notify_url:
+    #产品码
+    product_no:
+    #超时时间
+    time_express: 15m
+    #支付网关
+    url: https://openapi.alipaydev.com/gateway.do
+    #加密方式
+    sign_type: RSA
+
+
+
+

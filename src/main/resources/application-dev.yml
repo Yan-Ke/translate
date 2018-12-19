@@ -1,0 +1,71 @@
+spring:
+  application:
+    name: order
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123
+    url: jdbc:mysql://127.0.0.1:3306/translate?characterEncoding=utf-8&useSell=false&serverTimezone=GMT%2B8
+  jpa:
+    show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 5MB
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: PT2H
+file:
+    port: ${server.port}
+    rootPath: "E:"
+    sonPath: /img/
+pay:
+  #商品描述 需传入应用市场上的APP名字-实际商品名称
+  body: 翻译—会员充值
+  #附加数据，在查询API和支付通知中原样返回，该字段主要用于商户携带订单的自定义数据 例如:深圳分店
+  attach: 翻译
+  #支付宝配置
+  zhifubao:
+    #支付宝应用id 商户号
+    appid: 2016092200571547
+    #私钥
+    private_key: MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAJ+N54hdltAnMfN5cR5G4ie3d1TORc8ZMCxljo0mMRhCiycB2VF/6JkUG/zbZDNgbM2c0aG9S9HfRX/AE0yAdNfPvUZF7EBS+7VBGt/Tv9lYwhX8l2K2M5hsQR0zLgEqMFAqmvOpp7oW9IKTwOgOguzb07OQ0K86+4Qld8heKBWXAgMBAAECgYEAhmDhi7wm9JDORR0W5EUW3BRs8IP5z36LUBkIgmCUILaKtAOeoEF2CNci60drkMm5WUKmW+4uGUhOJFYE6v2VaYa1P8RkOyALSvUs91GbjjBqPtEDq1hhbmOnMVK12UoN6KVYZl4Surrm26yjyBoY1xPDw7QPERPH386/GYWK+UECQQDjtfLtWuG/Wit8Xf/CoQlX7IwqgbHMk/AsOxFEKQQSuBOKrzqoSgQgukSdMX5Yo0i7Boy4yNJ66xdpG48KwRb/AkEAs2BTsNtueXrcmfBDH3whX23auspUtWVfUR8M3vnNPxBCLNsjchVV34MtRMJ7u/3NJNnhg/7b+fXz7lz2+wlZaQJBAIHQzsdGEoC2dSgXpqFckSkQ7++jtKs+g6OToQpMn8fULT/ZGgWq/KNzzX4YI0GBBQuqdjs6MdRlhhkj3u5wmh0CQCAa85/KBqHznZxn5nuyKf78mJOqNzMoa8EHP7SBHX1WGaIRruxyaSZSQj32WVMygA9CeBy59wFsRja5qPMRn1ECQQDiDxpSd9ehrbLsqWJe1ZbHZcNtkg7HrXigkgw1gZsHD72XUO5yEe6hFcv9sNN3P5VEhX0ZsVO5l71vv2y2qfHV
+    #公钥
+    ali_public_key: MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCfjeeIXZbQJzHzeXEeRuInt3dUzkXPGTAsZY6NJjEYQosnAdlRf+iZFBv822QzYGzNnNGhvUvR30V/wBNMgHTXz71GRexAUvu1QRrf07/ZWMIV/JditjOYbEEdMy4BKjBQKprzqae6FvSCk8DoDoLs29OzkNCvOvuEJXfIXigVlwIDAQAB
+    #支付同步返回地址
+    ali_return_url:
+    #支付异步通知地址
+    ali_notify_url: http://79376n.natappfree.cc/order/aliNotify
+    #产品码
+    product_no:
+    #该笔订单允许的最晚付款时间，逾期将关闭交易。取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。 该参数数值不接受小数点， 如 1.5h，可转换为 90m。
+    #注：若为空，则默认为15d。
+    time_express: 30m
+    #支付网关
+    url: https://openapi.alipaydev.com/gateway.do
+    #加密方式
+    sign_type: RSA
+
+  #微信支付相关配置
+  weixin:
+    #应用id
+    appid:
+    #商户号
+    mchId:
+    #api密钥
+    key:
+    #连接超时时间 毫秒
+    connectTimeoutMs: 8000
+    #读超时时间 毫秒
+    readTimeoutMs: 10000
+    #微信支付回调地址
+    weixin_notify_url: http://79376n.natappfree.cc/order/weixinNotify
+
+
+
+
+
+
+
+
