@@ -1,7 +1,6 @@
 package com.sian.translate.member.enity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -27,7 +26,7 @@ public class MemberPayRecord {
     private Integer userId;
 
     /**优惠券ID**/
-    private Integer couponId;
+    private String couponId;
 
     /**支付金额**/
     private BigDecimal amount;
@@ -44,10 +43,8 @@ public class MemberPayRecord {
     /**1支付宝 2微信**/
     private Integer payType;
 
-
     /**购买时间**/
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date payTime;
-
 
 }

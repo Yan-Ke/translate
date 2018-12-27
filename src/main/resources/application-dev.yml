@@ -5,7 +5,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: 123
-    url: jdbc:mysql://127.0.0.1:3306/translate?characterEncoding=utf-8&useSell=false&serverTimezone=GMT%2B8
+    url: jdbc:mysql://127.0.0.1:3306/translate?characterEncoding=utf-8&useSell=false&serverTimezone=GMT%2B8&
   jpa:
     show-sql: true
   servlet:
@@ -68,4 +68,5 @@ pay:
 
 
 
-
+logging:
+  path: D:\translate\

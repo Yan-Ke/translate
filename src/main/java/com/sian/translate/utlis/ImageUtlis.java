@@ -38,7 +38,7 @@ public class ImageUtlis {
     //获取图片链接
     private String imgPath;
 
-    public static HashMap<String,String> loadImage(MultipartFile file) throws IOException {
+    public static HashMap<String,String> loadImageAndcompressImg(MultipartFile file) throws IOException {
 
         //获取本机IP
         String host = InetAddress.getLocalHost().getHostAddress();
@@ -167,5 +167,37 @@ public class ImageUtlis {
             ex.printStackTrace();
         }
         return true;
+    }
+
+
+    public static String loadImage(MultipartFile file) throws IOException {
+
+        //获取本机IP
+        String host = InetAddress.getLocalHost().getHostAddress();
+        String port = loadConfig.getPort();
+        String rootPath = loadConfig.getRootPath();
+        String sonPath = loadConfig.getSonPath();
+
+        // 获取文件名
+//            String fileName = file.getOriginalFilename();
+
+        // 解决中文问题，liunx下中文路径，图片显示问题
+        String fileName = SUFFIXNAME + FileUtils.getUUID()+FileUtils.getSuffix(file.getOriginalFilename());
+
+
+        //logger.info("上传的文件名为：" + fileName);
+        // 设置文件上传后的路径
+        String filePath = rootPath + sonPath;
+        log.info("上传的文件路径" + filePath);
+        log.info("整个图片路径：" + host + ":" + port + sonPath + fileName);
+        //创建文件路径
+        String orignalFilePath = filePath + fileName;
+        File dest = new File(orignalFilePath);
+        file.transferTo(dest);
+
+        String orginalPath = ("http://"+host + ":" + port + sonPath + fileName).toString();
+
+        return orginalPath;
+
     }
 }

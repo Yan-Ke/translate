@@ -1,6 +1,6 @@
 package com.sian.translate.information.service.impl;
 
-import com.sian.translate.DTO.PageInfoDto;
+import com.sian.translate.DTO.PageInfoDTO;
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.information.enity.Information;
 import com.sian.translate.information.repository.InformationRepository;
@@ -14,7 +14,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -30,7 +29,7 @@ public class InformationServiceImpl implements InformationService {
         if (!StringUtils.isEmpty(languageType) && languageType.equals("1")){
             type = 1;
         }
-        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
+        Sort sort = new Sort(Sort.Direction.DESC,"order").and(new Sort(Sort.Direction.DESC, "createTime"));
         if (page < 1){
             page = 1;
         }
@@ -40,13 +39,13 @@ public class InformationServiceImpl implements InformationService {
         Pageable pageable = PageRequest.of(page-1,size,sort);
 
 
-        Page<Information> datas = informationRepository.findAllByType(type,pageable);
+        Page<Information> datas = informationRepository.findAllByLanguageType(type,pageable);
 
         int totalElements = (int) datas.getTotalElements(); //总条数
         int totalPages =  datas.getTotalPages(); // 总页数
         List<Information> content = datas.getContent(); // 数据列表
 
-        PageInfoDto pageInfoDto =  new PageInfoDto();
+        PageInfoDTO pageInfoDto =  new PageInfoDTO();
         pageInfoDto.setPage(page);
         pageInfoDto.setSize(size);
         pageInfoDto.setTotalElements(totalElements);

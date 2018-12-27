@@ -21,7 +21,7 @@ public class MemberController {
      */
     @GetMapping(value = "/getMemberPayRecordList", produces = "application/json;charset=UTF-8")
     ResultVO getMemberPayRecordList(@RequestParam(value = "languageType", required = false) String languageType,
-                                    @RequestParam(value = "userId", required = false) String userId,
+                                    @RequestParam(value = "userId", required = false) Integer userId,
                                     @RequestParam(value = "page", required = false,defaultValue = "1")Integer page,
                                     @RequestParam(value = "size", required = false,defaultValue = "20")Integer size) {
         return  memberService.getInformationList(userId,languageType,page,size);

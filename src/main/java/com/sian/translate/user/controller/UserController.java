@@ -18,51 +18,67 @@ public class UserController {
     UserService userService;
 
     /***
-     * 注册
-     * @param nickName 昵称
-     * @param password 密码
-     * @param openid 微信或qq唯一id
-     * @param phone 电话
-     * @param sex 性别 1男 2女
-     * @param age 年龄
-     * @param education 学历
+     * 第三方登陆
      * @param languageType 语言 0 汉语 1 藏语
-     * @param file 头像
      * @return
      */
-    @PostMapping("/registe")
-    public ResultVO registe(@RequestParam(value = "nickName", required = false) String nickName,
-                            @RequestParam(value = "password", required = false) String password,
-                            @RequestParam(value = "openid", required = false) String openid,
-                            @RequestParam(value = "phone", required = false) String phone,
-                            @RequestParam(value = "sex", required = false) Integer sex,
-                            @RequestParam(value = "age", required = false) Integer age,
-                            @RequestParam(value = "education", required = false) String education,
-                            @RequestParam(value = "languageType", required = false) String languageType,
-                            @RequestParam(value = "image", required = false) MultipartFile file) {
+    @PostMapping("/thridLogin")
+    public ResultVO thridLogin(@RequestParam(value = "weixinOpenid", required = false) String weixinOpenid,
+                                       @RequestParam(value = "qqOpenid", required = false) String qqOpenid,
+                                       @RequestParam(value = "languageType", required = false) String languageType) {
+
+        return userService.thridLogin(weixinOpenid, qqOpenid, languageType);
+    }
+
+
+    /***
+     * 第三方登陆后注册
+     * @param nickName 昵称
+     * @param phone 电话
+     * @param sex 性别 1男 2女
+     * @param languageType 语言 0 汉语 1 藏语
+     * @return
+     */
+    @PostMapping("/thridLoginRegister")
+    public ResultVO thridLoginRegister(@RequestParam(value = "phone", required = false) String phone,
+                               @RequestParam(value = "code", required = false) String code,
+                               @RequestParam(value = "nickName", required = false) String nickName,
+                               @RequestParam(value = "weixinOpenid", required = false) String weixinOpenid,
+                               @RequestParam(value = "qqOpenid", required = false) String qqOpenid,
+                               @RequestParam(value = "sex", required = false) Integer sex,
+                               @RequestParam(value = "imagePath", required = false) String imagePath,
+                               @RequestParam(value = "languageType", required = false) String languageType) {
 
         UserInfo userInfo = new UserInfo();
         userInfo.setNickName(nickName);
-        userInfo.setPassword(password);
-        userInfo.setOpenid(openid);
+        userInfo.setQqOpenid(qqOpenid);
+        userInfo.setWeixinOpenid(weixinOpenid);
         userInfo.setPhone(phone);
         userInfo.setSex(sex);
-        userInfo.setAge(age);
-        userInfo.setEducation(education);
+        userInfo.setHeadSmallImage(imagePath);
+        userInfo.setHeadBigImage(imagePath);
+        userInfo.setOrignalImage(imagePath);
 
-        return userService.registe(file, userInfo, languageType);
+
+        return userService.thridLoginRegister(code, userInfo, languageType);
     }
+
+
 
     /****
      * 登陆
-     * @param phone
-     * @param password
+     * @param phone 手机
+     * @param code 验证码
      * @param languageType
      * @return
      */
-    @GetMapping(value = "/login", produces = "application/json;charset=UTF-8")
-    ResultVO login(@RequestParam(value = "phone", required = false) String phone, @RequestParam(value = "password", required = false) String password, @RequestParam(value = "languageType", required = false) String languageType) {
-        ResultVO resultVO = userService.login(phone, password, languageType);
+    @PostMapping(value = "/login", produces = "application/json;charset=UTF-8")
+    ResultVO login(@RequestParam(value = "phone", required = false) String phone,
+                   @RequestParam(value = "code", required = false) String code,
+                   @RequestParam(value = "languageType", required = false) String languageType) {
+
+        //1.直接登陆
+        ResultVO resultVO = userService.login(phone, code, languageType);
         return resultVO;
     }
 
@@ -78,6 +94,7 @@ public class UserController {
         return resultVO;
     }
 
+
     /****
      * 获取学历列表
      * @param languageType
@@ -88,6 +105,38 @@ public class UserController {
         ResultVO resultVO = userService.getDucation(languageType);
         return resultVO;
     }
+    /***
+     * 修改用户信息
+     * @param nickName 昵称
+     * @param sex 性别 1男 2女
+     * @param age 年龄
+     * @param education 学历
+     * @param languageType 语言 0 汉语 1 藏语
+     * @param file 头像
+     * @return
+     */
+    @PostMapping("/editUserInfo")
+    public ResultVO editUserInfo(@RequestParam(value = "id", required = false) Integer id,
+                                 @RequestParam(value = "nickName", required = false) String nickName,
+                                 @RequestParam(value = "sex", required = false) Integer sex,
+                                 @RequestParam(value = "age", required = false) Integer age,
+                                 @RequestParam(value = "education", required = false) String education,
+                                 @RequestParam(value = "languageType", required = false) String languageType,
+                                 @RequestParam(value = "image", required = false) MultipartFile file) {
+
+        UserInfo userInfo = new UserInfo();
+        userInfo.setId(id);
+        userInfo.setNickName(nickName);
+//        userInfo.setPhone(phone);
+        userInfo.setSex(sex);
+        userInfo.setAge(age);
+        userInfo.setEducation(education);
+
+
+        return userService.editUserInfo(file, userInfo, languageType);
+    }
+
+
 
     /****
      * 用户帮助反馈
@@ -96,9 +145,42 @@ public class UserController {
     @PostMapping(value = "/feedback", produces = "application/json;charset=UTF-8")
     ResultVO feedback(@RequestParam(value = "languageType", required = false) String languageType,
                       @RequestParam(value = "userId", required = false) Integer userId,
-                      @RequestParam(value = "content", required = false) String content) {
-        ResultVO resultVO = userService.feedback(languageType,userId,content);
+                      @RequestParam(value = "content", required = false) String content,
+                      @RequestParam(value = "images", required = false) MultipartFile[] files) {
+        ResultVO resultVO = userService.feedback(languageType, userId, content,files);
         return resultVO;
+    }
+
+    /****
+     * 更改用户手机
+     * @param id 用户id
+     * @param nowPhone 现在手机号码
+     * @param newPhone 新手机号码
+     * @param code 验证码
+     * @param languageType
+     * @return
+     */
+    @PostMapping(value = "/changePhone", produces = "application/json;charset=UTF-8")
+    ResultVO changePhone(@RequestParam(value = "id", required = false) Integer id,
+                         @RequestParam(value = "nowPhone", required = false) String nowPhone,
+                         @RequestParam(value = "newPhone", required = false) String newPhone,
+                         @RequestParam(value = "code", required = false) String code,
+                         @RequestParam(value = "languageType", required = false) String languageType) {
+
+        return userService.changePhone(id,nowPhone, newPhone,code, languageType);
+    }
+
+    /***
+     * 获取系统配置
+     * @param type 1关于我们 2注册协议
+     * @param languageType
+     * @return
+     */
+
+    @GetMapping(value = "/getConfig", produces = "application/json;charset=UTF-8")
+    ResultVO getConfig(@RequestParam(value = "type", required = false) Integer type, @RequestParam(value = "languageType", required = false) String languageType) {
+
+        return userService.getConfig(type,languageType);
     }
 
 }

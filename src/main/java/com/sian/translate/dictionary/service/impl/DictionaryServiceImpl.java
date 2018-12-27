@@ -1,6 +1,6 @@
 package com.sian.translate.dictionary.service.impl;
 
-import com.sian.translate.DTO.PageInfoDto;
+import com.sian.translate.DTO.PageInfoDTO;
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.dictionary.enity.Dictionary;
 import com.sian.translate.dictionary.enity.UserCollectionDictionary;
@@ -11,7 +11,6 @@ import com.sian.translate.dictionary.repository.UserTranslateRecordRepository;
 import com.sian.translate.dictionary.service.DictionaryService;
 import com.sian.translate.hint.enums.HintMessageEnum;
 import com.sian.translate.hint.service.HintMessageService;
-import com.sian.translate.member.enity.MemberPayRecord;
 import com.sian.translate.utlis.ResultVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -132,7 +131,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         int totalPages =  datas.getTotalPages(); // 总页数
         List<UserTranslateRecord> content = datas.getContent(); // 数据列表
 
-        PageInfoDto pageInfoDto =  new PageInfoDto();
+        PageInfoDTO pageInfoDto =  new PageInfoDTO();
         pageInfoDto.setPage(page);
         pageInfoDto.setSize(size);
         pageInfoDto.setTotalElements(totalElements);
@@ -164,7 +163,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         int totalPages =  datas.getTotalPages(); // 总页数
         List<UserCollectionDictionary> content = datas.getContent(); // 数据列表
 
-        PageInfoDto pageInfoDto =  new PageInfoDto();
+        PageInfoDTO pageInfoDto =  new PageInfoDTO();
         pageInfoDto.setPage(page);
         pageInfoDto.setSize(size);
         pageInfoDto.setTotalElements(totalElements);

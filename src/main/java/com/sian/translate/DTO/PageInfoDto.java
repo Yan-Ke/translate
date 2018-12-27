@@ -5,7 +5,7 @@ import lombok.Data;
 
 
 @Data
-public class PageInfoDto<T> {
+public class PageInfoDTO<T> {
 
 
     /**当前页码*/

@@ -3,8 +3,6 @@ package com.sian.translate.dictionary.repository;
 import com.sian.translate.dictionary.enity.Dictionary;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 public interface DictionaryRepository extends JpaRepository<Dictionary,Integer> {
 
 
@@ -17,6 +15,18 @@ public interface DictionaryRepository extends JpaRepository<Dictionary,Integer> 
     Dictionary findByJapanese(String japanese);
 
     Dictionary findByEnglish(String english);
+
+
+    long countByChinese(String chinese);
+
+    long countByZang(String zang);
+
+    long countBySanskirt(String sanskirt);
+
+    long countByJapanese(String japanese);
+
+    long countByEnglish(String english);
+
 
 
 }

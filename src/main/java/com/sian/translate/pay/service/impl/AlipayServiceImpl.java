@@ -7,7 +7,9 @@ import com.github.wxpay.sdk.WXPay;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.coupon.enity.Coupon;
+import com.sian.translate.coupon.enity.UserMidCoupon;
 import com.sian.translate.coupon.repository.CouponRepository;
+import com.sian.translate.coupon.repository.UserMidCouponRepository;
 import com.sian.translate.hint.enums.HintMessageEnum;
 import com.sian.translate.hint.service.HintMessageService;
 import com.sian.translate.member.enity.MemberConfig;
@@ -87,10 +89,13 @@ public class AlipayServiceImpl implements AlipayService {
     @Autowired
     UserInfoRepository userInfoRepository;
 
+    @Autowired
+    UserMidCouponRepository userMidCouponRepository;
+
 
     @Transactional
     @Override
-    public ResultVO createOrder(Integer userId, Integer memberId, Integer couponId, String type, Integer payType) throws Exception {
+    public ResultVO createOrder(Integer userId, Integer memberId, Integer id, String type, Integer payType) throws Exception {
 
 
         if (userId == null) {
@@ -118,15 +123,25 @@ public class AlipayServiceImpl implements AlipayService {
         BigDecimal couponAccount = new BigDecimal(0);
         BigDecimal total = memberConfig.getAmount();
 
+        int couponId = 0;
         /***优惠卷信息***/
-        if (couponId != null) {
+        if (id != null) {
+
+            Optional<UserMidCoupon> userMidCouponOptional = userMidCouponRepository.findById(id);
+            if (!userMidCouponOptional.isPresent()){
+                return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_NOT_EXIST.getCode(), type));
+            }
+            UserMidCoupon userMidCoupon = userMidCouponOptional.get();
+
+            couponId = userMidCoupon.getCouponId();
             Optional<Coupon> couponOptional = couponRepository.findById(couponId);
-            if (!couponOptional.isPresent()) {
+
+            if (!couponOptional.isPresent() || userMidCoupon == null) {
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_NOT_EXIST.getCode(), type));
             }
             Coupon coupon = couponOptional.get();
             //优惠卷信息不全
-            if (coupon.getFullPrice() == null || coupon.getReducePrice() == null || coupon.getEndTime() == null || coupon.getStatus() == null) {
+            if (coupon.getFullPrice() == null || coupon.getReducePrice() == null || coupon.getEndTime() == null ) {
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_INFO_INCOMPLETE.getCode(), type));
             }
             //已经过期
@@ -134,11 +149,11 @@ public class AlipayServiceImpl implements AlipayService {
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_OVERDUE.getCode(), type));
             }
             //已经使用
-            if (coupon.getStatus() == 1) {
+            if (userMidCoupon.getIsUse() == 1) {
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_USEED.getCode(), type));
             }
             //未满足优惠卷使用金额
-            if (coupon.getFullPrice().compareTo(total) == -1) {
+            if (coupon.getFullPrice().compareTo(total) != -1) {
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_UNSATISFIED.getCode(), type));
             }
             //抵扣金额大于了总金额
@@ -156,6 +171,7 @@ public class AlipayServiceImpl implements AlipayService {
         String totalFee = total.subtract(couponAccount).toString();
 
         MemberPayRecord memberPayRecord = new MemberPayRecord();
+        memberPayRecord.setOrderId(order_no);
         memberPayRecord.setUserId(userId);
         memberPayRecord.setAmount(new BigDecimal(totalFee));
         memberPayRecord.setMonth(month);
@@ -163,8 +179,8 @@ public class AlipayServiceImpl implements AlipayService {
         memberPayRecord.setReduceAmount(couponAccount);
         memberPayRecord.setStatus(0);
         memberPayRecord.setPayType(payType);
-        if (couponId != null) {
-            memberPayRecord.setCouponId(couponId);
+        if (couponId <= 0) {
+            memberPayRecord.setCouponId(couponId+"");
         }
         memberPayRecordRepository.save(memberPayRecord);
 

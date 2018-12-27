@@ -12,9 +12,9 @@ public interface AlipayService {
      * @return 付款返回值
      * @param userId
      * @param memberId
-     * @param couponId
+     * @param id
      */
-    ResultVO createOrder(Integer userId, Integer memberId, Integer couponId,String languageType,Integer payType) throws Exception;
+    ResultVO createOrder(Integer userId, Integer memberId, Integer id,String languageType,Integer payType) throws Exception;
 
     /**
      * 付款异步通知调用地址

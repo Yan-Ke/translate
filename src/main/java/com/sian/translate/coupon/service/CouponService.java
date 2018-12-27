@@ -14,4 +14,9 @@ public interface CouponService {
      */
     ResultVO getCouponList(String languageType,Integer userId,String status);
 
+    ResultVO getWaitReceiveCouponList(String languageType, Integer userId);
+
+    ResultVO receiveCoupon(String languageType, Integer userId, Integer id) throws Exception;
+
+    ResultVO findPayCouponList(String languageType, Integer userId, String amount);
 }

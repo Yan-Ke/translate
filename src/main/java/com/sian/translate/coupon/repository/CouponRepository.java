@@ -4,6 +4,7 @@ import com.sian.translate.coupon.enity.Coupon;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -15,8 +16,8 @@ public interface CouponRepository extends JpaRepository<Coupon,Integer> {
      * @param userId
      * @return
      */
-    @Query(value = "SELECT c.* FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.user_id = ?1 ORDER BY c.end_time < NOW(),c.status,c.end_time ", nativeQuery = true)
-    List<Coupon> findAllCoupon(Integer userId);
+    @Query(value = "SELECT umc.id as id,c.name as name,c.content as content,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.user_id = ?1 ORDER BY umc.end_time < NOW(),umc.is_use,umc.end_time ", nativeQuery = true)
+    List<Object[]> findAllCoupon(Integer userId);
 
     /***
      * 获取该用户所有未使用优惠卷
@@ -24,8 +25,8 @@ public interface CouponRepository extends JpaRepository<Coupon,Integer> {
      * @param userId
      * @return
      */
-    @Query(value = "SELECT c.* FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.user_id = ?1  and c.status = 0 ORDER BY c.end_time < NOW(), c.end_time ", nativeQuery = true)
-    List<Coupon> findUnusedCoupon(Integer userId);
+    @Query(value = "SELECT umc.id as id,c.name as name,c.content as content,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.is_use =0 and umc.user_id = ?1  and umc.end_time > NOW() ORDER BY umc.end_time < NOW(), umc.end_time ", nativeQuery = true)
+    List<Object[]> findUnusedCoupon(Integer userId);
 
     /***
      * 获取该用户已使用优惠卷
@@ -33,8 +34,8 @@ public interface CouponRepository extends JpaRepository<Coupon,Integer> {
      * @param userId
      * @return
      */
-    @Query(value = "SELECT c.* FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.user_id = ?1 and c.status = 1 ORDER BY c.end_time ", nativeQuery = true)
-    List<Coupon> findUsedCoupon(Integer userId);
+    @Query(value = "SELECT umc.id as id,c.name as name,c.content as content,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.is_use =1 and umc.user_id = ?1  ORDER BY umc.end_time ", nativeQuery = true)
+    List<Object[]> findUsedCoupon(Integer userId);
 
 
     /***
@@ -43,6 +44,25 @@ public interface CouponRepository extends JpaRepository<Coupon,Integer> {
      * @param userId
      * @return
      */
-    @Query(value = "SELECT c.* FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.user_id = ?1 and c.end_time < NOW() ORDER BY c.end_time ", nativeQuery = true)
-    List<Coupon> finDoverdueCoupon(Integer userId);
+    @Query(value = "SELECT umc.id as id,c.name as name,c.content as content,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.user_id = ?1 and umc.end_time < NOW()  ORDER BY umc.end_time ", nativeQuery = true)
+    List<Object[]> finDoverdueCoupon(Integer userId);
+
+
+    /***
+     * 获取该用户待领取的所有优惠卷
+     * @return
+     */
+    @Query(value = "SELECT * FROM coupon as c WHERE  (c.end_time > NOW() and c.count > 0) or c.type = 1 ORDER BY c.end_time < NOW(),c.end_time ", nativeQuery = true)
+    List<Coupon> findAllWaitReceivceCoupon();
+
+
+
+    /***
+     * 支付时获取可以使用的优惠券列表
+     * @return
+     */
+    @Query(value ="SELECT umc.id as id,c.name as name,c.content as content,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon AS umc INNER JOIN coupon AS c ON umc.coupon_id = c.id WHERE umc.is_use = 0 AND umc.user_id = ?1  AND c.full_price <= ?2 AND umc.end_time > NOW() AND umc.begin_time < NOW() ORDER BY umc.end_time < NOW(), umc.end_time",nativeQuery = true)
+    List<Object[]> findPayCouponList(Integer userId, BigDecimal amount);
+
+
 }

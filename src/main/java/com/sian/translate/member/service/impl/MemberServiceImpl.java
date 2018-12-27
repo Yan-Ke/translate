@@ -1,6 +1,6 @@
 package com.sian.translate.member.service.impl;
 
-import com.sian.translate.DTO.PageInfoDto;
+import com.sian.translate.DTO.PageInfoDTO;
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.hint.enums.HintMessageEnum;
 import com.sian.translate.hint.service.HintMessageService;
@@ -33,7 +33,7 @@ public class MemberServiceImpl implements MemberService {
     MemberConfigRepository memberConfigRepository;
 
     @Override
-    public ResultVO getInformationList(String userID,String languageType,Integer page ,Integer size) {
+    public ResultVO getInformationList(Integer userID,String languageType,Integer page ,Integer size) {
 
         if (StringUtils.isEmpty(userID)){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
@@ -55,7 +55,7 @@ public class MemberServiceImpl implements MemberService {
         int totalPages =  datas.getTotalPages(); // 总页数
         List<MemberPayRecord> content = datas.getContent(); // 数据列表
 
-        PageInfoDto pageInfoDto =  new PageInfoDto();
+        PageInfoDTO pageInfoDto =  new PageInfoDTO();
         pageInfoDto.setPage(page);
         pageInfoDto.setSize(size);
         pageInfoDto.setTotalElements(totalElements);

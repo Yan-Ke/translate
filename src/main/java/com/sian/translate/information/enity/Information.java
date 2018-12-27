@@ -15,34 +15,51 @@ public class Information {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Integer id;
 
-    /**主题**/
-    private String theme;
+    /**标题**/
+    private String title;
 
     /**内容**/
     private String content;
 
-    /**小图**/
-    private String smallImage;
+    /**作者**/
+    private String author;
 
-    /**大图**/
-    private String bigImage;
+    /**跳转地址**/
+    private String url;
 
     /**原图**/
-    private String orignalImage;
+    private String image;
 
     /**发布人*/
-    private String createUser;
+    private Integer createUser;
+
+    /**发布人*/
+    private Integer updateUser;
 
     /**发布时间**/
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**更新时间**/
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
 
-    /**类型分组用(预留字段)**/
+    /**0 文章 1广告**/
+    private Integer type;
+
+    /**语言类型**/
     @JsonIgnore  //返回时排除掉这个字段
-    private  Integer type;
+    private  Integer languageType;
+
+    /**排序 数字越大越靠前**/
+    @JsonIgnore  //返回时排除掉这个字段
+    private  Integer order;
+
+    /**0隐藏1显示**/
+    @JsonIgnore  //返回时排除掉这个字段
+    private  Integer isShow;
+
+
+
 
 }

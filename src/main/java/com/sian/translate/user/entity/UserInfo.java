@@ -3,7 +3,6 @@ package com.sian.translate.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -21,10 +20,10 @@ public class UserInfo {
     private Integer id;
     /**用户昵称**/
     private String nickName;
-    /**用户密碼**/
-    private String password;
-    /**用户微信qq唯一id**/
-    private String openid;
+    /**用户微信唯一id**/
+    private String weixinOpenid;
+    /**用户qq唯一id**/
+    private String qqOpenid;
     /**用户头像原图**/
     private String orignalImage;
     /**用户头像小图**/
@@ -42,18 +41,23 @@ public class UserInfo {
     /**用户余额**/
     private BigDecimal  balance;
     /**用户注册时间**/
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date registrationTime;
     /**用户更新时间**/
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
     /**用户会员开始时间**/
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date memberBeginTime;
     /**用户会员截止时间**/
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date memberEndTime;
     /**是否为会员 0 不是 1是**/
     @Transient
     private Integer isMember;
+
+    /**0正常1禁用**/
+    private Integer userStatus;
+
+
 }

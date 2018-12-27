@@ -9,6 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface InformationRepository extends JpaRepository<Information,Integer> {
 
 
-    Page<Information> findAllByType(Integer type,Pageable pageable);
+    Page<Information> findAllByLanguageType(Integer languageType,Pageable pageable);
 
 }

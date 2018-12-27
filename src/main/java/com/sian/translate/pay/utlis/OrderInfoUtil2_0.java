@@ -61,7 +61,6 @@ public class OrderInfoUtil2_0 {
      * 构造支付订单参数列表
      *
      * @param app_id
-     * @param rsa2     是否用rsa2加密
      * @param body     user_id+ coupon_id
      * @param order_no 运单号
      * @return

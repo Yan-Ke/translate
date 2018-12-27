@@ -16,28 +16,11 @@ public class Coupon {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Integer id;
 
-    /**优惠券名称中文**/
-    @JsonIgnore
-    private String chineseName;
-    /**优惠券名称藏文**/
-    @JsonIgnore
-    private String zangName;
-    /**优惠券名称 返回该字段给客户端**/
-    @Transient
+    /**优惠券名称**/
     private String name;
 
-    /**优惠券内容中文**/
-    @JsonIgnore
-    private String chineseContent;
-    /**优惠券内容*藏文*/
-    @JsonIgnore
-    private String zangContent;
-    /**优惠券内容 返回该字段给客户端**/
-    @Transient
+    /**优惠券内容**/
     private String content;
-
-    /**优惠券图片链接**/
-    private String image;
 
     /**满足此金额使用**/
     private BigDecimal fullPrice;
@@ -45,34 +28,47 @@ public class Coupon {
     /**抵扣金额**/
     private BigDecimal reducePrice;
 
-    /**状态 0未使用 1已经使用 2已过期**/
-    private  Integer status;
 
     /**是否过期 0未过期 1过期**/
     @Transient
     private Integer overdue;
 
+    /**优惠卷开始使用日期**/
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date beginTime;
+
     /**优惠卷截止使用日期**/
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
     /**发布人*/
     @JsonIgnore
-    private String createUser;
+    private Integer createUser;
 
     /**更新人*/
     @JsonIgnore
-    private String updateUser;
+    private Integer updateUser;
 
     /**优惠卷创建时间**/
     @JsonIgnore
-//    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
     /**优惠卷更新时间**/
     @JsonIgnore
-//    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;
+
+    /**剩余数量**/
+    private  Integer count;
+
+    /**0 按开始日期到截止计算优惠券周期 1 按几天计算日期，从领取日开始计算**/
+    private  Integer type;
+
+    /**几天内有效(从领取时开始计算),type=1时不能为0**/
+    private  Integer day;
+
+
 
 
 

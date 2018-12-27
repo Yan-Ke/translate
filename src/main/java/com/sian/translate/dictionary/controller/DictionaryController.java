@@ -20,7 +20,7 @@ public class DictionaryController {
      * @param languageType app语言
      * @param userId 用户id
      * @param fromType 需要翻译的语言类型 0 汉语 1 藏语 2 梵语 3 日语 4 英语
-     * @param fromType 翻译后语类型 0 汉语 1 藏语 2 梵语 3 日语 4 英语
+     * @param toType 翻译后语类型 0 汉语 1 藏语 2 梵语 3 日语 4 英语
      * @param content 需要翻译的内容
      * @return
      */
@@ -56,7 +56,7 @@ public class DictionaryController {
      * @param languageType app语言
      * @param userId 用户id
      * @param fromType 需要翻译的语言类型 0 汉语 1 藏语 2 梵语 3 日语 4 英语
-     * @param fromType 翻译后语类型 0 汉语 1 藏语 2 梵语 3 日语 4 英语
+     * @param toType 翻译后语类型 0 汉语 1 藏语 2 梵语 3 日语 4 英语
      * @param content 需要翻译的内容
      * @return
      */

@@ -1,6 +1,5 @@
 package com.sian.translate.member.enity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -19,12 +18,12 @@ public class MemberConfig {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Integer id;
 
-    /**会员资费说明藏语**/
-    @JsonIgnore
+    /**会员资费说明中文**/
+//    @JsonIgnore
     private String explainChinese;
 
     /**会员资费说明藏语*/
-    @JsonIgnore
+//    @JsonIgnore
     private String explainZang;
 
     /**会员资费说明 返回该字段给app*/
@@ -38,21 +37,21 @@ public class MemberConfig {
     private Integer month;
 
     /**创建时间**/
-//    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonIgnore
     private Date createTime;
 
     /**修改时间**/
-//    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss", timezone = "GMT+8")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @JsonIgnore
     private Date updateTime;
 
     /**创建人ID**/
     @JsonIgnore
-    private String createUser;
+    private Integer createUser;
 
     /**修改人ID**/
     @JsonIgnore
-    private String updateUser;
+    private Integer updateUser;
 
 }

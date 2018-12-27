@@ -12,7 +12,7 @@ public interface MemberService {
      * @param size  条数
      * @return
      */
-    ResultVO getInformationList(String userID, String languageType,Integer page, Integer size);
+    ResultVO getInformationList(Integer userID, String languageType,Integer page, Integer size);
 
     /****
      * 获取会员资费列表

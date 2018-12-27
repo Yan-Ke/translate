@@ -1,16 +1,14 @@
 package com.sian.translate.user.repository;
 
 
-import com.sian.translate.member.enity.MemberPayRecord;
 import com.sian.translate.user.entity.UserInfo;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 
 public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
 
@@ -21,6 +19,15 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
      */
     UserInfo findByPhone(String phone);
 
+
+    /***通过手机查找该用户数量**/
+    int countByPhone(String phone);
+
+    /***通过qqopenid获取用户信息**/
+    UserInfo findByQqOpenid(String qqOpenid);
+
+    /***通过weixinopenid获取用户信息**/
+    UserInfo findByWeixinOpenid(String weixinOpenid);
 
     /***
      * 根据用户id更新会员时间
@@ -37,22 +44,33 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
     /***
      * 获取所有会员信息
      */
-    @Query(value = "select * from user_info where member_end_time >= NOW() ORDER BY ?#{#pageable}", nativeQuery = true)
-    Page<UserInfo> findAllMemberUsers(Pageable pageable);
+//    @Query(value = "select * from user_info where member_end_time >= NOW() ORDER BY ?#{#pageable}", nativeQuery = true)
+    @Query(value ="select * from user_info where member_end_time >= NOW()"
+            + " order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
+    List<UserInfo> findAllMemberUsers(Integer pageNumber, Integer pageSize);
 
     /***
      * 获取所有非会员信息
      */
-    @Query(value = "select * from user_info where member_end_time < NOW() or member_end_time is null ORDER BY ?#{#pageable}", nativeQuery = true)
-    Page<UserInfo> findAllUnmemberUsers(Pageable pageable);
+//    @Query(value = "select * from user_info where member_end_time < NOW() or member_end_time is null ORDER BY ?#{#pageable}", nativeQuery = true)
+//    @Query(value = "select * from user_info where member_end_time < NOW() or member_end_time is null ORDER BY ?#{#pageable}",
+//            countQuery="select count(*) from user_info where member_end_time < NOW() or member_end_time is null",
+//            nativeQuery = true)
+//    Page<UserInfo> findAllUnmemberUsers(Pageable pageable);
+
+    @Query(value ="select * from user_info where member_end_time < NOW() or member_end_time is null"
+            + " order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
+    List<UserInfo> findAllUnmemberUsers(Integer pageNumber, Integer pageSize);
+
 
     /****
      * 获取所有用户信息
-     * @param pageable
      * @return
      */
 //    @Query(value = "select * from user_info ORDER BY ?#{#pageable}", nativeQuery = true)
-    Page<UserInfo> findAll(Pageable pageable);
+    @Query(value ="select * from user_info "
+            + " order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
+    List<UserInfo> findAll(Integer pageNumber, Integer pageSize);
 
 
 
