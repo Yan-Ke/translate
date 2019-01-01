@@ -52,12 +52,21 @@ public class UserInfo {
     /**用户会员截止时间**/
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date memberEndTime;
-    /**是否为会员 0 不是 1是**/
+    /**是否为会员 0 不是 1是 2过期会员**/
     @Transient
     private Integer isMember;
 
     /**0正常1禁用**/
     private Integer userStatus;
 
+    /**用户购买会员的月数**/
+    private Integer memberMonth;
 
+    /**购买时间**/
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date buyTime;
+
+    /**购买时间**/
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date loginTime;
 }

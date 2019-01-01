@@ -19,9 +19,6 @@ public class UserCouponDTO implements Serializable {
     /**优惠券名称**/
     private String name;
 
-    /**内容**/
-    private String content;
-
     /**截止日期**/
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date beginTime;
@@ -43,10 +40,9 @@ public class UserCouponDTO implements Serializable {
     public UserCouponDTO() {
     }
 
-    public UserCouponDTO(int id, String name, String content, Date beginTime,Date endTime, BigDecimal fullPrice, BigDecimal reducePrice,int couponId) {
+    public UserCouponDTO(int id, String name, Date beginTime,Date endTime, BigDecimal fullPrice, BigDecimal reducePrice,int couponId) {
         this.id = id;
         this.name = name;
-        this.content = content;
         this.beginTime = beginTime;
         this.endTime = endTime;
         this.fullPrice = fullPrice;

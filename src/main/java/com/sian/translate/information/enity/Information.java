@@ -1,10 +1,12 @@
 package com.sian.translate.information.enity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Date;
 
 @Entity
@@ -48,15 +50,15 @@ public class Information {
     private Integer type;
 
     /**语言类型**/
-    @JsonIgnore  //返回时排除掉这个字段
+//    @JsonIgnore  //返回时排除掉这个字段
     private  Integer languageType;
 
     /**排序 数字越大越靠前**/
-    @JsonIgnore  //返回时排除掉这个字段
-    private  Integer order;
+//    @JsonIgnore  //返回时排除掉这个字段
+    private  Integer infomationOrder;
 
     /**0隐藏1显示**/
-    @JsonIgnore  //返回时排除掉这个字段
+//    @JsonIgnore  //返回时排除掉这个字段
     private  Integer isShow;
 
 

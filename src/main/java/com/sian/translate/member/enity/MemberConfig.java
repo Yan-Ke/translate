@@ -19,11 +19,11 @@ public class MemberConfig {
     private  Integer id;
 
     /**会员资费说明中文**/
-//    @JsonIgnore
+    @JsonIgnore
     private String explainChinese;
 
     /**会员资费说明藏语*/
-//    @JsonIgnore
+    @JsonIgnore
     private String explainZang;
 
     /**会员资费说明 返回该字段给app*/

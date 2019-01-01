@@ -26,7 +26,10 @@ public class MemberPayRecord {
     private Integer userId;
 
     /**优惠券ID**/
-    private String couponId;
+    private Integer couponId;
+
+    /**用户优惠券中间表id**/
+    private Integer userMidCouponId;
 
     /**支付金额**/
     private BigDecimal amount;

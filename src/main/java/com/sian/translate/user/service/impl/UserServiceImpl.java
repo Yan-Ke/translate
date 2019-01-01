@@ -134,6 +134,7 @@ public class UserServiceImpl implements UserService {
         }
 
         setUserIsMember(userInfo);
+        userInfo.setLoginTime(new Date());
         userInfoRepository.save(userInfo);
 
 //        userInfo.setPassword(password);
@@ -301,6 +302,7 @@ public class UserServiceImpl implements UserService {
         userInfo.setBalance(new BigDecimal(0.00));
         userInfo.setIsMember(0);
         userInfo.setUserStatus(0);
+        userInfo.setLoginTime(new Date());
         userInfoRepository.save(userInfo);
         return ResultVOUtil.success(userInfo);
 
@@ -322,6 +324,9 @@ public class UserServiceImpl implements UserService {
             UserInfo userInfo = userInfoRepository.findByQqOpenid(qqOpenid);
 
             if (userInfo != null) {
+                setUserIsMember(userInfo);
+                userInfo.setLoginTime(new Date());
+                userInfoRepository.save(userInfo);
                 return ResultVOUtil.success(userInfo);
             }
         }
@@ -334,6 +339,8 @@ public class UserServiceImpl implements UserService {
                     ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_PROHIBIT.getCode(), languageType));
                 }
                 setUserIsMember(userInfo);
+                userInfo.setLoginTime(new Date());
+                userInfoRepository.save(userInfo);
                 return ResultVOUtil.success(userInfo);
             }
         }
@@ -418,11 +425,15 @@ public class UserServiceImpl implements UserService {
     }
 
     private void setUserIsMember(UserInfo userInfo) {
-        userInfo.setIsMember(0);
         if (userInfo.getMemberBeginTime() != null
-                && userInfo.getMemberEndTime() != null
-                && CommonUtlis.isEffectiveDate(new Date(), userInfo.getMemberBeginTime(), userInfo.getMemberEndTime())) {
-            userInfo.setIsMember(1);
+                && userInfo.getMemberEndTime() != null) {
+            if (CommonUtlis.isEffectiveDate(new Date(), userInfo.getMemberBeginTime(), userInfo.getMemberEndTime())){
+                userInfo.setIsMember(1);
+            }else{
+                userInfo.setIsMember(2);
+            }
+        }else{
+            userInfo.setIsMember(0);
         }
     }
 

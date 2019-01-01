@@ -19,33 +19,22 @@ public class Dictionary {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Integer id;
 
-    /**中文**/
-    @JsonIgnore
-    private String chinese;
+    /**词典名称**/
+    private String name;
 
-    /**藏语**/
-    @JsonIgnore
-    private String zang;
+    /**词典图片**/
+    private String image;
 
-    /**梵语**/
-    @JsonIgnore
-    private String sanskirt;
-
-    /**日语**/
-    @JsonIgnore
-    private String japanese;
-
-    /**英语**/
-    @JsonIgnore
-    private String english;
-
-    /**翻译内容统一返回该字段**/
-    @Transient
-    private String content;
+    /**词典类型 1藏汉 2藏英 3藏日 4藏梵**/
+    private Integer type;
 
     /**创建人用户id**/
     @JsonIgnore
     private  Integer userId;
+
+    /**创建人用户id**/
+    @JsonIgnore
+    private  Integer updateUserId;
 
     /**创建时间**/
     @JsonIgnore
@@ -54,6 +43,11 @@ public class Dictionary {
     /**更新时间**/
     @JsonIgnore
     private Date updateTime;
+
+    /**是否会员可见 0不是 1会员可见**/
+    private  Integer isMemberVisible;
+
+
 
 
 }

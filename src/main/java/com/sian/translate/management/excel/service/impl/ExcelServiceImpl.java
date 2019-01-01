@@ -1,11 +1,16 @@
 package com.sian.translate.management.excel.service.impl;
 
+import com.sian.translate.DTO.FinancialInfoDTO;
 import com.sian.translate.DTO.PageInfoDTO;
+import com.sian.translate.DTO.UserRecordDTO;
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.dictionary.enity.Dictionary;
+import com.sian.translate.dictionary.enity.Thesaurus;
 import com.sian.translate.dictionary.repository.DictionaryRepository;
+import com.sian.translate.dictionary.repository.ThesaurusRepository;
 import com.sian.translate.hint.enums.HintMessageEnum;
 import com.sian.translate.hint.service.HintMessageService;
+import com.sian.translate.management.dictionary.service.DictionaryManageService;
 import com.sian.translate.management.excel.service.ExcelService;
 import com.sian.translate.management.excel.utils.ExcelData;
 import com.sian.translate.management.excel.utils.ExportExcelUtils;
@@ -41,13 +46,22 @@ public class ExcelServiceImpl implements ExcelService {
     ManageMemberService manageMemberService;
 
     @Autowired
+    DictionaryManageService dictionaryManageService;
+
+    @Autowired
     UserInfoRepository userInfoRepository;
+
+    @Autowired
+    ThesaurusRepository thesaurusRepository;
 
     @Autowired
     DictionaryRepository dictionaryRepository;
 
+    @Autowired
+    ManageUserService manageUserService;
+
     @Override
-    public ResultVO exportmemberUserInfo(Integer isMember, HttpServletResponse response, Integer page, Integer size, HttpSession session) throws Exception {
+    public ResultVO exportmemberUserInfo(Integer isMember, HttpServletResponse response, Integer page, Integer size, String param, HttpSession session) throws Exception {
 
 
         if (page == -1) {
@@ -55,7 +69,7 @@ public class ExcelServiceImpl implements ExcelService {
             page = 1;
             size = (int) count;
         }
-        ResultVO memberListResultVO = manageMemberService.getMemberList(isMember, page, size, session);
+        ResultVO memberListResultVO = manageMemberService.getMemberList(isMember, param, page, size, session);
         if (memberListResultVO.getCode() != 0) {
             return memberListResultVO;
         }
@@ -65,11 +79,13 @@ public class ExcelServiceImpl implements ExcelService {
 
         String excelName = "";
         if (isMember == -1) {
-            excelName = "用户信息";
+            excelName = "所有用户信息";
         } else if (isMember == 0) {
             excelName = "非会员用户信息";
-        } else {
+        } else if (isMember == 1) {
             excelName = "会员用户信息";
+        } else {
+            excelName = "过期会员用户信息";
         }
 
         ExcelData data = new ExcelData();
@@ -91,7 +107,7 @@ public class ExcelServiceImpl implements ExcelService {
         titles.add("更新时间");
         titles.add("会员开始时间");
         titles.add("会员截止时间");
-        titles.add("是否为会员（0 不是 1是）");
+        titles.add("是否为会员（0 不是 1是 2过期会员）");
         data.setTitles(titles);
 
         List<List<Object>> rows = new ArrayList();
@@ -117,9 +133,12 @@ public class ExcelServiceImpl implements ExcelService {
             row.add(userInfo.getMemberBeginTime() == null ? "" : format.format(userInfo.getMemberBeginTime()));
             row.add(userInfo.getMemberEndTime() == null ? "" : format.format(userInfo.getMemberEndTime()));
             if (userInfo.getMemberBeginTime() != null
-                    && userInfo.getMemberEndTime() != null
-                    && CommonUtlis.isEffectiveDate(new Date(), userInfo.getMemberBeginTime(), userInfo.getMemberEndTime())) {
-                row.add(1);
+                    && userInfo.getMemberEndTime() != null) {
+                if (CommonUtlis.isEffectiveDate(new Date(), userInfo.getMemberBeginTime(), userInfo.getMemberEndTime())) {
+                    row.add(1);
+                } else {
+                    row.add(2);
+                }
             } else {
                 row.add(0);
             }
@@ -135,7 +154,7 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
-    public ResultVO importDictionary(MultipartFile file, HttpSession session) throws IOException {
+    public ResultVO importDictionary(Integer id, MultipartFile file, HttpSession session) throws IOException {
 
         String languageType = "0";
 
@@ -144,6 +163,21 @@ public class ExcelServiceImpl implements ExcelService {
         if (StringUtils.isEmpty(userId)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOT_LOGIN.getCode(), languageType));
         }
+        if (id == null) {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.DICTIONARY_ID_NOT_EMPTY.getCode(), languageType));
+        }
+
+        Optional<Dictionary> dictionaryOptional = dictionaryRepository.findById(id);
+
+        if (!dictionaryOptional.isPresent()) {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.DICTIONARY_NOT_EXIST.getCode(), languageType));
+        }
+        if (file == null || file.isEmpty()) {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.UPLOAD_EXCEL_EMPTY.getCode(), languageType));
+        }
+
+        Dictionary dictionary = dictionaryOptional.get();
+
         String fileName = file.getOriginalFilename();
 
         if (!fileName.matches("^.+\\.(?i)(xls)$") && !fileName.matches("^.+\\.(?i)(xlsx)$")) {
@@ -162,8 +196,8 @@ public class ExcelServiceImpl implements ExcelService {
         } else {
             wb = new XSSFWorkbook(is);
         }
-        Dictionary dictionary = null;
-        List<Dictionary> dictionaryList = new ArrayList<>();
+        Thesaurus thesaurus = null;
+        List<Thesaurus> thesaurusArrayList = new ArrayList<>();
 
         Sheet sheet = wb.getSheetAt(0);
 
@@ -179,118 +213,65 @@ public class ExcelServiceImpl implements ExcelService {
 
             Cell cell0 = row.getCell(0);
             Cell cell1 = row.getCell(1);
-            Cell cell2 = row.getCell(2);
-            Cell cell3 = row.getCell(3);
-            Cell cell4 = row.getCell(4);
 
-            String chinese = null;
+
+            String languageContentOne = null;
             if (cell0 != null) {
                 cell0.setCellType(CellType.STRING);
-                chinese = cell0.getStringCellValue();
+                languageContentOne = cell0.getStringCellValue();
             }
 
-            String zang = null;
+            String languageContentTwo = null;
             if (cell1 != null) {
                 cell1.setCellType(CellType.STRING);
-                zang = cell1.getStringCellValue();
+                languageContentTwo = cell1.getStringCellValue();
             }
 
-            String sanskirt = null;
-            if (cell2 != null) {
-                cell2.setCellType(CellType.STRING);
-                sanskirt = cell2.getStringCellValue();
-            }
-            String japanese = null;
-            if (cell3 != null) {
-                cell3.setCellType(CellType.STRING);
-                japanese = cell3.getStringCellValue();
-            }
 
-            String english = null;
-            if (cell4 != null) {
-                cell4.setCellType(CellType.STRING);
-                english = cell4.getStringCellValue();
-            }
+            long count1 = 0;
+            long count2 = 0;
 
-            long chineseCount = 0;
-            long zangCount = 0;
-            long sanskirtCount = 0;
-            long japaneseCount = 0;
-            long englishCount = 0;
-
-            if (chinese == null || chinese.trim().equals("")) {
+            if (languageContentOne == null || languageContentOne.trim().equals("")) {
                 isError = true;
                 putErrorMap((r + 1), hintMessageService.getHintMessage(HintMessageEnum.EXCEL_CHINESE_NOT_EMPTY.getCode(), languageType), errorMap);
-            }else{
-                chineseCount = dictionaryRepository.countByChinese(chinese.trim());
+            } else {
+                count1 = thesaurusRepository.countByContentOne(languageContentOne.trim());
             }
 
-            if (zang == null || zang.trim().equals("")) {
+            if (languageContentTwo == null || languageContentTwo.trim().equals("")) {
                 isError = true;
                 putErrorMap((r + 1), hintMessageService.getHintMessage(HintMessageEnum.EXCEL_ZANG_NOT_EMPTY.getCode(), languageType), errorMap);
-            }else{
-                zangCount = dictionaryRepository.countByZang(zang.trim());
-            }
-
-            if (sanskirt == null || sanskirt.trim().equals("")) {
-                isError = true;
-                putErrorMap((r + 1), hintMessageService.getHintMessage(HintMessageEnum.EXCEL_SANSKIRT_NOT_EMPTY.getCode(), languageType), errorMap);
-            }else{
-                sanskirtCount = dictionaryRepository.countBySanskirt(sanskirt.trim());
-            }
-
-            if (japanese == null || japanese.trim().equals("")) {
-                isError = true;
-                putErrorMap((r + 1), hintMessageService.getHintMessage(HintMessageEnum.EXCEL_JAPANESE_EMPTY.getCode(), languageType), errorMap);
-            }else{
-                japaneseCount = dictionaryRepository.countByJapanese(japanese.trim());
-            }
-
-            if (english == null || english.trim().equals("")) {
-                isError = true;
-                putErrorMap((r + 1), hintMessageService.getHintMessage(HintMessageEnum.EXCEL_ENGLISH_NOT_EMPTY.getCode(), languageType), errorMap);
-            }else{
-                englishCount = dictionaryRepository.countByEnglish(english.trim());
+            } else {
+                count2 = thesaurusRepository.countByContentTwo(languageContentTwo.trim());
             }
 
 
-            if (chineseCount > 0) {
+            if (count1 > 0) {
                 isError = true;
                 putErrorMap((r + 1), hintMessageService.getHintMessage(HintMessageEnum.EXCEL_CHINESE_EXIST.getCode(), languageType), errorMap);
             }
-            if (zangCount > 0) {
+            if (count2 > 0) {
                 isError = true;
                 putErrorMap((r + 1), hintMessageService.getHintMessage(HintMessageEnum.EXCEL_ZANG_EXIST.getCode(), languageType), errorMap);
-            }
-            if (sanskirtCount > 0) {
-                isError = true;
-                putErrorMap((r + 1), hintMessageService.getHintMessage(HintMessageEnum.EXCEL_SANSKIRT_EXIST.getCode(), languageType), errorMap);
-            }
-            if (japaneseCount > 0) {
-                isError = true;
-                putErrorMap((r + 1), hintMessageService.getHintMessage(HintMessageEnum.EXCEL_JAPANESE_EXIST.getCode(), languageType), errorMap);
-            }
-            if (englishCount > 0) {
-                isError = true;
-                putErrorMap((r + 1), hintMessageService.getHintMessage(HintMessageEnum.EXCEL_ENGLISH_EXIST.getCode(), languageType), errorMap);
             }
 
 
             if (!isError) {
-                dictionary = new Dictionary();
-                dictionary.setChinese(chinese.trim());
-                dictionary.setZang(zang.trim());
-                dictionary.setSanskirt(sanskirt.trim());
-                dictionary.setJapanese(japanese.trim());
-                dictionary.setEnglish(english.trim());
-                dictionary.setUserId(userId);
-                dictionary.setCreateTime(new Date());
-                dictionary.setUpdateTime(new Date());
-                dictionaryList.add(dictionary);
+                thesaurus = new Thesaurus();
+                thesaurus.setDictionaryId(dictionary.getId());
+                thesaurus.setType(dictionary.getType());
+                thesaurus.setContentOne(languageContentOne);
+                thesaurus.setContentTwo(languageContentTwo);
+                thesaurus.setCreateUser(userId);
+                thesaurus.setUpdateUser(userId);
+                thesaurus.setCreateTime(new Date());
+                thesaurus.setUpdateTime(new Date());
+                thesaurusArrayList.add(thesaurus);
             }
 
         }
-        List<Dictionary> result = dictionaryRepository.saveAll(dictionaryList);
+
+        List<Thesaurus> result = thesaurusRepository.saveAll(thesaurusArrayList);
 
         if (errorMap.isEmpty()) {
             return ResultVOUtil.success("上传成功" + result.size() + "条记录");
@@ -311,6 +292,240 @@ public class ExcelServiceImpl implements ExcelService {
         }
 
     }
+
+    @Override
+    public ResultVO exportThesaurus(Integer id, String name, HttpServletResponse response, Integer page, Integer size, HttpSession session) throws Exception {
+        String languageType = "0";
+
+        if (page == -1) {
+            long count = thesaurusRepository.count();
+            page = 1;
+            size = (int) count;
+        }
+        ResultVO resultVO = dictionaryManageService.getThesaurusList(id, name, page, size, session);
+        if (resultVO.getCode() != 0) {
+            return resultVO;
+        }
+
+        PageInfoDTO pageInfoDto = (PageInfoDTO) resultVO.getData();
+        List<Thesaurus> thesaurusList = (List<Thesaurus>) pageInfoDto.getList();
+
+
+        if (thesaurusList != null && thesaurusList.size() > 0) {
+
+            Optional<Dictionary> dictionaryOptional = dictionaryRepository.findById(id);
+
+            if (!dictionaryOptional.isPresent()) {
+                return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOT_LOGIN.getCode(), languageType));
+            }
+
+            Dictionary dictionary = dictionaryOptional.get();
+
+
+            /***词典类型 1藏汉 2藏英 3藏日 4藏梵****/
+            Integer type = dictionary.getType();
+            String excelName = dictionary.getName();
+            String columnOne = "ID";
+            String columTwo = "";
+            String columThree = "";
+
+            if (type == 1) {
+                columTwo = "藏语";
+                columThree = "汉语";
+            } else if (type == 2) {
+                columTwo = "藏语";
+                columThree = "英语";
+            } else if (type == 3) {
+                columTwo = "藏语";
+                columThree = "日语";
+            } else if (type == 4) {
+                columTwo = "藏语";
+                columThree = "梵语";
+            }
+
+            ExcelData data = new ExcelData();
+            data.setName(excelName);
+            List<String> titles = new ArrayList();
+            titles.add(columnOne);
+            titles.add(columTwo);
+            titles.add(columThree);
+            data.setTitles(titles);
+
+            List<List<Object>> rows = new ArrayList();
+
+
+            for (Thesaurus thesaurus : thesaurusList) {
+                List<Object> row = new ArrayList();
+                row.add(thesaurus.getId() == null ? "" : thesaurus.getId());
+                row.add(thesaurus.getContentOne() == null ? "" : thesaurus.getContentOne());
+                row.add(thesaurus.getContentTwo() == null ? "" : thesaurus.getContentTwo());
+
+                rows.add(row);
+            }
+
+
+            data.setRows(rows);
+
+            ExportExcelUtils.exportExcel(response, excelName + ".xlsx", data);
+            return ResultVOUtil.success();
+        } else {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.DICTIONARY_THESAURUS_IS_EMPTY.getCode(), languageType));
+        }
+
+
+    }
+
+    @Override
+    public ResultVO exportMemberPayRecord(String beginTime, String endTime, String orderNo, String nickName, Integer page, Integer size, HttpServletResponse response, HttpSession session) throws Exception {
+        String languageType = "0";
+
+        if (page == -1) {
+            long count = thesaurusRepository.count();
+            page = 1;
+            size = (int) count;
+        }
+        ResultVO resultVO = manageMemberService.getAllMemberPayRecordList(beginTime, endTime, orderNo, nickName, page, size, session);
+        if (resultVO.getCode() != 0) {
+            return resultVO;
+        }
+
+        PageInfoDTO pageInfoDto = (PageInfoDTO) resultVO.getData();
+        List<UserRecordDTO> userRecordDTOList = (List<UserRecordDTO>) pageInfoDto.getList();
+
+
+        if (userRecordDTOList != null && userRecordDTOList.size() > 0) {
+
+
+            String excelName = "会员购买流水";
+            String column1 = "订单编号";
+            String column2 = "购买人";
+            String column3 = "VIP(0不是1是2过期会员)";
+            String column4 = "类型";
+            String column5 = "价格/元";
+            String column6 = "优惠券";
+            String column7 = "实际支付";
+            String column8 = "支付方式";
+            String column9 = "支付时间";
+
+
+            ExcelData data = new ExcelData();
+            data.setName(excelName);
+            List<String> titles = new ArrayList();
+            titles.add(column1);
+            titles.add(column2);
+            titles.add(column3);
+            titles.add(column4);
+            titles.add(column5);
+            titles.add(column6);
+            titles.add(column7);
+            titles.add(column8);
+            titles.add(column9);
+            data.setTitles(titles);
+
+            List<List<Object>> rows = new ArrayList();
+
+
+            for (UserRecordDTO userRecordDTO : userRecordDTOList) {
+                List<Object> row = new ArrayList();
+
+
+                row.add(userRecordDTO.getOrderId() == null ? "" : userRecordDTO.getOrderId());
+                row.add(userRecordDTO.getNickName() == null ? "" : userRecordDTO.getNickName());
+                row.add(userRecordDTO.getIsMember());
+                row.add(userRecordDTO.getMonth() + "个月");
+
+
+                if (userRecordDTO.getReduceAmount() != null) {
+                    row.add(userRecordDTO.getAmount() == null ? "" : userRecordDTO.getAmount().add(userRecordDTO.getReduceAmount()));
+                } else {
+                    row.add(userRecordDTO.getAmount() == null ? "" : userRecordDTO.getAmount());
+                }
+                row.add(userRecordDTO.getCouponName() == null ? "" : userRecordDTO.getCouponName());
+
+                row.add(userRecordDTO.getAmount() == null ? "" : userRecordDTO.getAmount());
+                if (userRecordDTO.getPayType() == 1) {
+                    row.add("支付宝");
+                } else {
+                    row.add("微信");
+                }
+                row.add(userRecordDTO.getPayTime() == null ? "" : userRecordDTO.getPayTime());
+
+                rows.add(row);
+            }
+
+
+            data.setRows(rows);
+
+            ExportExcelUtils.exportExcel(response, excelName + ".xlsx", data);
+            return ResultVOUtil.success();
+        } else {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PAY_RECORD_IS_EMPTY.getCode(), languageType));
+        }
+    }
+
+    @Override
+    public ResultVO exportFinancialInfo(String beginTime, String endTime, Integer page, Integer size, HttpServletResponse response, HttpSession session) throws Exception {
+        String languageType = "0";
+
+        if (page == -1) {
+            long count = thesaurusRepository.count();
+            page = 1;
+            size = (int) count;
+        }
+        ResultVO resultVO = manageMemberService.getAllFinancialInfo(beginTime, endTime,page, size, session);
+        if (resultVO.getCode() != 0) {
+            return resultVO;
+        }
+
+        PageInfoDTO pageInfoDto = (PageInfoDTO) resultVO.getData();
+        List<FinancialInfoDTO> financialInfoDTOS = (List<FinancialInfoDTO>) pageInfoDto.getList();
+
+
+        if (financialInfoDTOS != null && financialInfoDTOS.size() > 0) {
+
+
+            String excelName = "财务统计报表";
+            String column1 = "时间";
+            String column2 = "订单总数";
+            String column3 = "今日新增";
+            String column4 = "订单总金额/元";
+            String column5 = "今日新增/元";
+
+
+            ExcelData data = new ExcelData();
+            data.setName(excelName);
+            List<String> titles = new ArrayList();
+            titles.add(column1);
+            titles.add(column2);
+            titles.add(column3);
+            titles.add(column4);
+            titles.add(column5);
+            data.setTitles(titles);
+
+            List<List<Object>> rows = new ArrayList();
+
+
+            for (FinancialInfoDTO financialInfoDTO : financialInfoDTOS) {
+                List<Object> row = new ArrayList();
+
+
+                row.add(financialInfoDTO.getPayTime() == null ? "" : financialInfoDTO.getPayTime());
+                row.add(financialInfoDTO.getTotalCount());
+                row.add(financialInfoDTO.getDayCount());
+                row.add(financialInfoDTO.getTotalAmount() == null ? "" : financialInfoDTO.getTotalAmount());
+                row.add(financialInfoDTO.getDayAmount() == null ? "" : financialInfoDTO.getDayAmount());
+
+                rows.add(row);
+            }
+
+
+            data.setRows(rows);
+
+            ExportExcelUtils.exportExcel(response, excelName + ".xlsx", data);
+            return ResultVOUtil.success();
+        } else {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PAY_RECORD_IS_EMPTY.getCode(), languageType));
+        }    }
 
     private void putErrorMap(Integer num, String msg, HashMap<Integer, String> errorMap) {
 

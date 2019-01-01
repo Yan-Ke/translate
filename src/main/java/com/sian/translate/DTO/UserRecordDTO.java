@@ -30,7 +30,7 @@ public class UserRecordDTO implements Serializable {
     private Date payTime;
 
     /**优惠券ID**/
-    private String couponId;
+    private Integer couponId;
 
     /**优惠券抵扣金额**/
     private BigDecimal reduceAmount;
@@ -47,9 +47,26 @@ public class UserRecordDTO implements Serializable {
     /**用户昵称**/
     private String nickName;
 
+    /**用户头像**/
+    private String headBigImage;
+
+    /**会员开始时间**/
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date memberBeginTime;
+
+    /**会员结束时间**/
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date memberEndTime;
+
+    /**优惠券名称**/
+    private String couponName;
+
+    private int isMember;
+
     public UserRecordDTO() {
     }
-    public UserRecordDTO(int id, int userId, BigDecimal amount, int month, Date payTime, String couponId, BigDecimal reduceAmount, int status, String orderId, int payType, String nickName) {
+
+    public UserRecordDTO(int id, int userId, BigDecimal amount, int month, Date payTime, int couponId, BigDecimal reduceAmount, int status, String orderId, int payType, String nickName, String headBigImage, Date memberBeginTime, Date memberEndTime, String couponName) {
         this.id = id;
         this.userId = userId;
         this.amount = amount;
@@ -61,5 +78,11 @@ public class UserRecordDTO implements Serializable {
         this.orderId = orderId;
         this.payType = payType;
         this.nickName = nickName;
+        this.headBigImage = headBigImage;
+        this.memberBeginTime = memberBeginTime;
+        this.memberEndTime = memberEndTime;
+        this.couponName = couponName;
     }
+
+
 }

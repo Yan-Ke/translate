@@ -38,8 +38,8 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
      */
     @Modifying
     @Transactional
-    @Query(value = "UPDATE user_info set member_begin_time = ?1,member_end_time = ?2 where  id = ?3", nativeQuery = true)
-    void updateMemberDateById(Date memberBeginTime, Date memberEndTime,Integer id);
+    @Query(value = "UPDATE user_info set member_begin_time = ?1,member_end_time = ?2,member_month = ?3,buy_time = ?4 where  id = ?5", nativeQuery = true)
+    void updateMemberDateById(Date memberBeginTime, Date memberEndTime,Integer memberMonth,Date buyTime,Integer id);
 
     /***
      * 获取所有会员信息
@@ -48,9 +48,19 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
     @Query(value ="select * from user_info where member_end_time >= NOW()"
             + " order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
     List<UserInfo> findAllMemberUsers(Integer pageNumber, Integer pageSize);
+    @Query(value ="select count(1) from user_info "
+            + " where member_end_time >= NOW()",nativeQuery = true)
+    long  countAllMembers();
+
+    @Query(value ="select * from user_info where member_end_time >= NOW()"
+            + " and (phone like ?3 or nick_name like ?3) order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
+    List<UserInfo> findAllMemberUsersByPhoneOrNickName(Integer pageNumber, Integer pageSize,String param);
+    @Query(value ="select count(1) from user_info "
+            + " where member_end_time >= NOW() and (phone like ?1 or nick_name like ?1) ",nativeQuery = true)
+    long  countAllMembersByPhoneOrNickName(String param);
 
     /***
-     * 获取所有非会员信息
+     * 获取所有非会员信息(不包括过期会员)
      */
 //    @Query(value = "select * from user_info where member_end_time < NOW() or member_end_time is null ORDER BY ?#{#pageable}", nativeQuery = true)
 //    @Query(value = "select * from user_info where member_end_time < NOW() or member_end_time is null ORDER BY ?#{#pageable}",
@@ -58,10 +68,41 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
 //            nativeQuery = true)
 //    Page<UserInfo> findAllUnmemberUsers(Pageable pageable);
 
-    @Query(value ="select * from user_info where member_end_time < NOW() or member_end_time is null"
+    @Query(value ="select * from user_info where member_end_time is null"
             + " order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
     List<UserInfo> findAllUnmemberUsers(Integer pageNumber, Integer pageSize);
+    @Query(value ="select count(1) from user_info "
+            + " where member_end_time is null ",nativeQuery = true)
+    long  countAllUnmembers();
 
+    @Query(value ="select * from user_info where member_end_time is null"
+            + " and (phone like ?3 or nick_name like ?3) order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
+    List<UserInfo> findAllUnmemberUsersByPhoneOrNickName(Integer pageNumber, Integer pageSize,String param);
+    @Query(value ="select count(1) from user_info "
+            + " where member_end_time is null and (phone like ?1 or nick_name like ?1) ",nativeQuery = true)
+    long  countAllUnmemberByPhoneOrNickName(String param);
+
+    /***4
+     * 获取所有过期会员
+     * @param pageNumber
+     * @param pageSize
+     * @return
+     */
+    @Query(value ="select * from user_info where member_end_time < NOW() and member_end_time is not null"
+            + " order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
+    List<UserInfo> findOverdueUnmemberUsers(Integer pageNumber, Integer pageSize);
+
+    @Query(value ="select count(1) from user_info "
+            + " where  member_end_time < NOW() and member_end_time is not null ",nativeQuery = true)
+    long  countOverdueMembers();
+
+    @Query(value ="select * from user_info where member_end_time < NOW() and member_end_time is not null"
+            + " and (phone like ?3 or nick_name like ?3) order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
+    List<UserInfo> findOverdueUnmemberUsersByPhoneOrNickName(Integer pageNumber, Integer pageSize,String param);
+
+    @Query(value ="select count(1) from user_info "
+            + " where  member_end_time < NOW() and member_end_time is not null and (phone like ?1 or nick_name like ?1) ",nativeQuery = true)
+    long countOverdueMembersByPhoneOrNickName(String param);
 
     /****
      * 获取所有用户信息
@@ -71,6 +112,23 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
     @Query(value ="select * from user_info "
             + " order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
     List<UserInfo> findAll(Integer pageNumber, Integer pageSize);
+
+
+    @Query(value ="select * from user_info "
+            + " where phone like ?3 or nick_name like ?3 order by registration_time desc  limit ?1,?2 ",nativeQuery = true)
+    List<UserInfo> findAllByPhoneOrNickName(Integer pageNumber, Integer pageSize,String param);
+
+    @Query(value ="select count(1) from user_info "
+            + " where phone like ?1 or nick_name like ?1 ",nativeQuery = true)
+    long  countAllByPhoneOrNickName(String param);
+
+
+    List<UserInfo> findByIdIn(List<Integer> users);
+
+
+    List<UserInfo> findByMemberEndTimeIsNotNull();
+
+    List<UserInfo> findByMemberEndTimeIsNull();
 
 
 

@@ -3,12 +3,16 @@ package com.sian.translate.coupon.service.impl;
 import com.sian.translate.DTO.UserCouponDTO;
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.coupon.enity.Coupon;
+import com.sian.translate.coupon.enity.UserCouponRecord;
 import com.sian.translate.coupon.enity.UserMidCoupon;
 import com.sian.translate.coupon.repository.CouponRepository;
+import com.sian.translate.coupon.repository.UserCouponRecordRepository;
 import com.sian.translate.coupon.repository.UserMidCouponRepository;
 import com.sian.translate.coupon.service.CouponService;
 import com.sian.translate.hint.enums.HintMessageEnum;
 import com.sian.translate.hint.service.HintMessageService;
+import com.sian.translate.user.entity.UserInfo;
+import com.sian.translate.user.repository.UserInfoRepository;
 import com.sian.translate.utlis.CommonUtlis;
 import com.sian.translate.utlis.ResultVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CouponServiceImpl implements CouponService {
@@ -32,6 +37,12 @@ public class CouponServiceImpl implements CouponService {
 
     @Autowired
     UserMidCouponRepository userMidCouponRepository;
+
+    @Autowired
+    UserInfoRepository userInfoRepository;
+
+    @Autowired
+    UserCouponRecordRepository userCouponRecordRepository;
 
     /****
      * 获取优惠券列表
@@ -81,9 +92,11 @@ public class CouponServiceImpl implements CouponService {
 
         List<Coupon> couponList = couponRepository.findAllWaitReceivceCoupon();
 
-        couponList.stream().forEach(coupon -> setContentAndName(coupon));
 
-        return ResultVOUtil.success(couponList);
+        final Integer id = userId;
+        couponList.stream().forEach(coupon -> setCouponOverdueAndReceive(coupon,id));
+        List<Coupon> collect = couponList.stream().sorted().collect(Collectors.toList());
+        return ResultVOUtil.success(collect);
 
     }
 
@@ -99,9 +112,18 @@ public class CouponServiceImpl implements CouponService {
         }
 
 
+        Optional<UserInfo> userInfoOptional = userInfoRepository.findById(userId);
+
+        if (!userInfoOptional.isPresent()){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), languageType));
+        }
+
+        UserInfo userInfo = userInfoOptional.get();
         Optional<Coupon> couponOptional = couponRepository.findById(id);
 
         if (couponOptional.isPresent()){
+
+
 
             Coupon coupon = couponOptional.get();
             coupon.setCount(coupon.getCount() - 1);
@@ -123,7 +145,30 @@ public class CouponServiceImpl implements CouponService {
                 userMidCoupon.setEndTime(CommonUtlis.addDay(nowDate, coupon.getDay()));
             }
 
-            userMidCouponRepository.save(userMidCoupon);
+            UserCouponRecord userCouponRecord = new UserCouponRecord();
+            userCouponRecord.setCouponId(id);
+            userCouponRecord.setCouponName(coupon.getName());
+            if (userInfo.getMemberBeginTime() != null
+                    && userInfo.getMemberEndTime() != null) {
+                if (CommonUtlis.isEffectiveDate(new Date(), userInfo.getMemberBeginTime(), userInfo.getMemberEndTime())){
+                    userCouponRecord.setIsMember(1);
+                }else{
+                    userCouponRecord.setIsMember(2);
+                }
+            }else{
+                userCouponRecord.setIsMember(0);
+            }
+            userCouponRecord.setUserHead(userInfo.getHeadBigImage());
+            userCouponRecord.setUserName(userInfo.getNickName());
+            userCouponRecord.setUserId(userInfo.getId());
+            userCouponRecord.setUserPhone(userInfo.getPhone());
+            userCouponRecord.setReceiveTime(new Date());
+
+            UserMidCoupon save = userMidCouponRepository.save(userMidCoupon);
+
+            userCouponRecord.setUserMidCouponId(save.getId());
+            userCouponRecordRepository.save(userCouponRecord);
+
             return ResultVOUtil.success();
 
         }else{
@@ -153,7 +198,7 @@ public class CouponServiceImpl implements CouponService {
         return ResultVOUtil.success(content);
     }
 
-    private void setContentAndName(Coupon coupon){
+    private void setCouponOverdueAndReceive(Coupon coupon,Integer id){
 
         coupon.setOverdue(0);
         //截止日期大于当前日期，过期
@@ -162,7 +207,13 @@ public class CouponServiceImpl implements CouponService {
                 coupon.setOverdue(1);
             }
         }
-
+        int count = userMidCouponRepository.countByUserIdAndCouponId(id, coupon.getId());
+        if (count > 0){
+            coupon.setIsReceive(1);
+        }else{
+            coupon.setIsReceive(0);
+        }
 
     }
+
 }

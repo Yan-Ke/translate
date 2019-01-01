@@ -11,4 +11,9 @@ public interface InformationRepository extends JpaRepository<Information,Integer
 
     Page<Information> findAllByLanguageType(Integer languageType,Pageable pageable);
 
+
+    Page<Information> findAll(Pageable pageable);
+
+    Page<Information> findAllByTitleLike(String title,Pageable pageable);
+
 }

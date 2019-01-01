@@ -9,6 +9,7 @@ import com.sian.translate.VO.ResultVO;
 import com.sian.translate.coupon.enity.Coupon;
 import com.sian.translate.coupon.enity.UserMidCoupon;
 import com.sian.translate.coupon.repository.CouponRepository;
+import com.sian.translate.coupon.repository.UserCouponRecordRepository;
 import com.sian.translate.coupon.repository.UserMidCouponRepository;
 import com.sian.translate.hint.enums.HintMessageEnum;
 import com.sian.translate.hint.service.HintMessageService;
@@ -92,6 +93,9 @@ public class AlipayServiceImpl implements AlipayService {
     @Autowired
     UserMidCouponRepository userMidCouponRepository;
 
+    @Autowired
+    UserCouponRecordRepository userCouponRecordRepository;
+
 
     @Transactional
     @Override
@@ -141,11 +145,11 @@ public class AlipayServiceImpl implements AlipayService {
             }
             Coupon coupon = couponOptional.get();
             //优惠卷信息不全
-            if (coupon.getFullPrice() == null || coupon.getReducePrice() == null || coupon.getEndTime() == null ) {
+            if (coupon.getFullPrice() == null || coupon.getReducePrice() == null  ) {
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_INFO_INCOMPLETE.getCode(), type));
             }
             //已经过期
-            if (CommonUtlis.compareNowDate(coupon.getEndTime()) == 1) {
+            if (CommonUtlis.compareNowDate(userMidCoupon.getEndTime()) == 1) {
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_OVERDUE.getCode(), type));
             }
             //已经使用
@@ -179,9 +183,8 @@ public class AlipayServiceImpl implements AlipayService {
         memberPayRecord.setReduceAmount(couponAccount);
         memberPayRecord.setStatus(0);
         memberPayRecord.setPayType(payType);
-        if (couponId <= 0) {
-            memberPayRecord.setCouponId(couponId+"");
-        }
+        memberPayRecord.setCouponId(couponId);
+        memberPayRecord.setUserMidCouponId(id);
         memberPayRecordRepository.save(memberPayRecord);
 
 
@@ -263,7 +266,6 @@ public class AlipayServiceImpl implements AlipayService {
                 }
             }
 
-
         } else {
             String resXml = "";
             System.err.println("进入异步通知");
@@ -330,7 +332,6 @@ public class AlipayServiceImpl implements AlipayService {
             }
         }
 
-        out_trade_no = "1";
         if (flag) {//验证成功
             if (StringUtils.isEmpty(out_trade_no)) {
                 log.error("订单ID为空");
@@ -370,7 +371,9 @@ public class AlipayServiceImpl implements AlipayService {
                         memberBeginResultTime = new Date();
                         memberEndTimeResultTime = CommonUtlis.subMonth(memberBeginResultTime, month);
                     }
-                    userInfoRepository.updateMemberDateById(memberBeginResultTime, memberEndTimeResultTime, userId);
+
+                    userCouponRecordRepository.updateByuserMidCouponId(new Date(),out_trade_no,Integer.valueOf(memberPayRecord.getUserMidCouponId()));
+                    userInfoRepository.updateMemberDateById(memberBeginResultTime, memberEndTimeResultTime,memberPayRecord.getMonth(),new Date(), userId);
 
                 }
             }

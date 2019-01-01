@@ -22,16 +22,10 @@ public class UserTranslateRecord {
     /**翻译内容**/
     private String content;
 
-    /**需要翻译的语言类型 0 汉语 1 藏语 2 梵语 3 日语 4 英语**/
-    @JsonIgnore
-    private Integer formType;
-
-    /**翻译后的语言类型 0 汉语 1 藏语 2 梵语 3 日语 4 英语**/
-    @JsonIgnore
-    private Integer toType;
+    /**词典类型 1藏汉 2藏英 3藏日 4藏梵**/
+    private Integer type;
 
     /**翻译后内容**/
-    @JsonIgnore
     private String translateContent;
 
     /**创建人用户id**/

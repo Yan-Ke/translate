@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface UserMidCouponRepository extends JpaRepository<UserMidCoupon,Integer> {
 
 
+    int countByUserIdAndCouponId(Integer userId,Integer couponId);
 
+    void deleteByCouponId(Integer couponId);
 }

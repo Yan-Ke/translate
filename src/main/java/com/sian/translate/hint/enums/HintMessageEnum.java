@@ -39,6 +39,8 @@ public enum HintMessageEnum {
     SYSTEM_CONFIG_TYPE_NOT_EMPPPTY(31,"类型不能为空"),
     SYSTEM_CONFIG_EMPPPTY(32,"未获取到该配置项"),
     PAY_FORMAT_ERROR(33,"支付金额格式有误"),
+    TRANSLATE_TYPE_EMPTY(34,"翻译类型不能为空"),
+    TRANSLATE_RESULT_EMPTY(35,"还没有收录该单词"),
 
 
 
@@ -87,7 +89,46 @@ public enum HintMessageEnum {
     COUPON_REDUCE_PRICE_NOT_EMPTY(1034,"优惠券抵扣金额不能为空"),
     COUPON_REDUCE_PRICE_FORMAT_ERROR(1035,"优惠券抵扣金额格式错误"),
     COUPON_END_TIME_NOT_EMPTY(1036,"优惠券截止使用日期不能为空"),
-    COUPON_END_TIME_FORMAT_ERROR(1037,"优惠券截止使用日期格式错误"),
+    COUPON_BEGIN_TIME_NOT_EMPTY(1037,"优惠券开始日期不能为空"),
+    COUPON_TIME_FORMAT_ERROR(1038,"优惠券使用日期格式错误"),
+    COUPON_DAY_NOT_EMPTY(1039,"优惠券有效日期不能为空"),
+
+
+    DICTIONARY_NAME_NOT_EMPTY(1040,"词典名称不能为空"),
+    DICTIONARY_TYPE_NOT_EMPTY(1041,"词典语言不能为空"),
+    DICTIONARY_IMAGE_NOT_EMPTY(1042,"词典图片不能为空"),
+    DICTIONARY_ID_NOT_EMPTY(1143,"词典ID不能为空"),
+    DICTIONARY_NOT_EXIST(1144,"该词典不存在"),
+
+
+
+    THESAURUS_ID_NOT_EMPTY(1043,"词条名称不能为空"),
+    THESAURUS_NOT_EXIST(1044,"该条词条记录不存在"),
+
+    COUPON_FULL_PRICE_LESS_ZERO(1045,"优惠券使用金额不能小于0"),
+    COUPON_REDUCE_PRICE_LESS_ZERO(1046,"优惠券抵扣金额不能小于0"),
+    COUPON_GRANT_TYPE_NOT_EMPTY(1047,"请选择发送类型"),
+    COUPON_GRANT_MEMBERPHONE_NOT_EMPTY(1048,"发送类型为指定会员时，会员手机号码不能为空"),
+    COUPON_GRANT_MEMBER_TYPE_NOT_EMPTY(1049,"请选择会员类型"),
+    COUPON_COUNT_ERROR(1050,"优惠券数量不能为空或小于等于0"),
+    COUPON_MEMBER_PHONE_ERROR(1051,"用户手机格式有误"),
+
+
+    MEMBER_MONTY_AMOUNT_NOT_EMPTY(1052,"请输入会员月资费金额"),
+    MEMBER_QUART_AMOUNT_NOT_EMPTY(1053,"请输入会员季度资费金额"),
+    MEMBER_HALF_YEAR_AMOUNT_NOT_EMPTY(1054,"请输入会员半年资费金额"),
+    MEMBER_YEAR_AMOUNT_NOT_EMPTY(1055,"请输入会员年资费金额"),
+
+    THESAURUS_NOT_EMPTY(1056,"词条文字不能为空"),
+
+    DICTIONARY_THESAURUS_IS_EMPTY(1057,"无词条数据"),
+
+    UPLOAD_EXCEL_EMPTY(1058,"上传的Excel文件为空"),
+
+    PAY_TIME_FORMAT_ERROR(1059,"支付日期格式错误"),
+
+    PAY_RECORD_IS_EMPTY(1060,"无购买记录"),
+
     ;
 
     private  Integer code;

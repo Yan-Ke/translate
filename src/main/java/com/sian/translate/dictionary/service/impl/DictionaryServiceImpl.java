@@ -3,9 +3,11 @@ package com.sian.translate.dictionary.service.impl;
 import com.sian.translate.DTO.PageInfoDTO;
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.dictionary.enity.Dictionary;
+import com.sian.translate.dictionary.enity.Thesaurus;
 import com.sian.translate.dictionary.enity.UserCollectionDictionary;
 import com.sian.translate.dictionary.enity.UserTranslateRecord;
 import com.sian.translate.dictionary.repository.DictionaryRepository;
+import com.sian.translate.dictionary.repository.ThesaurusRepository;
 import com.sian.translate.dictionary.repository.UserCollectionDictionrayRepository;
 import com.sian.translate.dictionary.repository.UserTranslateRecordRepository;
 import com.sian.translate.dictionary.service.DictionaryService;
@@ -20,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
 
@@ -38,8 +41,12 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Autowired
     UserCollectionDictionrayRepository userCollectionDictionrayRepository;
 
+    @Autowired
+    ThesaurusRepository thesaurusRepository;
+
+    @Transactional
     @Override
-    public ResultVO translate(String languageType, Integer userID, Integer fromType, Integer toType, String content) {
+    public ResultVO translate(String languageType, Integer userID, Integer type, String content) {
 
         if (StringUtils.isEmpty(userID)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
@@ -47,65 +54,27 @@ public class DictionaryServiceImpl implements DictionaryService {
         if (StringUtils.isEmpty(content)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.CONTENT_NOT_EMPTY.getCode(), languageType));
         }
-
-        Dictionary dictionary = new Dictionary();
-        dictionary.setContent(content);
-
-        if (fromType == toType) {
-            return ResultVOUtil.success(dictionary);
+        if(type == null){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.TRANSLATE_TYPE_EMPTY.getCode(), languageType));
         }
-        /**需要翻译的语言类型 0 汉语 1 藏语 2 梵语 3 日语 4 英语**/
-        switch (fromType) {
-            case 0:
-                dictionary = dictionaryRepository.findByChinese(content);
-                break;
-            case 1:
-                dictionary = dictionaryRepository.findByZang(content);
-                break;
-            case 2:
-                dictionary = dictionaryRepository.findBySanskirt(content);
-                break;
-            case 3:
-                dictionary = dictionaryRepository.findByJapanese(content);
-                break;
-            case 4:
-                dictionary = dictionaryRepository.findByEnglish(content);
-                break;
 
+
+        Thesaurus thesaurus = thesaurusRepository.findFirstByContentOneAndType(content, type);
+        if (thesaurus == null){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.TRANSLATE_RESULT_EMPTY.getCode(), languageType));
         }
-        String translateContent = "";
-        switch (toType) {
-            case 0:
-                translateContent = dictionary.getChinese();
-                break;
-            case 1:
-                translateContent = dictionary.getChinese();
-                break;
-            case 2:
-                translateContent = dictionary.getSanskirt();
-                break;
-            case 3:
-                translateContent = dictionary.getJapanese();
-                break;
-            case 4:
-                translateContent = dictionary.getEnglish();
-                break;
-
-        }
-        dictionary.setContent(translateContent);
-
+        thesaurus.setTranslateResult(thesaurus.getContentTwo());
 
         UserTranslateRecord userTranslateRecord = new UserTranslateRecord();
         userTranslateRecord.setUserId(userID);
         userTranslateRecord.setContent(content);
-        userTranslateRecord.setFormType(fromType);
-        userTranslateRecord.setToType(toType);
-        userTranslateRecord.setTranslateContent(translateContent);
+        userTranslateRecord.setType(type);
+        userTranslateRecord.setTranslateContent(thesaurus.getContentTwo());
         userTranslateRecord.setCreateTime(new Date());
 
         userTranslateRecordRepository.save(userTranslateRecord);
 
-        return ResultVOUtil.success(dictionary);
+        return ResultVOUtil.success(thesaurus);
     }
 
     @Override
@@ -138,7 +107,7 @@ public class DictionaryServiceImpl implements DictionaryService {
         pageInfoDto.setTotalPages(totalPages);
         pageInfoDto.setList(content);
 
-        return  ResultVOUtil.success(content);
+        return  ResultVOUtil.success(pageInfoDto);
     }
 
     @Override
@@ -174,7 +143,7 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    public ResultVO collectionDictionary(String languageType, Integer userId, Integer fromType, Integer toType, String content, String translateContent) {
+    public ResultVO collectionDictionary(String languageType, Integer userId, Integer type, String content, String translateContent) {
 
         if (StringUtils.isEmpty(userId)){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
@@ -186,13 +155,23 @@ public class DictionaryServiceImpl implements DictionaryService {
         userCollectionDictionary.setUserId(userId);
         userCollectionDictionary.setContent(content);
         userCollectionDictionary.setTranslateContent(translateContent);
-        userCollectionDictionary.setFormType(fromType);
-        userCollectionDictionary.setToType(toType);
+        userCollectionDictionary.setType(type);
         userCollectionDictionary.setCreateTime(new Date());
 
         userCollectionDictionrayRepository.save(userCollectionDictionary);
 
         return ResultVOUtil.success(userCollectionDictionary);
+    }
+
+    @Override
+    public ResultVO getAllDictionary(String languageType, Integer userId) {
+
+        if (StringUtils.isEmpty(userId)){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
+        }
+        List<Dictionary> all = dictionaryRepository.findAll();
+
+        return ResultVOUtil.success(all);
     }
 
 }

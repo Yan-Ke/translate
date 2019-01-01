@@ -1,6 +1,8 @@
 package com.sian.translate.coupon.repository;
 
 import com.sian.translate.coupon.enity.Coupon;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,7 +18,7 @@ public interface CouponRepository extends JpaRepository<Coupon,Integer> {
      * @param userId
      * @return
      */
-    @Query(value = "SELECT umc.id as id,c.name as name,c.content as content,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.user_id = ?1 ORDER BY umc.end_time < NOW(),umc.is_use,umc.end_time ", nativeQuery = true)
+    @Query(value = "SELECT umc.id as id,c.name as name,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.user_id = ?1 ORDER BY umc.end_time < NOW(),umc.is_use,umc.end_time ", nativeQuery = true)
     List<Object[]> findAllCoupon(Integer userId);
 
     /***
@@ -25,7 +27,7 @@ public interface CouponRepository extends JpaRepository<Coupon,Integer> {
      * @param userId
      * @return
      */
-    @Query(value = "SELECT umc.id as id,c.name as name,c.content as content,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.is_use =0 and umc.user_id = ?1  and umc.end_time > NOW() ORDER BY umc.end_time < NOW(), umc.end_time ", nativeQuery = true)
+    @Query(value = "SELECT umc.id as id,c.name as name,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.is_use =0 and umc.user_id = ?1  and umc.end_time > NOW() ORDER BY umc.end_time < NOW(), umc.end_time ", nativeQuery = true)
     List<Object[]> findUnusedCoupon(Integer userId);
 
     /***
@@ -34,7 +36,7 @@ public interface CouponRepository extends JpaRepository<Coupon,Integer> {
      * @param userId
      * @return
      */
-    @Query(value = "SELECT umc.id as id,c.name as name,c.content as content,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.is_use =1 and umc.user_id = ?1  ORDER BY umc.end_time ", nativeQuery = true)
+    @Query(value = "SELECT umc.id as id,c.name as name,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.is_use =1 and umc.user_id = ?1  ORDER BY umc.end_time ", nativeQuery = true)
     List<Object[]> findUsedCoupon(Integer userId);
 
 
@@ -44,7 +46,7 @@ public interface CouponRepository extends JpaRepository<Coupon,Integer> {
      * @param userId
      * @return
      */
-    @Query(value = "SELECT umc.id as id,c.name as name,c.content as content,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.user_id = ?1 and umc.end_time < NOW()  ORDER BY umc.end_time ", nativeQuery = true)
+    @Query(value = "SELECT umc.id as id,c.name as name,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon as umc INNER JOIN coupon as c on umc.coupon_id = c.id WHERE umc.user_id = ?1 and umc.end_time < NOW()  ORDER BY umc.end_time ", nativeQuery = true)
     List<Object[]> finDoverdueCoupon(Integer userId);
 
 
@@ -61,8 +63,31 @@ public interface CouponRepository extends JpaRepository<Coupon,Integer> {
      * 支付时获取可以使用的优惠券列表
      * @return
      */
-    @Query(value ="SELECT umc.id as id,c.name as name,c.content as content,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon AS umc INNER JOIN coupon AS c ON umc.coupon_id = c.id WHERE umc.is_use = 0 AND umc.user_id = ?1  AND c.full_price <= ?2 AND umc.end_time > NOW() AND umc.begin_time < NOW() ORDER BY umc.end_time < NOW(), umc.end_time",nativeQuery = true)
+    @Query(value ="SELECT umc.id as id,c.name as name,umc.begin_time as beginTime,umc.end_time as endTime,c.full_price as fullPrice,c.reduce_price as reducePrice,c.id as couponId FROM user_mid_coupon AS umc INNER JOIN coupon AS c ON umc.coupon_id = c.id WHERE umc.is_use = 0 AND umc.user_id = ?1  AND c.full_price <= ?2 AND umc.end_time > NOW() AND umc.begin_time < NOW() ORDER BY umc.end_time < NOW(), umc.end_time",nativeQuery = true)
     List<Object[]> findPayCouponList(Integer userId, BigDecimal amount);
 
+
+
+
+    /***
+     * 通过优惠券名称查询优惠券
+     * @param pageable
+     * @return
+     */
+    Page<Coupon> findAllByNameLike(String name,Pageable pageable);
+
+    /***
+     * 查询所有优惠券
+     * @param pageable
+     * @return
+     */
+    Page<Coupon> findAll(Pageable pageable);
+
+    /**
+     * 通过id查询优惠券数量
+     * @param id
+     * @return
+     */
+    int countById(Integer id);
 
 }
