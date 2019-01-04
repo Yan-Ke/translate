@@ -58,6 +58,20 @@ public interface MemberPayRecordRepository extends JpaRepository<MemberPayRecord
      */
     long countByStatus(Integer status);
 
+    /****
+     * 获取今日支付成功的订单数量
+     * @return
+     */
+    @Query(value = "select count(1) from user_order where to_days(pay_time) = to_days(now())  and status = 1", nativeQuery = true)
+    long getTodayCount();
+
+
+    /****
+     * 获取今日支付成功的订单金额
+     * @return
+     */
+    @Query(value = "select SUM(amount) from user_order where to_days(pay_time) = to_days(now())  and status = 1", nativeQuery = true)
+    BigDecimal getTodayAmount();
 
     /***
      * 根据订单状态查询总金额
@@ -66,6 +80,107 @@ public interface MemberPayRecordRepository extends JpaRepository<MemberPayRecord
      */
     @Query(value = "SELECT SUM(amount) FROM user_order WHERE status = ?1 ", nativeQuery = true)
     BigDecimal getSumAmountByStatus(Integer status);
+
+
+    /****
+     * 获取7日内数据
+     * @return
+     */
+    @Query(value = "select a.click_date,ifnull(b.count,0) as count\n" +
+            "from (\n" +
+            "    SELECT curdate() as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 1 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 2 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 3 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 4 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 5 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 6 day) as click_date\n" +
+            ") a left join (\n" +
+            "  select date(pay_time) as pay_time, count(*) as count\n" +
+            "  from user_order\n" +
+            "  group by date(pay_time)\n" +
+            ") b on a.click_date = b.pay_time;\n", nativeQuery = true)
+    List<Object[]> getSevenDayOrderCount();
+
+
+    /****
+     * 获取30天订单数量
+     * @return
+     */
+    @Query(value = "select a.click_date,ifnull(b.count,0) as count\n" +
+            "from (\n" +
+            "    SELECT curdate() as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 1 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 2 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 3 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 4 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 5 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 6 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 7 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 8 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 9 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 10 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 11 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 12 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 13 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 14 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 15 day) as click_date\n" +
+            " union all\n" +
+            "    SELECT date_sub(curdate(), interval 16 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 17 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 18 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 19 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 20 day) as click_date\n" +
+            "    union all\n" +
+            "    SELECT date_sub(curdate(), interval 21 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 22 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 23 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 24 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 25 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 26 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 27 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 28 day) as click_date\n" +
+            "  union all\n" +
+            "    SELECT date_sub(curdate(), interval 29 day) as click_date\n" +
+            " \n" +
+            ") a left join (\n" +
+            "  select date(pay_time) as pay_time, count(*) as count\n" +
+            "  from user_order\n" +
+            "  group by date(pay_time)\n" +
+            ") b on a.click_date = b.pay_time;", nativeQuery = true)
+    List<Object[]> getMonthOrderCount();
 
 
 

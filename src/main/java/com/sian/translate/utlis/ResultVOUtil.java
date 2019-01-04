@@ -35,4 +35,23 @@ public class ResultVOUtil {
         return resultVO;
 
     }
+
+    public static ResultVO success(String logmsg) {
+
+        ResultVO resultVO = new ResultVO();
+        resultVO.setCode(0);
+        resultVO.setLogmsg(logmsg);
+        resultVO.setMsg("成功");
+        return resultVO;
+    }
+
+    public static ResultVO success(Object object,String logmsg) {
+
+        ResultVO resultVO = new ResultVO();
+        resultVO.setCode(0);
+        resultVO.setMsg("成功");
+        resultVO.setLogmsg(logmsg);
+        resultVO.setData(object);
+        return resultVO;
+    }
 }

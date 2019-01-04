@@ -210,7 +210,9 @@ public class CouponManageServiceImpl implements CounponManageService {
         coupon.setCount(count);
         couponRepository.save(coupon);
 
-        return ResultVOUtil.success(coupon);
+        String logmsg = "新增优惠券:"+name;
+
+        return ResultVOUtil.success(coupon,logmsg);
     }
 
     @Override
@@ -326,7 +328,10 @@ public class CouponManageServiceImpl implements CounponManageService {
         coupon.setUpdateTime(new Date());
         couponRepository.save(coupon);
 
-        return ResultVOUtil.success(coupon);
+        String logmsg = "修改优惠券:"+coupon.getName();
+
+
+        return ResultVOUtil.success(coupon,logmsg);
     }
 
     @Transactional
@@ -344,16 +349,20 @@ public class CouponManageServiceImpl implements CounponManageService {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_ID_NOT_EMPTY.getCode(), languageType));
         }
 
-        int count = couponRepository.countById(id);
-        if (count <= 0) {
+
+        Optional<Coupon> byId = couponRepository.findById(id);
+        if (!byId.isPresent()) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_NOT_EXIST.getCode(), languageType));
         }
+
+        Coupon coupon = byId.get();
 
         userMidCouponRepository.deleteByCouponId(id);
         couponRepository.deleteById(id);
 
+        String logmsg = "删除优惠券:"+coupon.getName();
 
-        return ResultVOUtil.success();
+        return ResultVOUtil.success(logmsg);
     }
 
     @Transactional
@@ -440,8 +449,10 @@ public class CouponManageServiceImpl implements CounponManageService {
             List<UserInfo> userInfoList = userInfoRepository.findAll();
             saveUserCouponRecord(id, coupon, receiveTime, userInfoList);
         }
+        String logmsg = "发放优惠券";
 
-        return ResultVOUtil.success(couponRecord);
+
+        return ResultVOUtil.success(couponRecord,logmsg);
     }
 
 

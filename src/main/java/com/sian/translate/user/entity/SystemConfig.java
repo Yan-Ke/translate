@@ -1,9 +1,13 @@
 package com.sian.translate.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import java.util.Date;
 
 
@@ -19,17 +23,9 @@ public class SystemConfig {
     private  Integer id;
     /**电话**/
     private String phone;
-
-    /**藏语内容**/
-    @JsonIgnore
-    private String zangContent;
-    /**中文内容**/
-    @JsonIgnore
-    private String chineseContent;
-
-    /**内容统一返回该字段**/
-    @Transient
+    /**内容**/
     private String content;
+
     /**创建人**/
     @JsonIgnore
     private  Integer createUser;
@@ -37,7 +33,8 @@ public class SystemConfig {
     @JsonIgnore
     private  Integer updateUser;
     /**创建时间**/
-    @JsonIgnore
+//    @JsonIgnore
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private  Date createTime;
     /**修改时间**/
     @JsonIgnore

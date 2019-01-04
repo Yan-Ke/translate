@@ -1,8 +1,13 @@
 package com.sian.translate.user.service.impl;
 
+import com.sian.translate.DTO.PageInfoDTO;
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.hint.enums.HintMessageEnum;
 import com.sian.translate.hint.service.HintMessageService;
+import com.sian.translate.management.systemset.enity.HelpCenter;
+import com.sian.translate.management.systemset.enity.Notify;
+import com.sian.translate.management.systemset.repository.HelpCenterRepository;
+import com.sian.translate.management.systemset.repository.NotifyRepository;
 import com.sian.translate.user.entity.SystemConfig;
 import com.sian.translate.user.entity.UserFeedback;
 import com.sian.translate.user.entity.UserInfo;
@@ -16,10 +21,19 @@ import com.sian.translate.utlis.ImageUtlis;
 import com.sian.translate.utlis.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -43,6 +57,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     SystemConfigRepositpory systemConfigRepositpory;
+
+    @Autowired
+    NotifyRepository notifyRepository;
+
+    @Autowired
+    HelpCenterRepository helpCenterRepository;
 
     @Override
     public ResultVO editUserInfo(MultipartFile file, UserInfo userInfo, String type) {
@@ -415,14 +435,90 @@ public class UserServiceImpl implements UserService {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.SYSTEM_CONFIG_EMPPPTY.getCode(), languageType));
         }
 
-        if (StringUtils.isEmpty(languageType) || languageType.equals("0")){
-            systemConfig.setContent(systemConfig.getChineseContent());
-        }else{
-            systemConfig.setContent(systemConfig.getZangContent());
-        }
+//        if (StringUtils.isEmpty(languageType) || languageType.equals("0")){
+//            systemConfig.setContent(systemConfig.getChineseContent());
+//        }else{
+//            systemConfig.setContent(systemConfig.getZangContent());
+//        }
 
         return ResultVOUtil.success(systemConfig);
     }
+
+    /**
+     * 获取通知列表
+     *
+     * @param languageType
+     * @param page
+     * @param size
+     **/
+    @Override
+    public ResultVO getNotifkList(String languageType, Integer page, Integer size) {
+
+        Sort sort = new Sort(Sort.Direction.DESC,"updateTime");
+
+        if (page < 1){
+            page = 1;
+        }
+        if (size < 1){
+            size = 1;
+        }
+
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<Notify> notifyPage = notifyRepository.findAll(new Specification<Notify>() {
+            @Override
+            public Predicate toPredicate(Root<Notify> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+
+                List<Predicate> predicate = new ArrayList<>();
+                if (!StringUtils.isEmpty(languageType)) {
+                    predicate.add(criteriaBuilder.equal(root.get("languageType"),  languageType));
+                }
+                return criteriaBuilder.and(predicate.toArray(new Predicate[predicate.size()]));
+
+            }
+        }, pageable);
+
+        PageInfoDTO pageInfoDTO = new PageInfoDTO();
+        pageInfoDTO.setTotalPages(notifyPage.getTotalPages());
+        pageInfoDTO.setTotalElements((int) notifyPage.getTotalElements());
+        pageInfoDTO.setPage(page);
+        pageInfoDTO.setSize(size);
+        pageInfoDTO.setList(notifyPage.getContent());
+
+        return ResultVOUtil.success(pageInfoDTO);
+
+    }
+
+    /**
+     * 获取帮助中心列表
+     *
+     * @param languageType
+     * @param page
+     * @param size
+     **/
+    @Override
+    public ResultVO getHelpCenterList(String languageType, Integer page, Integer size) {
+
+        Sort sort = new Sort(Sort.Direction.DESC,"updateTime");
+
+        if (page < 1){
+            page = 1;
+        }
+        if (size < 1){
+            size = 1;
+        }
+        Pageable pageable = PageRequest.of(page - 1 , size, sort);
+
+        Page<HelpCenter> notifyPage = helpCenterRepository.findAllByStatus(0, pageable);
+
+        PageInfoDTO pageInfoDTO = new PageInfoDTO();
+        pageInfoDTO.setTotalPages(notifyPage.getTotalPages());
+        pageInfoDTO.setTotalElements((int) notifyPage.getTotalElements());
+        pageInfoDTO.setPage(page);
+        pageInfoDTO.setSize(size);
+        pageInfoDTO.setList(notifyPage.getContent());
+
+        return ResultVOUtil.success(pageInfoDTO);       }
 
     private void setUserIsMember(UserInfo userInfo) {
         if (userInfo.getMemberBeginTime() != null

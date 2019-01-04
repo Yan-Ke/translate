@@ -3,6 +3,7 @@ package com.sian.translate.user.controller;
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.user.entity.UserInfo;
 import com.sian.translate.user.service.UserService;
+import com.sian.translate.utlis.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -179,8 +180,43 @@ public class UserController {
 
     @GetMapping(value = "/getConfig", produces = "application/json;charset=UTF-8")
     ResultVO getConfig(@RequestParam(value = "type", required = false) Integer type, @RequestParam(value = "languageType", required = false) String languageType) {
-
         return userService.getConfig(type,languageType);
     }
+
+    /***
+     * 获取验证码
+     * @param languageType
+     * @return
+     */
+
+    @GetMapping(value = "/getCode", produces = "application/json;charset=UTF-8")
+    ResultVO getCode(@RequestParam(value = "languageType", required = false) String languageType) {
+        //Todo
+        return ResultVOUtil.success();
+    }
+
+
+    /****
+     * 获取通知列表
+     * @return
+     */
+    @GetMapping(value = "/getNotifykList", produces = "application/json;charset=UTF-8")
+    ResultVO getNotifkList(@RequestParam(value = "languageType", required = false) String languageType,
+                            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                            @RequestParam(value = "size", required = false, defaultValue = "20") Integer size) {
+        return userService.getNotifkList(languageType, page, size);
+    }
+
+    /****
+     * 获取帮助中心列表
+     * @return
+     */
+    @GetMapping(value = "/getHelpCenterList", produces = "application/json;charset=UTF-8")
+    ResultVO getHelpCenterList(@RequestParam(value = "languageType", required = false) String languageType,
+                               @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                               @RequestParam(value = "size", required = false, defaultValue = "20") Integer size) {
+        return userService.getHelpCenterList(languageType, page, size);
+    }
+
 
 }

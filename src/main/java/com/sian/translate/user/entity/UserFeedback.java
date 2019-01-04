@@ -45,10 +45,15 @@ public class UserFeedback {
     @JsonIgnore
     private String image;
 
+    @JsonIgnore
+    private Integer handUser;
+
+    @JsonIgnore
+    private Date handTime;
+
+
     @Transient
     private List<String> images = new ArrayList<>();
-
-
 
 
 

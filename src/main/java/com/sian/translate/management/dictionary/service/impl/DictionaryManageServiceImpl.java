@@ -85,7 +85,9 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
 
         dictionaryRepository.save(dictionary);
 
-        return ResultVOUtil.success(dictionary);
+        String logmsg = "新增词典:"+name;
+
+        return ResultVOUtil.success(dictionary,logmsg);
     }
 
     @Override
@@ -136,7 +138,35 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
 
         dictionaryRepository.save(dictionary);
 
-        return ResultVOUtil.success(dictionary);
+        String logmsg = "修改词典:"+name;
+
+        return ResultVOUtil.success(dictionary,logmsg);
+    }
+
+    @Override
+    public ResultVO deleteDictionaryr(Integer id, HttpSession session) {
+        String languageType = "0";
+
+        Integer userId = (Integer) session.getAttribute(ManageUserService.SESSION_KEY);
+
+        if (StringUtils.isEmpty(userId)){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOT_LOGIN.getCode(), languageType));
+        }
+
+        if (id == null){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.DICTIONARY_ID_NOT_EMPTY.getCode(), languageType));
+        }
+
+        Optional<Dictionary> dictionaryOptional = dictionaryRepository.findById(id);
+        if (!dictionaryOptional.isPresent()){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.DICTIONARY_NOT_EXIST.getCode(), languageType));
+        }
+        Dictionary dictionary = dictionaryOptional.get();
+        dictionaryRepository.deleteById(id);
+
+        String logmsg = "删除词典:"+dictionary.getName();
+
+        return ResultVOUtil.success(logmsg);
     }
 
     @Override
@@ -241,7 +271,9 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
 
         thesaurusRepository.save(thesaurus);
 
-        return ResultVOUtil.success(thesaurus);
+        String logmsg = "新增词条"+"("+contentOne+"->"+contentTwo+")"+"至词典:"+dictionary.getName();
+
+        return ResultVOUtil.success(thesaurus,logmsg);
     }
 
     @Override
@@ -279,7 +311,10 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
         thesaurus.setUpdateTime(new Date());
         thesaurusRepository.save(thesaurus);
 
-        return ResultVOUtil.success(thesaurus);
+        String logmsg = "修改词条"+"("+contentOne+"->"+contentTwo+")";
+
+
+        return ResultVOUtil.success(thesaurus,logmsg);
     }
 
     @Override
@@ -300,9 +335,11 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
         if (!thesaurusOptional.isPresent()){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.THESAURUS_NOT_EXIST.getCode(), languageType));
         }
+        Thesaurus thesaurus = thesaurusOptional.get();
         thesaurusRepository.deleteById(thesaurusId);
 
+        String logmsg = "删除词条"+"("+thesaurus.getContentOne()+"->"+thesaurus.getContentTwo()+")";
 
-        return ResultVOUtil.success();
+        return ResultVOUtil.success(logmsg);
     }
 }

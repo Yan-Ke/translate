@@ -13,5 +13,5 @@ public interface DictionaryService {
 
     ResultVO collectionDictionary(String languageType, Integer userId, Integer type, String content, String translateContent);
 
-    ResultVO getAllDictionary(String languageType, Integer userId);
+    ResultVO getAllDictionary(String languageType, Integer type, Integer userId);
 }

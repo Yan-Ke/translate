@@ -32,4 +32,10 @@ public interface UserService {
 
     /**获取系统配置**/
     ResultVO getConfig(Integer type, String languageType);
+
+    /**获取通知列表**/
+    ResultVO getNotifkList(String languageType, Integer page, Integer size);
+
+    /**获取帮助中心列表**/
+    ResultVO getHelpCenterList(String languageType, Integer page, Integer size);
 }

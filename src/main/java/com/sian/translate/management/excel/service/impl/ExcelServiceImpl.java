@@ -274,7 +274,8 @@ public class ExcelServiceImpl implements ExcelService {
         List<Thesaurus> result = thesaurusRepository.saveAll(thesaurusArrayList);
 
         if (errorMap.isEmpty()) {
-            return ResultVOUtil.success("上传成功" + result.size() + "条记录");
+            String losmsg = "导入词条至词典:"+dictionary.getName()+","+result.size()+ "条记录";
+            return ResultVOUtil.success("上传成功" + result.size() + "条记录",losmsg);
         } else {
             StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append("上传成功" + result.size() + "条记录;");
@@ -322,7 +323,7 @@ public class ExcelServiceImpl implements ExcelService {
             Dictionary dictionary = dictionaryOptional.get();
 
 
-            /***词典类型 1藏汉 2藏英 3藏日 4藏梵****/
+            /***词典类型 1藏汉2 汉藏3 臧英 4英臧 5臧臧 6臧梵7 汉汉****/
             Integer type = dictionary.getType();
             String excelName = dictionary.getName();
             String columnOne = "ID";
@@ -333,14 +334,23 @@ public class ExcelServiceImpl implements ExcelService {
                 columTwo = "藏语";
                 columThree = "汉语";
             } else if (type == 2) {
-                columTwo = "藏语";
-                columThree = "英语";
+                columTwo = "汉语";
+                columThree = "藏语";
             } else if (type == 3) {
                 columTwo = "藏语";
-                columThree = "日语";
+                columThree = "英语";
             } else if (type == 4) {
+                columTwo = "英语";
+                columThree = "藏语";
+            }else if (type == 5){
+                columTwo = "藏语";
+                columThree = "藏语";
+            }else if (type == 6) {
                 columTwo = "藏语";
                 columThree = "梵语";
+            }else if (type == 7) {
+                columTwo = "汉语";
+                columThree = "汉语";
             }
 
             ExcelData data = new ExcelData();
@@ -376,7 +386,7 @@ public class ExcelServiceImpl implements ExcelService {
     }
 
     @Override
-    public ResultVO exportMemberPayRecord(String beginTime, String endTime, String orderNo, String nickName, Integer page, Integer size, HttpServletResponse response, HttpSession session) throws Exception {
+    public ResultVO exportMemberPayRecord(String beginTime, String endTime, String orderNo, String nickName, Integer month ,Integer page, Integer size, HttpServletResponse response, HttpSession session) throws Exception {
         String languageType = "0";
 
         if (page == -1) {
@@ -384,7 +394,7 @@ public class ExcelServiceImpl implements ExcelService {
             page = 1;
             size = (int) count;
         }
-        ResultVO resultVO = manageMemberService.getAllMemberPayRecordList(beginTime, endTime, orderNo, nickName, page, size, session);
+        ResultVO resultVO = manageMemberService.getAllMemberPayRecordList(beginTime, endTime, orderNo, nickName, month,page, size, session);
         if (resultVO.getCode() != 0) {
             return resultVO;
         }

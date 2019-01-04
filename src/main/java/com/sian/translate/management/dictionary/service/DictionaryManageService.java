@@ -12,6 +12,8 @@ public interface DictionaryManageService {
 
     ResultVO editDictionaryr(Integer id, String name, Integer type, Integer isMemberVisible, MultipartFile image, HttpSession session);
 
+    ResultVO deleteDictionaryr(Integer id, HttpSession session);
+
     ResultVO getAllDictionary(HttpSession session);
 
     ResultVO getThesaurusList(Integer id, String name,Integer page, Integer size, HttpSession session);

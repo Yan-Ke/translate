@@ -53,7 +53,6 @@ public class BannerManageController {
 
     /****
      *  修改banner
-     * @param type 0汉语 1藏语
      * @return
      */
 

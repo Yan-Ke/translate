@@ -100,7 +100,8 @@ public class InformationManageServiceImpl implements InformationManageService {
 
         informationRepository.save(information);
 
-        return ResultVOUtil.success(information);
+        String losmsg = "新增资讯:"+information.getTitle();
+        return ResultVOUtil.success(information,losmsg);
     }
 
     @Override
@@ -187,8 +188,10 @@ public class InformationManageServiceImpl implements InformationManageService {
         information.setUpdateUser(userId);
         information.setUpdateTime(new Date());
         informationRepository.save(information);
+        String losmsg = "编辑资讯:"+information.getTitle();
 
-        return ResultVOUtil.success(information);       }
+        return ResultVOUtil.success(information,losmsg);
+    }
 
     @Override
     public ResultVO deleteInformotion(Integer informationId, HttpSession session) {
@@ -208,10 +211,14 @@ public class InformationManageServiceImpl implements InformationManageService {
         if (!informationOptional.isPresent()){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.INFORMATION_NOT_EXIST.getCode(), languageType));
         }
+        Information information = informationOptional.get();
 
         informationRepository.deleteById(informationId);
 
-        return ResultVOUtil.success();
+        String losmsg = "删除资讯:"+information.getTitle();
+
+
+        return ResultVOUtil.success(losmsg);
     }
 
     @Override

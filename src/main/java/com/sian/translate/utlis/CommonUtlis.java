@@ -3,9 +3,12 @@ package com.sian.translate.utlis;
 import com.sian.translate.hint.enums.HintMessageEnum;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -200,5 +203,67 @@ public class CommonUtlis {
             return null;
         }
     }
+
+
+    public static boolean  isNumerOrLetter(String content){
+
+        for(int i=content.length();--i>=0;){
+
+//            int chr=content.charAt(i);
+
+            char ch = content.charAt(i);
+
+
+
+            boolean isNum = (ch>='0' && ch<='9');
+            boolean isLetter = (ch>='A' && ch<='Z'  ||  ch>='a' && ch<='z');
+
+
+           if (!isNum && !isLetter){
+               return false;
+           }
+        }
+
+        return  true;
+    }
+
+    public static String getIpAddr(HttpServletRequest request) {
+        String ipAddress = null;
+        try {
+            ipAddress = request.getHeader("x-forwarded-for");
+            if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+                ipAddress = request.getHeader("Proxy-Client-IP");
+            }
+            if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+                ipAddress = request.getHeader("WL-Proxy-Client-IP");
+            }
+            if (ipAddress == null || ipAddress.length() == 0 || "unknown".equalsIgnoreCase(ipAddress)) {
+                ipAddress = request.getRemoteAddr();
+                if (ipAddress.equals("127.0.0.1")) {
+                    // 根据网卡取本机配置的IP
+                    InetAddress inet = null;
+                    try {
+                        inet = InetAddress.getLocalHost();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                    ipAddress = inet.getHostAddress();
+                }
+            }
+            // 对于通过多个代理的情况，第一个IP为客户端真实IP,多个IP按照','分割
+            if (ipAddress != null && ipAddress.length() > 15) { // "***.***.***.***".length()
+                // = 15
+                if (ipAddress.indexOf(",") > 0) {
+                    ipAddress = ipAddress.substring(0, ipAddress.indexOf(","));
+                }
+            }
+        } catch (Exception e) {
+            ipAddress="";
+        }
+        // ipAddress = this.getRequest().getRemoteAddr();
+
+        return ipAddress;
+    }
+
 
 }

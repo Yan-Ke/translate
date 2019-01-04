@@ -80,6 +80,7 @@ public class ManageUserMember {
      * @param endTime 支付时间 结束 时间搓
      * @param orderNo  订单编号
      * @param nickName 会员昵称
+     * @param month 几个月
      * @return
      */
     @GetMapping(value = "/getAllMemberPayRecordList", produces = "application/json;charset=UTF-8")
@@ -87,10 +88,11 @@ public class ManageUserMember {
                                        @RequestParam(value = "endTime", required = false)String endTime,
                                        @RequestParam(value = "orderNo", required = false)String orderNo,
                                        @RequestParam(value = "nickName", required = false)String nickName,
+                                       @RequestParam(value = "month", required = false)Integer month,
                                        @RequestParam(value = "page", required = false,defaultValue = "1")Integer page,
                                     @RequestParam(value = "size", required = false,defaultValue = "20")Integer size,
                                     HttpSession session) {
-        return  manageMemberService.getAllMemberPayRecordList(beginTime,endTime,orderNo,nickName,page,size,session);
+        return  manageMemberService.getAllMemberPayRecordList(beginTime,endTime,orderNo,nickName,month,page,size,session);
     }
 
 

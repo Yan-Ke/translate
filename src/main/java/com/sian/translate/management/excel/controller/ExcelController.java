@@ -110,6 +110,7 @@ public class ExcelController {
                                    @RequestParam(value = "endTime", required = false) String endTime,
                                    @RequestParam(value = "orderNo", required = false) String orderNo,
                                    @RequestParam(value = "nickName", required = false) String nickName,
+                                   @RequestParam(value = "month", required = false) Integer month,
                                    @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                    @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
                                    HttpServletResponse response,
@@ -117,7 +118,7 @@ public class ExcelController {
 
 
         try {
-            ResultVO resultVO = excelService.exportMemberPayRecord(beginTime, endTime, orderNo, nickName, page, size,response, session);
+            ResultVO resultVO = excelService.exportMemberPayRecord(beginTime, endTime, orderNo, nickName,month, page, size,response, session);
             if (resultVO.getCode() == 0) {
                 return null;
             } else {

@@ -230,7 +230,9 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         memberConfigRepository.deleteAll();
         memberConfigRepository.saveAll(memberConfigList);
 
-        return ResultVOUtil.success(memberConfigList);
+        String losmsg = "新增会员配置";
+
+        return ResultVOUtil.success(memberConfigList,losmsg);
     }
 
     @Override
@@ -436,11 +438,14 @@ public class ManageMemberServiceImpl implements ManageMemberService {
 
         memberConfigRepository.save(memberConfig);
 
-        return ResultVOUtil.success(memberConfig);
+        String losmsg = "编辑会员配置";
+
+
+        return ResultVOUtil.success(memberConfig,losmsg);
     }
 
     @Override
-    public ResultVO getAllMemberPayRecordList(String beginTime,String endTime, String orderNo, String nickName, Integer page, Integer size, HttpSession session) {
+    public ResultVO getAllMemberPayRecordList(String beginTime,String endTime, String orderNo, String nickName, Integer month,Integer page, Integer size, HttpSession session) {
         String languageType = "0";
 
         Integer userId = (Integer) session.getAttribute(ManageUserService.SESSION_KEY);
@@ -530,6 +535,9 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         if (!StringUtils.isEmpty(nickName)){
             whereSql.append(" AND ui.nick_name like :nickName");
         }
+        if (month != null){
+            whereSql.append(" AND uo.month = :month");
+        }
 
         //组装sql语句
         dataSql.append(whereSql).append(" order by uo.pay_time desc");
@@ -559,6 +567,11 @@ public class ManageMemberServiceImpl implements ManageMemberService {
             dataQuery.setParameter("nickName", "%"+ nickName + "%");
             countQuery.setParameter("nickName", "%" + nickName + "%");
         }
+        if (month != null){
+            dataQuery.setParameter("month", month);
+            countQuery.setParameter("month", month);
+        }
+
         dataQuery.setFirstResult(page - 1);
         dataQuery.setMaxResults(size);
 

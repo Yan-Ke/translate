@@ -71,14 +71,14 @@ public enum HintMessageEnum {
     BANNER_CONTENT_NOT_EMPTY(1019,"banner内容不能为空"),
     BANNER_URL_NOT_EMPTY(1020,"banner的url链接不能为空"),
     BANNER_LANGUAGE_NOT_EMPTY(1021,"banner语言类型不能为空"),
-    BANNER_ID_NOT_EMPTY(1022,"bannerId不能为空"),
+    BANNER_ID_NOT_EMPTY(1022,"bannerID不能为空"),
     BANNER_NOT_EXIST(1023,"该条banner记录不存在"),
 
     INFORMATION_TITLE_NOT_EMPTY(1024,"资讯标题不能为空"),
     INFORMATION_CONTENT_URL_NOT_EMPTY(1025,"资讯内容和外部链接不能同时为空"),
     INFORMATION_TYPE_NOT_EMPTY(1025,"资讯类型不能为空"),
     INFORMATION_LANGUAGETYPE_NOT_EMPTY(1026,"资讯语言类型不能为空"),
-    INFORMATION_ID_NOT_EMPTY(1027,"资讯Id不能为空"),
+    INFORMATION_ID_NOT_EMPTY(1027,"资讯ID不能为空"),
     INFORMATION_NOT_EXIST(1028,"该条资讯记录不存在"),
 
     COUPON_NAME_NOT_EMPTY(1029,"优惠卷名称不能为空"),
@@ -128,6 +128,47 @@ public enum HintMessageEnum {
     PAY_TIME_FORMAT_ERROR(1059,"支付日期格式错误"),
 
     PAY_RECORD_IS_EMPTY(1060,"无购买记录"),
+
+    ROLE_NAME_IS_NOT_EMPTY(1061,"角色名称不能为空"),
+    STATUS_IS_NOT_EMPTY(1062,"状态不能为空"),
+    ROLE_NAME_IS_EXIST(1063,"该角色名称已经存在"),
+
+    ROLE_ID_IS_NOT_EMPTY(1064,"角色ID不能为空"),
+    ROLE_IS_NOT_EXIST(1065,"该角色不存在"),
+
+
+    MANAGE_ACCOUNT_NOT_EMPTY(1066,"用户名不能为空"),
+    MANAGE_ACCOUNT_LENGTH_ERROR(1067,"用户名长度为4-12位"),
+    MANAGE_ACCOUNT_FORMAT_ERROR(1068,"用户名只能位数字或字母组合"),
+    MANAGE_USERNAME_NOT_EMPTY(1069,"真实姓名不能为空"),
+    MANAGE_ACCOUNT_IS_EXIST(1070,"用户名已存在"),
+
+
+    FEEDBACK_ID_IS_NOT_NULL(1071,"反馈数据ID不能为空"),
+    FEEDBACK_IS_NOT_EXIST(1072,"反馈数据不存在"),
+    FEEDBACK_IS_HANDER1072(1073,"反馈数据已经处理"),
+
+    NOTIFY_TITLE_NOT_EMPTY(1074,"通知标题不能为空"),
+    NOTIFY_CONTENT_NOT_EMPTY(1075,"通知内容不能为空"),
+    NOTIFY_ID_NOT_EMPTY(1076,"通知ID不能为空"),
+    NOTIFY_IS_NOT_EXIST(1077,"通知不存在"),
+
+
+    HELP_TITLE_NOT_EMPTY(1078,"帮助标题不能为空"),
+    HELP_CONTENT_NOT_EMPTY(1079,"帮助内容不能为空"),
+    HELP_ID_NOT_EMPTY(1080,"帮助ID不能为空"),
+    HELPIS_NOT_EXIST(1081,"帮助不存在"),
+    HELP_STATUS_NOT_EMPTY(1082,"帮助状态不能为空"),
+
+
+    REGISTE_PROTOCOL_CONTENT_NOT_EMPTY(1083,"注册协议内容不能为空"),
+
+    ABOUT_ME_CONTENT_NOT_EMPTY(1084,"关于内容不能为空"),
+    ABOUT_ME_PHONE_NOT_EMPTY(1085,"关于我们手机号码不能为空"),
+
+
+    DAY_NOT_EMPTY(1086,"天数不能位空"),
+
 
     ;
 

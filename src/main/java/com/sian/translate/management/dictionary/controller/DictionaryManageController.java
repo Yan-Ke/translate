@@ -34,6 +34,21 @@ public class DictionaryManageController {
         return dictionaryManageService.addDictionaryr(name, type, isMemberVisible, image, session);
     }
 
+
+    /****
+     *  删除词典
+     *
+     * @param  id 词典id
+     * @return
+     */
+
+    @PostMapping(value = "/deleteDictionaryr", produces = "application/json;charset=UTF-8")
+    ResultVO deleteDictionaryr(@RequestParam(value = "id", required = false) Integer id,
+                             HttpSession session) {
+        return dictionaryManageService.deleteDictionaryr(id, session);
+    }
+
+
     /****
      * 获取所有词典
      * @return

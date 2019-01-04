@@ -15,7 +15,7 @@ public interface ExcelService {
 
     ResultVO exportThesaurus(Integer id, String name, HttpServletResponse response, Integer page, Integer size, HttpSession session) throws Exception;
 
-    ResultVO exportMemberPayRecord(String beginTime, String endTime, String orderNo, String nickName, Integer page, Integer size, HttpServletResponse response, HttpSession session) throws Exception;
+    ResultVO exportMemberPayRecord(String beginTime, String endTime, String orderNo, String nickName, Integer month,Integer page, Integer size, HttpServletResponse response, HttpSession session) throws Exception;
 
     ResultVO exportFinancialInfo(String beginTime, String endTime, Integer page, Integer size, HttpServletResponse response, HttpSession session) throws Exception;
 }

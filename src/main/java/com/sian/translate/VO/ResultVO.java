@@ -1,5 +1,7 @@
 package com.sian.translate.VO;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 /**
@@ -13,5 +15,9 @@ public class ResultVO<T> {
 
     private String msg;
 
+    @JsonIgnore
+    private String logmsg;
+
+    @JsonInclude(value= JsonInclude.Include.NON_NULL)
     private T data;
 }

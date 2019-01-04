@@ -16,7 +16,7 @@ public class DictionaryController {
      *  获取该词对应的翻译内容
      * @param languageType app语言
      * @param userId 用户id
-     * @param type 词典类型 1藏汉 2藏英 3藏日 4藏梵
+     * @param type 词典类型 1藏汉2 汉藏3 臧英 4英臧 5臧臧 6臧梵7 汉汉
      * @param content 需要翻译的内容
      * @return
      */
@@ -24,8 +24,8 @@ public class DictionaryController {
     ResultVO translate(@RequestParam(value = "languageType", required = false) String languageType,
                        @RequestParam(value = "userId", required = false) Integer userId,
                        @RequestParam(value = "type", required = false) Integer type,
-                       @RequestParam(value = "content",required = false) String content) {
-        return  dictionaryService.translate(languageType,userId,type,content);
+                       @RequestParam(value = "content", required = false) String content) {
+        return dictionaryService.translate(languageType, userId, type, content);
     }
 
 
@@ -40,9 +40,9 @@ public class DictionaryController {
     @GetMapping(value = "/getTranslateRecord", produces = "application/json;charset=UTF-8")
     ResultVO getTranslateRecord(@RequestParam(value = "languageType", required = false) String languageType,
                                 @RequestParam(value = "userId", required = false) Integer userId,
-                                @RequestParam(value = "page", required = false,defaultValue = "1")Integer page,
-                                @RequestParam(value = "size", required = false,defaultValue = "20")Integer size) {
-        return  dictionaryService.getTranslateRecord(languageType,userId,page,size);
+                                @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                                @RequestParam(value = "size", required = false, defaultValue = "20") Integer size) {
+        return dictionaryService.getTranslateRecord(languageType, userId, page, size);
     }
 
 
@@ -50,17 +50,17 @@ public class DictionaryController {
      *  收藏单词
      * @param languageType app语言
      * @param userId 用户id
-     * @param type 词典类型 1藏汉 2藏英 3藏日 4藏梵
+     * @param type 词典类型 1藏汉2 汉藏3 臧英 4英臧 5臧臧 6臧梵7 汉汉
      * @param content 需要翻译的内容
      * @return
      */
     @PostMapping(value = "/collectionDictionary", produces = "application/json;charset=UTF-8")
     ResultVO collectionDictionary(@RequestParam(value = "languageType", required = false) String languageType,
-                       @RequestParam(value = "userId", required = false) Integer userId,
-                       @RequestParam(value = "type", required = false) Integer type,
-                       @RequestParam(value = "content",required = false) String content,
-                       @RequestParam(value = "translateContent",required = false) String translateContent) {
-        return  dictionaryService.collectionDictionary(languageType,userId,type,content,translateContent);
+                                  @RequestParam(value = "userId", required = false) Integer userId,
+                                  @RequestParam(value = "type", required = false) Integer type,
+                                  @RequestParam(value = "content", required = false) String content,
+                                  @RequestParam(value = "translateContent", required = false) String translateContent) {
+        return dictionaryService.collectionDictionary(languageType, userId, type, content, translateContent);
     }
 
     /*****
@@ -73,22 +73,26 @@ public class DictionaryController {
      */
     @GetMapping(value = "/getUserCollectionDictionary", produces = "application/json;charset=UTF-8")
     ResultVO getUserCollectionDictionary(@RequestParam(value = "languageType", required = false) String languageType,
-                                @RequestParam(value = "userId", required = false) Integer userId,
-                                @RequestParam(value = "page", required = false,defaultValue = "1")Integer page,
-                                @RequestParam(value = "size", required = false,defaultValue = "20")Integer size) {
-        return  dictionaryService.getUserCollectionDictionary(languageType,userId,page,size);
+                                         @RequestParam(value = "userId", required = false) Integer userId,
+                                         @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                                         @RequestParam(value = "size", required = false, defaultValue = "20") Integer size) {
+        return dictionaryService.getUserCollectionDictionary(languageType, userId, page, size);
     }
 
 
     /****
      * 获取所有词典
      * @param languageType
+     * @param type 0全部 1藏汉2 汉藏3 臧英 4英臧 5臧臧 6臧梵7 汉汉
      * @return
      */
     @GetMapping(value = "/getAllDictionary", produces = "application/json;charset=UTF-8")
-    ResultVO getAllDictionary(@RequestParam(value = "languageType", required = false) String languageType,@RequestParam(value = "userId", required = false) Integer userId){
-        return dictionaryService.getAllDictionary(languageType,userId);
+    ResultVO getAllDictionary(@RequestParam(value = "languageType", required = false) String languageType,
+                              @RequestParam(value = "type", required = false,defaultValue = "0") Integer type,
+                              @RequestParam(value = "userId", required = false) Integer userId) {
+        return dictionaryService.getAllDictionary(languageType,type, userId);
     }
+
 
 
 

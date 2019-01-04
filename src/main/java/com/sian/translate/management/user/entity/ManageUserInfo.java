@@ -4,11 +4,9 @@ package com.sian.translate.management.user.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 
 /***
@@ -38,8 +36,30 @@ public class ManageUserInfo {
     @JsonIgnore
     private String password;
 
-    /**角色(1.超级管理员所有权限 2.管理员 3.普通人员)**/
+    /**用户头像**/
+    private String headImage;
+
+    /**角色id**/
+    @JsonIgnore
     private Integer role;
+
+    /**角色名称**/
+    private String roleName;
+
+    /**0正常1禁用**/
+    private Integer userStatus;
+
+    /**创建人id**/
+    @JsonIgnore
+    private Integer createUser;
+
+    /**修改人id**/
+    @JsonIgnore
+    private Integer updateUser;
+
+
+    @Transient
+    private List<ManageResource> manageResourceList;
 
     /**创建用户时间**/
     @JsonIgnore
@@ -49,5 +69,5 @@ public class ManageUserInfo {
     /**更新时间**/
     @JsonIgnore
 //    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date update_time;
+    private Date updateTime;
 }

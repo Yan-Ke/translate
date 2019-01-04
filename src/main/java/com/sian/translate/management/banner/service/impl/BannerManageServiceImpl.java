@@ -76,7 +76,7 @@ public class BannerManageServiceImpl implements BannerManageService {
 
         bannerRepository.save(banner);
 
-        return ResultVOUtil.success(banner);
+        return ResultVOUtil.success(banner,"新增banner,内容位:"+content+",url="+url);
     }
 
     @Override
@@ -138,7 +138,10 @@ public class BannerManageServiceImpl implements BannerManageService {
         banner.setUpdateTime(new Date());
         bannerRepository.save(banner);
 
-        return ResultVOUtil.success(banner);    }
+        return ResultVOUtil.success(banner,"修改id="+bannerId+"的banner,内容位:"+content+",url="+url);
+
+
+    }
 
     @Override
     public ResultVO deleteBanner(Integer bannerId, HttpSession session) {
@@ -160,7 +163,7 @@ public class BannerManageServiceImpl implements BannerManageService {
         }
         bannerRepository.deleteById(bannerId);
 
+        return ResultVOUtil.success("删除id="+bannerId+"的banner");
 
-        return ResultVOUtil.success();
     }
 }

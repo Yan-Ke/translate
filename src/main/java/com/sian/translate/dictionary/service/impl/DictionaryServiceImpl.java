@@ -19,10 +19,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -57,7 +63,6 @@ public class DictionaryServiceImpl implements DictionaryService {
         if(type == null){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.TRANSLATE_TYPE_EMPTY.getCode(), languageType));
         }
-
 
         Thesaurus thesaurus = thesaurusRepository.findFirstByContentOneAndType(content, type);
         if (thesaurus == null){
@@ -164,14 +169,29 @@ public class DictionaryServiceImpl implements DictionaryService {
     }
 
     @Override
-    public ResultVO getAllDictionary(String languageType, Integer userId) {
+    public ResultVO getAllDictionary(String languageType, Integer type, Integer userId) {
 
         if (StringUtils.isEmpty(userId)){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
         }
-        List<Dictionary> all = dictionaryRepository.findAll();
+
+
+        List<Dictionary> all = dictionaryRepository.findAll(new Specification<Dictionary>() {
+            @Override
+            public Predicate toPredicate(Root<Dictionary> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+
+                List<Predicate> predicates = new ArrayList<>();
+
+                if (type != 0){
+                    predicates.add(criteriaBuilder.equal(root.get("type"),type ));
+                }
+
+                return criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()]));
+            }
+        });
 
         return ResultVOUtil.success(all);
     }
+
 
 }
