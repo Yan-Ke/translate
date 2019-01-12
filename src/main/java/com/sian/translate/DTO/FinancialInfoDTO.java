@@ -1,10 +1,8 @@
 package com.sian.translate.DTO;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 /***
  * 财务流水
@@ -12,8 +10,11 @@ import java.util.Date;
 @Data
 public class FinancialInfoDTO {
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private Date payTime;
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+//    private Date payTime;
+
+    private String payTimeString;
+
 
     /**日订单数量**/
     private long dayCount;

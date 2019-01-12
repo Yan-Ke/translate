@@ -29,7 +29,7 @@ public class InformationServiceImpl implements InformationService {
         if (!StringUtils.isEmpty(languageType) && languageType.equals("1")){
             type = 1;
         }
-        Sort sort = new Sort(Sort.Direction.DESC,"order").and(new Sort(Sort.Direction.DESC, "createTime"));
+        Sort sort = new Sort(Sort.Direction.DESC,"infomationOrder").and(new Sort(Sort.Direction.DESC, "createTime"));
         if (page < 1){
             page = 1;
         }

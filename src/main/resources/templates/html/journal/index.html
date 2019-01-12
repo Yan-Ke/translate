@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <link href="../../css/index.css" rel="stylesheet">
+    <link href="../../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../font/iconfont.css">
+    <link rel="stylesheet" href="../../css/public.css">
+</head>
+<body class="graybg">
+    <div class="wrapper-content">
+        <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>管理日志</h5>
+            <div class="ibox-tools"></div>
+        </div>
+        <div class="ibox-content">
+            <!-- <div class="row admin-mt10">
+                <div class="col-sm-8 admin-mt5">
+                    <a href="add.html" class="btn btn-primary btn-w-m">添加帮助</a>
+                </div>
+                <div class="col-sm-4" style="padding-left:0">
+                    <div class="input-group">
+                        <input type="text" id="search" name="search" placeholder="请输入帮助标题查找" class=" form-control"> 
+                        <span class="input-group-btn">
+                           <button type="submit" class="btn  btn-primary"> 查找</button>
+                         </span>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="col-sm-6">
+                合计：<span th:text="${totalElements}" class="color-primary"> </span>  条
+            </div>
+
+            <table class="table table-hover admin-mt40 table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>管理员</th>
+                        <th>操作详情</th>
+                        <th>操作时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr id="selectIds" th:each="manageLog : ${manageLogList}">
+                        <td th:text="${manageLog.id}"></td>
+                        <td th:text="${manageLog.account}"></td>
+                        <td th:text="${manageLog.content}">---</td>
+                        <td th:text="${manageLog.createTime}"></td>
+                    </tr>
+                    <!--搜索无结果-->
+                        <tr class="not_tr">
+                            <td colspan="4">
+                                <div>
+                                    <img th:style="${manageLogList.size()}>0?'display:none;':''" src="../../image/nodat.png">
+                                    <p class="text-center" th:text="${manageLogList.size()}<1?'暂无相关信息':''"></p>
+                                </div>
+                            </td>
+                        </tr>
+                </tbody>
+
+            </table>
+            <!--分页-->
+            <div class="text-center">
+                <ul class="pagination">
+                    <li th:class="${indexPage==1}?'disabled' : ''"><a
+                            th:class="${indexPage==1}?'btn disabled' : ''" th:href="@{/manage/system/manageLog(page= ${indexPage-1})}">上一页</a>
+                    </li>
+                    <li th:if="${indexPage-3 >=1}"><a
+                            th:href="@{/manage/system/manageLog(page= ${indexPage-3})}"
+                            th:text="${indexPage -3}">1</a></li>
+                    <li th:if="${indexPage-2 >=1}"><a
+                            th:href="@{/manage/system/manageLog(page= ${indexPage-2})}"
+                            th:text="${indexPage -2}">1</a></li>
+                    <li th:if="${indexPage-1 >=1}"><a
+                            th:href="@{/manage/system/manageLog(page= ${indexPage-1})}"
+                            th:text="${indexPage -1}">1</a></li>
+                    <li class="active"><a href="#" th:text="${indexPage}">1</a></li>
+                    <li th:if="${indexPage+1 <=totalPage}"><a
+                            th:href="@{/manage/system/manageLog(page= ${indexPage+1})}"
+                            th:text="${indexPage +1}">1</a></li>
+                    <li th:if="${indexPage+2 <=totalPage}"><a
+                            th:href="@{/manage/system/manageLog(page= ${indexPage+2})}"
+                            th:text="${indexPage +2}">1</a></li>
+                    <li th:if="${indexPage+3 <=totalPage}"><a
+                            th:href="@{/manage/system/manageLog(page= ${indexPage+3})}"
+                            th:text="${indexPage +3}">1</a></li>
+
+                    <li th:class="${indexPage==totalPage || totalPage < 1}?'disabled' : ''"><a
+                            th:class="${indexPage==totalPage || totalPage < 1}?'btn disabled' : ''" th:href="@{/manage/system/manageLog(page= ${indexPage+1})}">下一页</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+</body> 
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<!-- 自定义js -->
+<!-- <script src="../../js/hplus.js?v=4.1.0"></script> -->
+<script type="text/javascript" src="../../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<!-- Input Mask-->
+<script src="../../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- suggest -->
+<script src="../../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../layer/layer.js"></script>
+<script src="../../layui/layui.js"></script>
+<!--高德地图api-->
+</html>

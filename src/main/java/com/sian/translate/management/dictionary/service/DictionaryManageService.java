@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 public interface DictionaryManageService {
 
 
-    ResultVO addDictionaryr(String name, Integer type, Integer isMemberVisible, MultipartFile image, HttpSession session);
+    ResultVO addDictionaryr(String name, Integer type, Integer isMemberVisible, String image, HttpSession session);
 
     ResultVO editDictionaryr(Integer id, String name, Integer type, Integer isMemberVisible, MultipartFile image, HttpSession session);
 
@@ -24,4 +24,5 @@ public interface DictionaryManageService {
 
     ResultVO deleteThesaurus(Integer thesaurusId, HttpSession session);
 
+    ResultVO getNewThesaurus();
 }

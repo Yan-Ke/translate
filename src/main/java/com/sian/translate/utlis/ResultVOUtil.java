@@ -54,4 +54,13 @@ public class ResultVOUtil {
         resultVO.setData(object);
         return resultVO;
     }
+
+    public static ResultVO uploadSuccess(String imagePath) {
+
+        ResultVO resultVO = new ResultVO();
+        resultVO.setCode(0);
+        resultVO.setData(imagePath);
+        resultVO.setMsg("成功");
+        return resultVO;
+    }
 }

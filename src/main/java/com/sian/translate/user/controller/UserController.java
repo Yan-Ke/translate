@@ -111,7 +111,7 @@ public class UserController {
      * @param nickName 昵称
      * @param sex 性别 1男 2女
      * @param age 年龄
-     * @param education 学历
+     * @param educationId 学历ID
      * @param languageType 语言 0 汉语 1 藏语
      * @param file 头像
      * @return
@@ -121,8 +121,10 @@ public class UserController {
                                  @RequestParam(value = "nickName", required = false) String nickName,
                                  @RequestParam(value = "sex", required = false) Integer sex,
                                  @RequestParam(value = "age", required = false) Integer age,
-                                 @RequestParam(value = "education", required = false) String education,
-                                 @RequestParam(value = "languageType", required = false) String languageType,
+                                 @RequestParam(value = "education", required = false) Integer educationId,
+                                 @RequestParam(value = "status", required = false,defaultValue = "0") Integer status,
+                                 @RequestParam(value = "phone", required = false) String phone,
+                                 @RequestParam(value = "languageType", required = false,defaultValue = "0") String languageType,
                                  @RequestParam(value = "image", required = false) MultipartFile file) {
 
         UserInfo userInfo = new UserInfo();
@@ -131,7 +133,9 @@ public class UserController {
 //        userInfo.setPhone(phone);
         userInfo.setSex(sex);
         userInfo.setAge(age);
-        userInfo.setEducation(education);
+        userInfo.setPhone(phone);
+        userInfo.setUserStatus(status);
+        userInfo.setEducationId(educationId);
 
 
         return userService.editUserInfo(file, userInfo, languageType);
@@ -179,7 +183,7 @@ public class UserController {
      */
 
     @GetMapping(value = "/getConfig", produces = "application/json;charset=UTF-8")
-    ResultVO getConfig(@RequestParam(value = "type", required = false) Integer type, @RequestParam(value = "languageType", required = false) String languageType) {
+    ResultVO getConfig(@RequestParam(value = "type", required = false,defaultValue = "0") Integer type, @RequestParam(value = "languageType", required = false) String languageType) {
         return userService.getConfig(type,languageType);
     }
 
@@ -201,7 +205,7 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/getNotifykList", produces = "application/json;charset=UTF-8")
-    ResultVO getNotifkList(@RequestParam(value = "languageType", required = false) String languageType,
+    ResultVO getNotifkList(@RequestParam(value = "languageType", required = false,defaultValue = "0") String languageType,
                             @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
                             @RequestParam(value = "size", required = false, defaultValue = "20") Integer size) {
         return userService.getNotifkList(languageType, page, size);
@@ -212,7 +216,7 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/getHelpCenterList", produces = "application/json;charset=UTF-8")
-    ResultVO getHelpCenterList(@RequestParam(value = "languageType", required = false) String languageType,
+    ResultVO getHelpCenterList(@RequestParam(value = "languageType", required = false,defaultValue = "0") String languageType,
                                @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
                                @RequestParam(value = "size", required = false, defaultValue = "20") Integer size) {
         return userService.getHelpCenterList(languageType, page, size);

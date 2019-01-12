@@ -13,6 +13,8 @@ import com.sian.translate.dictionary.repository.UserTranslateRecordRepository;
 import com.sian.translate.dictionary.service.DictionaryService;
 import com.sian.translate.hint.enums.HintMessageEnum;
 import com.sian.translate.hint.service.HintMessageService;
+import com.sian.translate.user.entity.UserInfo;
+import com.sian.translate.user.repository.UserInfoRepository;
 import com.sian.translate.utlis.ResultVOUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -31,6 +33,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DictionaryServiceImpl implements DictionaryService {
@@ -50,6 +53,9 @@ public class DictionaryServiceImpl implements DictionaryService {
     @Autowired
     ThesaurusRepository thesaurusRepository;
 
+    @Autowired
+    UserInfoRepository userInfoRepository;
+
     @Transactional
     @Override
     public ResultVO translate(String languageType, Integer userID, Integer type, String content) {
@@ -57,6 +63,13 @@ public class DictionaryServiceImpl implements DictionaryService {
         if (StringUtils.isEmpty(userID)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
         }
+
+        Optional<UserInfo> byId = userInfoRepository.findById(userID);
+
+        if (!byId.isPresent()){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), languageType));
+        }
+
         if (StringUtils.isEmpty(content)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.CONTENT_NOT_EMPTY.getCode(), languageType));
         }
@@ -65,17 +78,30 @@ public class DictionaryServiceImpl implements DictionaryService {
         }
 
         Thesaurus thesaurus = thesaurusRepository.findFirstByContentOneAndType(content, type);
-        if (thesaurus == null){
-            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.TRANSLATE_RESULT_EMPTY.getCode(), languageType));
-        }
-        thesaurus.setTranslateResult(thesaurus.getContentTwo());
+
+
+        UserInfo userInfo = byId.get();
+
+
 
         UserTranslateRecord userTranslateRecord = new UserTranslateRecord();
         userTranslateRecord.setUserId(userID);
         userTranslateRecord.setContent(content);
         userTranslateRecord.setType(type);
-        userTranslateRecord.setTranslateContent(thesaurus.getContentTwo());
         userTranslateRecord.setCreateTime(new Date());
+        userTranslateRecord.setNickName(userInfo.getNickName());
+        if (thesaurus == null){
+            userTranslateRecord.setTranslateContent(null);
+
+            userTranslateRecordRepository.save(userTranslateRecord);
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.TRANSLATE_RESULT_EMPTY.getCode(), languageType));
+        }
+
+        String contentTwo = thesaurus.getContentTwo();
+        thesaurus.setTranslateResult(contentTwo);
+
+        userTranslateRecord.setTranslateContent(contentTwo);
+
 
         userTranslateRecordRepository.save(userTranslateRecord);
 

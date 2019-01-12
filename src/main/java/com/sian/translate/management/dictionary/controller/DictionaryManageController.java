@@ -25,11 +25,11 @@ public class DictionaryManageController {
      * @isMemberVisible 是否会员可见 0不是 1是
      * @return
      */
-    @PostMapping(value = "/addDictionaryr", produces = "application/json;charset=UTF-8")
-    ResultVO addDictionaryr(@RequestParam(value = "name", required = false) String name,
+    @PostMapping(value = "/addDictionary", produces = "application/json;charset=UTF-8")
+    ResultVO addDictionary(@RequestParam(value = "name", required = false) String name,
                             @RequestParam(value = "type", required = false) Integer type,
                             @RequestParam(value = "isMemberVisible", required = false, defaultValue = "0") Integer isMemberVisible,
-                            @RequestParam(value = "file", required = false) MultipartFile image,
+                            @RequestParam(value = "image", required = false) String image,
                             HttpSession session) {
         return dictionaryManageService.addDictionaryr(name, type, isMemberVisible, image, session);
     }
@@ -132,5 +132,16 @@ public class DictionaryManageController {
     ResultVO deleteThesaurus(@RequestParam(value = "thesaurusId", required = false) Integer thesaurusId,
                              HttpSession session) {
         return dictionaryManageService.deleteThesaurus(thesaurusId, session);
+    }
+
+
+    /****
+     *获取最新的5条词条信息
+     * @return
+     */
+
+    @PostMapping(value = "/getNewThesaurus", produces = "application/json;charset=UTF-8")
+    ResultVO getNewThesaurus() {
+        return dictionaryManageService.getNewThesaurus();
     }
 }

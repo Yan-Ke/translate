@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <link href="../../css/index.css" rel="stylesheet">
+    <link href="../../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../font/iconfont.css">
+    <link rel="stylesheet" href="../../css/public.css">
+    <link rel="stylesheet" href="../../css/daterangepicker.css">
+</head>
+<body class="graybg">
+    <div class="wrapper-content">
+        <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>财务统计报表</h5>
+            <div class="ibox-tools"></div>
+        </div>
+        <div class="ibox-content">
+            <div class="row admin-mt10">
+                <div class="col-sm-4">
+                    <button class="btn btn-white" type="button" id="daterange-btn">选择支付时间</button> 
+                </div>
+                <div class="col-sm-8" style="text-align: right;">
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                           <button id="exportExcel" type="submit" class="btn " style="background:#33cc00;color:#fff"> 导出</button>
+                         </span>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover admin-mt40 table-bordered">
+                <thead>
+                    <tr>
+                        <th>时间</th>
+                        <th>订单总数</th>
+                        <th>今日新增</th>
+                        <th>订单总金额/元</th>
+                        <th>今日新增/元</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr id="selectIds" th:each="financialInfoDTO : ${financialInfoDTOList}">
+                        <td th:text="${financialInfoDTO.payTimeString}"></td>
+                        <td th:text="${financialInfoDTO.totalCount}"></td>
+                        <td th:text="${financialInfoDTO.dayCount}"></td>
+                        <td th:text="${financialInfoDTO.totalAmount}"></td>
+                        <td th:text="${financialInfoDTO.dayAmount}"></td>
+                    </tr>
+                    <!--搜索无结果-->
+                        <tr class="not_tr">
+                            <td colspan="5">
+                                <div>
+                                    <img th:style="${financialInfoDTOList.size()}>0?'display:none;':''" src="../../image/nodat.png">
+                                    <p class="text-center" th:text="${financialInfoDTOList.size()}<1?'暂无相关信息':''"></p>
+                                </div>
+                            </td>
+                        </tr>
+                </tbody>
+
+            </table>
+            <!--分页-->
+            <div class="text-center">
+                <ul class="pagination">
+                    <li th:class="${indexPage==1}?'disabled' : ''"><a
+                            th:class="${indexPage==1}?'btn disabled' : ''" th:href="@{/manage/fiance/reportForm(page= ${indexPage-1},beginTime=${beginTime},endTime=${endTime})}">上一页</a>
+                    </li>
+                    <li th:if="${indexPage-3 >=1}"><a
+                            th:href="@{/manage/fiance/reportForm(page= ${indexPage-3},beginTime=${beginTime},endTime=${endTime})}"
+                            th:text="${indexPage -3}">1</a></li>
+                    <li th:if="${indexPage-2 >=1}"><a
+                            th:href="@{/manage/fiance/reportForm(page= ${indexPage-2},beginTime=${beginTime},endTime=${endTime})}"
+                            th:text="${indexPage -2}">1</a></li>
+                    <li th:if="${indexPage-1 >=1}"><a
+                            th:href="@{/manage/fiance/reportForm(page= ${indexPage-1},beginTime=${beginTime},endTime=${endTime})}"
+                            th:text="${indexPage -1}">1</a></li>
+                    <li class="active"><a href="#" th:text="${indexPage}">1</a></li>
+                    <li th:if="${indexPage+1 <=totalPage}"><a
+                            th:href="@{/manage/fiance/reportForm(page= ${indexPage+1},beginTime=${beginTime},endTime=${endTime})}"
+                            th:text="${indexPage +1}">1</a></li>
+                    <li th:if="${indexPage+2 <=totalPage}"><a
+                            th:href="@{/manage/fiance/reportForm(page= ${indexPage+2},beginTime=${beginTime},endTime=${endTime})}"
+                            th:text="${indexPage +2}">1</a></li>
+                    <li th:if="${indexPage+3 <=totalPage}"><a
+                            th:href="@{/manage/fiance/reportForm(page= ${indexPage+3},beginTime=${beginTime},endTime=${endTime})}"
+                            th:text="${indexPage +3}">1</a></li>
+
+                    <li th:class="${indexPage==totalPage || totalPage < 1}?'disabled' : ''"><a
+                            th:class="${indexPage==totalPage || totalPage < 1}?'btn disabled' : ''" th:href="@{/manage/fiance/reportForm(page= ${indexPage+1},beginTime=${beginTime},endTime=${endTime})}">下一页</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+</body> 
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<!-- 自定义js -->
+<!-- <script src="../../js/hplus.js?v=4.1.0"></script> -->
+<script type="text/javascript" src="../../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<!-- Input Mask-->
+<script src="../../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- suggest -->
+<script src="../../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../layer/layer.js"></script>
+<script src="../../layui/layui.js"></script>
+<script src="../../js/moment.js"></script>
+<script src="../../js/daterangepicker.js"></script>
+<!--高德地图api-->
+<script th:inline="javascript">
+
+    var beginTime = [[${beginTime}]];
+    var endTime = [[${endTime}]];
+
+    if ((beginTime == null || beginTime == '') && (endTime == null || endTime == '')){
+        $('#daterange-btn').html('全部');
+    } else if ((beginTime == null || beginTime == '') && (endTime != null && endTime != '')) {
+        $('#daterange-btn').html(endTime);
+    } else if ((beginTime != null && beginTime != '') && (endTime == null || endTime == '')) {
+        $('#daterange-btn').html(beginTime);
+    }else if (beginTime == endTime) {
+        $('#daterange-btn').html(beginTime);
+    }else {
+        $('#daterange-btn').html(beginTime + ' 至 ' + endTime);
+    }
+
+    $('#daterange-btn').daterangepicker({
+            ranges: {
+                '全部': [moment(), moment().subtract(-1, 'days')],
+                '今天': [moment().startOf('day'), moment()],
+                '昨天': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                '最近七天': [moment().subtract(6, 'days'), moment()],
+                '最近30天': [moment().subtract(29, 'days'), moment()],
+                '最近60天': [moment().subtract(59, 'days'), moment()]
+            },
+            startDate: moment(),
+            endDate: moment()
+        },
+        function (start, end, label) {
+            //label:通过它来知道用户选择的是什么，传给后台进行相应的展示
+
+            beginTime = "";
+            endTime = "";
+            if (label == '全部'){
+                $('#start').val('4');
+                $('#end').val('4');
+
+            }else{
+                $('#start').val(start.format('YYYY-MM-DD'));
+                beginTime = start.format('YYYY-MM-DD');
+
+                if (end != null){
+                    $('#end').val(end.format('YYYY-MM-DD'));
+                    endTime = end.format('YYYY-MM-DD');
+                }
+            }
+
+
+            console.log(beginTime);
+            console.log(endTime);
+
+            if (label == '全部') {
+                $('#daterange-btn').html('全部');
+            } else if (label == '今天') {
+                $('#daterange-btn').html(start.format('YYYY-MM-DD'));
+            } else if (label == '昨天') {
+                $('#daterange-btn').html(start.format('YYYY-MM-DD'));
+            } else if (label == '最近七天') {
+                $('#daterange-btn').html(start.format('YYYY-MM-DD') + ' 至 ' + end.format('YYYY-MM-DD'));
+            } else if (label == '最近30天') {
+                $('#daterange-btn').html(start.format('YYYY-MM-DD') + ' 至 ' + end.format('YYYY-MM-DD'));
+            } else if (label == '最近60天') {
+                if (end != null){
+                    $('#daterange-btn').html(start.format('YYYY-MM-DD') + ' 至' + end .format('YYYY-MM-DD'));
+                } else{
+                    $('#daterange-btn').html(start.format('YYYY-MM-DD'));
+                }
+            }
+
+            window.location.href = '/manage/fiance/reportForm'+ "?beginTime=" + beginTime + "&endTime=" + endTime;
+
+        }
+    );
+
+    //点击导出
+    $('#exportExcel').click(function () {
+        window.location.href = '/manage/excel/exportFinancialInfo'+ "?beginTime=" + beginTime + "&endTime=" + endTime;
+    });
+
+
+</script>
+</html>

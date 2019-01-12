@@ -2,6 +2,7 @@ package com.sian.translate.user.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -34,10 +35,17 @@ public class UserInfo {
     private String phone;
     /**用户性别 0未知1男2女3保密**/
     private Integer sex;
+    @Transient
+    private String sexString;
+
     /**用户年龄**/
     private Integer age;
     /**用户学历**/
     private String education;
+    /**用户学历ID**/
+    private Integer educationId;
+
+
     /**用户余额**/
     private BigDecimal  balance;
     /**用户注册时间**/
@@ -55,6 +63,8 @@ public class UserInfo {
     /**是否为会员 0 不是 1是 2过期会员**/
     @Transient
     private Integer isMember;
+    @Transient
+    private String vipIcon;
 
     /**0正常1禁用**/
     private Integer userStatus;
@@ -69,4 +79,21 @@ public class UserInfo {
     /**购买时间**/
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date loginTime;
+
+
+    @Transient
+    @JsonIgnore
+    private  String registrationTimeString ;
+    @Transient
+    @JsonIgnore
+    private String memberBeginTimeString;
+    @Transient
+    @JsonIgnore
+    private String memberEndTimeString ;
+    @Transient
+    @JsonIgnore
+    private String buyTimeString;
+    @Transient
+    @JsonIgnore
+    private String loginTimeString;
 }

@@ -36,6 +36,15 @@ public class UserTranslateRecord {
     @JsonIgnore
     private Date createTime;
 
+    /**用户昵称**/
+    private String nickName;
 
+    /**vip图标**/
+    @Transient
+    private String vipIcon;
+
+    /**用户头像**/
+    @Transient
+    private String headImage;
 
 }

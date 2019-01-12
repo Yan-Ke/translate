@@ -35,7 +35,7 @@ public class InformationManageServiceImpl implements InformationManageService {
 
 
     @Override
-    public ResultVO addInformation(String title, String content, String author, String url,Integer languageType,Integer type, Integer order, Integer isShow, MultipartFile file, HttpSession session) {
+    public ResultVO addInformation(String title, String content, String author, String url,Integer languageType,Integer type, Integer order, Integer isShow, String image, HttpSession session) {
         String languageTypeString = "0";
 
 
@@ -45,9 +45,6 @@ public class InformationManageServiceImpl implements InformationManageService {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOT_LOGIN.getCode(), languageTypeString));
         }
 
-        if (languageType == null){
-            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.INFORMATION_LANGUAGETYPE_NOT_EMPTY.getCode(), languageTypeString));
-        }
 
         if (StringUtils.isEmpty(title)){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.INFORMATION_TITLE_NOT_EMPTY.getCode(), languageTypeString));
@@ -64,15 +61,8 @@ public class InformationManageServiceImpl implements InformationManageService {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.INFORMATION_CONTENT_URL_NOT_EMPTY.getCode(), languageTypeString));
         }
 
-        if (file == null){
+        if (StringUtils.isEmpty(image)){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_NOT_EMPTY.getCode(), languageTypeString));
-        }
-        String imagePath = "";
-        try {
-            imagePath = ImageUtlis.loadImage(file);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_FORMAT_ERROR.getCode(), languageTypeString));
         }
 
         Information information = new Information();
@@ -90,7 +80,7 @@ public class InformationManageServiceImpl implements InformationManageService {
         if (!StringUtils.isEmpty(content)){
             information.setContent(content);
         }
-        information.setImage(imagePath);
+        information.setImage(image);
         information.setCreateUser(userId);
         information.setCreateTime(new Date());
         information.setUpdateUser(userId);
@@ -119,7 +109,7 @@ public class InformationManageServiceImpl implements InformationManageService {
         }
 
         /**
-         * 输入了内容必须传入语言类型
+         * 输入了内容必须传入资讯类型
          */
         if (!StringUtils.isEmpty(content) && type == null){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.INFORMATION_LANGUAGETYPE_NOT_EMPTY.getCode(), languageTypeString));

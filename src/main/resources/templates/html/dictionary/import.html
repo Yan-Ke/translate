@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <link href="../../css/index.css" rel="stylesheet">
+    <link href="../../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../font/iconfont.css">
+    <link rel="stylesheet" href="../../css/public.css">
+</head>
+<body class="graybg">
+<div class="wrapper-content">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>词条批量导入</h5>
+            <div class="ibox-tools">
+                <a href="javascript:history.back(-1);" class="btn btn-white">返回列表</a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <div class="form-horizontal m-t">
+                <div class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
+                     上传文件
+                     <span class="white">*</span>
+                    </label>
+                    <div class="col-sm-6">
+                        <div class="input-group">
+                            <input type="text" disabled="disabled" class="form-control" placeholder="请上传excel文件">
+                            <div class="input-group-addon">
+                               <a href="javascript:;" id="upload">选择文件</a>
+                               <input class="layui-upload-file" type="file" name="file">
+                            </div>
+                        </div>
+                        <p class="m-t">
+                           请按照模板格式填写excel文件     
+                           <a href="/excel/导入词条模板.xls" class="color-primary">下载 Excel 模板</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group  admin-mt30">
+                    <div class="col-sm-6 col-sm-offset-2">
+                        <button class="btn btn-primary" type="button" id="submit">提交</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body> 
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<!-- 自定义js -->
+<!-- <script src="../../js/hplus.js?v=4.1.0"></script> -->
+<script type="text/javascript" src="../../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<!-- Input Mask-->
+<script src="../../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- suggest -->
+<script src="../../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../layer/layer.js"></script>
+<script src="../../layui/layui.js"></script>
+<!--高德地图api-->
+<script>
+
+   /* $(".upload").change(function(){
+        $("#file").attr("value",URL.createObjectURL($(this)[0].files[0]));
+    });*/
+   var id = [[${id}]];
+
+
+    layui.use('upload', function(){
+        var upload = layui.upload;
+
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#upload' //绑定元素
+            ,title: '请上传Excel文件'
+            ,url: "/manage/excel/importDictionary" //上传接口
+            ,exts: 'xls|xlsx' 			//设置智能格式文件
+            ,bindAction: '#submit'			//“上传”按钮的ID
+            ,auto: false				//不自动上传设置
+            ,data: {id: id}		//传递到后台的数据
+            ,before: function(obj) {
+                layer.load(); //上传loading
+            }
+            ,done: function(res){
+                layer.msg(res.msg);
+                console.log(res.msg);
+                layer.closeAll('loading'); //关闭loading
+
+
+                // imgUrl=obj;
+                // $('#LAY_demo_upload').attr('src',imgUrl ).css({display:'block'});
+            }
+            ,error: function(res){
+                //请求异常回调
+                layer.msg(res.msg);
+                console.log(res.msg);
+                layer.closeAll('loading'); //关闭loading
+
+
+            }
+        });
+    });
+
+
+</script>
+</html>

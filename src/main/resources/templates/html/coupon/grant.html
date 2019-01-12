@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <link href="../../css/index.css" rel="stylesheet">
+    <link href="../../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../font/iconfont.css">
+    <link rel="stylesheet" href="../../css/public.css">
+    <style>
+      .mark{
+        width: 100%;
+        height: 100%;
+        top:0;
+        left:0;
+        right:0;
+        bottom:0;
+        position: fixed;
+        background:none;
+        z-index: 10;
+        overflow: hidden;
+        display: none;
+      }
+      .mark>div{
+        width: 470px;
+        height: 470px;
+        border-radius: 4px;
+        border:1px solid  #f0f0f0;
+        position: absolute;
+        top:50%;
+        left:50%;
+        margin-top:-235px;
+        margin-left: -235px;
+        background: #ffffff;
+        box-shadow: rgba(0, 0, 0, 0.35) 0px 20px 100px;
+      }
+      .list{
+        max-height: 310px;
+        overflow-y:scroll; 
+      }
+      .list>li{
+        padding:15px 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .list>li:last-child{
+        border-bottom: none;
+      }
+    </style>
+</head>
+<body class="graybg">
+    <div class="wrapper-content">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>发放优惠券</h5>
+                <div class="ibox-tools"></div>
+            </div>
+            <div class="ibox-content">
+                <div class="form-horizontal m-t">
+                    <div class="form-group  admin-mt20">
+                        <label class="col-sm-2 control-label">
+                         选择券名称
+                         <span>*</span>
+                        </label>
+                        <div class="col-sm-6">
+                            <div class="input-group">
+                                <input id="couponName" type="text" disabled="disabled" class="form-control" >
+                                <div class="input-group-addon" style="cursor: pointer;" onclick="choose()">
+                                  <span>选择优惠券</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group  admin-mt20">
+                        <label class="col-sm-2 control-label">
+                         发放类型
+                         <span>*</span>
+                        </label>
+                        <div class="col-sm-6">
+                            <div class="admin-mt5">
+                                <label for="one" class="admin-mr15" > 
+                                    <input id="one" type="radio" name="show" checked="checked" >
+                                    <span>按指定会员发送</span>
+                                </label>
+                                <label for="type" class="admin-mr15">
+                                    <input id="type" type="radio" name="show">
+                                    <span>按会员类型发送</span>
+                                </label>
+                                <label for="all" class="admin-mr15">
+                                    <input id="all" type="radio" name="show">
+                                    <span>全部发送</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="chooseMember" class="form-group  admin-mt20">
+                        <label class="col-sm-2 control-label">
+                         选择会员
+                         <span class="white">*</span>
+                        </label>
+                        <div class="col-sm-6">
+                            <textarea id="memberPhones" placeholder="请填写会员手机号码，多个会员用半角逗号隔开" minlength="10" maxlength="100" style="width: 100%;height: 100px;resize: none;padding:15px;border-color: #eee"></textarea>
+                        </div>
+                    </div>
+
+                    <div id="chooseType"  style="display: none" class="form-group  admin-mt20">
+                        <label class="col-sm-2 control-label">
+                            选择会员类型
+                            <span class="white">*</span>
+                        </label>
+                        <div class="col-sm-7">
+                            <select class="form-control "  id = "memberType" >
+                                <option value="2">请选择会员类型</option>
+                                <option value="1">老会员</option>
+                                <option value="0">新会员</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group  admin-mt30">
+                        <div class="col-sm-6 col-sm-offset-2">
+                            <button class="btn btn-primary" type="button" id="submit">确认发送</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mark">
+        <div>
+            <div class="ibox-title">
+                <h5>选择优惠券</h5>
+                <div class="ibox-tools" onclick="_close()">
+                    <i class="iconfont icon-guanbi"></i>
+                </div>
+            </div>
+            <div class="wrapper-content">
+                <div class="input-group m-t">
+                    <input type="text" placeholder="请输入优惠券名称" id="searchValue" class="form-control" th:value="${name}">
+                    <div class="input-group-addon " style="cursor: pointer;background: #3399ff;border:1px solid #3399ff" onclick="search()">
+                      <span id="serarhcBtn" class="white">搜索</span>
+                    </div>
+                </div>
+                <ul id="listView" class="list m-t">
+                    <!--<<li class="admin_flexjust">
+                        <span>2019元旦优惠券</span>
+                        <span>满0元可用</span>
+                        <span class="color-primary">￥5</span>
+                        <a href="javascript:;" class="btn btn-white font-s12" style="padding:3px 9px;">选择</a>
+                    </li>
+                    <li class="admin_flexjust">
+                        <span>2019元旦优惠券</span>
+                        <span>满0元可用</span>
+                        <span class="color-primary">￥5</span>
+                        <a href="javascript:;" class="btn btn-white font-s12" style="padding:3px 9px;">选择</a>
+                    </li>
+                    <li class="admin_flexjust">
+                        <span>2019元旦优惠券</span>
+                        <span>满0元可用</span>
+                        <span class="color-primary">￥5</span>
+                        <a href="javascript:;" class="btn btn-white font-s12" style="padding:3px 9px;">选择</a>
+                    </li>
+                    <li class="admin_flexjust">
+                        <span>2019元旦优惠券</span>
+                        <span>满0元可用</span>
+                        <span class="color-primary">￥5</span>
+                        <a href="javascript:;" class="btn btn-white font-s12" style="padding:3px 9px;">选择</a>
+                    </li>
+                    <li class="admin_flexjust">
+                        <span>2019元旦优惠券</span>
+                        <span>满0元可用</span>
+                        <span class="color-primary">￥5</span>
+                        <a href="javascript:;" class="btn btn-white font-s12" style="padding:3px 9px;">选择</a>
+                    </li>
+                    <li class="admin_flexjust">
+                        <span>2019元旦优惠券</span>
+                        <span>满0元可用</span>
+                        <span class="color-primary">￥5</span>
+                        <a href="javascript:;" class="btn btn-white font-s12" style="padding:3px 9px;">选择</a>
+                    </li>
+                    <li class="admin_flexjust">
+                        <span>2019元旦优惠券</span>
+                        <span>满0元可用</span>
+                        <span class="color-primary">￥5</span>
+                        <a href="javascript:;" class="btn btn-white font-s12" style="padding:3px 9px;">选择</a>
+                    </li>
+                    <li class="admin_flexjust">
+                        <span>2019元旦优惠券</span>
+                        <span>满0元可用</span>
+                        <span class="color-primary">￥5</span>
+                        <a href="javascript:;" class="btn btn-white font-s12" style="padding:3px 9px;">选择</a>
+                        <button  onclick="chooseCoupon(name,id)" class="btn btn-white font-s12" style="padding:3px 9px">选择</button>
+                    </li>-->
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<!-- 自定义js -->
+<!-- <script src="../../js/hplus.js?v=4.1.0"></script> -->
+<script type="text/javascript" src="../../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<!-- Input Mask-->
+<script src="../../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- suggest -->
+<script src="../../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../layer/layer.js"></script>
+<script src="../../layui/layui.js"></script>
+<!--高德地图api-->
+<script  th:inline="javascript">
+    function choose(){
+        isShow = 1;
+        $('.mark').css({display:'block'});
+    }
+    function _close(){
+        isShow  = 0;
+        $('.mark').css({display:'none'});
+    }
+
+
+    var isShow = [[${isShow}]];;
+    var couponList = [[${couponList}]];
+    //0指定类型 1 会员类型发送  2全部
+    var type = [[${type}]];
+    var memberType = [[${memberType}]];
+
+    var id = "";
+
+    if (isShow == 0) {
+        $('.mark').css({display:'none'});
+    }else{
+        $('.mark').css({display:'block'});
+    }
+    if (type == 0){
+        $("input[id='one']").prop("checked", true);
+    }else if(type == 1) {
+        $("input[id='type']").prop("checked", true);
+    }else {
+        $("input[id='all']").prop("checked", true);
+    }
+
+    $("#memberType").find("option[value="+memberType+"]").attr("selected",true);
+
+
+
+    $(function () {
+
+        for(var j = 0,len = couponList.length; j < len; j++){
+            var coupon =  couponList[j];
+            var name = coupon.name;
+            var fullPrice = '满'+coupon.fullPrice+'元可用';
+            var reducePrice = '￥'+coupon.reducePrice;
+            var id = coupon.id;
+
+            $("#listView").append("<li class=\"admin_flexjust\">\n" +
+                "<span>"+name+"</span>" +
+                "<span>"+fullPrice+"+</span>" +
+                "<span class=\"color-primary\">"+reducePrice+"</span>" +
+                " <button  onclick='chooseCoupon("+j+");' class=\"btn btn-white font-s12\" style=\"padding:3px 9px\">选择</button>\n" +
+                " </li>");
+        }
+
+    })
+
+    search = function(){
+        var name = $('#searchValue').val();
+        console.log(name)
+        window.location.href = '/manage/coupon/grant?name=' + name+"&isShow="+isShow+"&type="+type+"&memberType="+memberType;
+    }
+    $('#one').click(function () {
+        $('#chooseMember').css({display:'block'});
+        $('#chooseType').css({display:'none'});
+        type = 0;
+    });
+
+    $('#type').click(function () {
+        $('#chooseType').css({display:'block'});
+        $('#chooseMember').css({display:'none'});
+
+        type = 1;
+    });
+    $('#all').click(function () {
+        $('#chooseMember').css({display:'none'});
+        $('#chooseType').css({display:'none'});
+        type = 2;
+    });
+
+
+    chooseCoupon = function(j) {
+        var coupon =  couponList[j];
+        isShow = 0;
+        $('#couponName').attr('value',coupon.name);
+        id = coupon.id;
+        $('.mark').css({display:'none'});
+    }
+
+    //确认发送
+    $('#submit').click(function () {
+        var memberPhones = $('#memberPhones').val();
+        var memberType=  $("#memberType option:selected").val();
+
+
+        $.ajax({
+            url: "/manage/coupon/grantCoupon",
+            data: {
+                "id": id,
+                "type": type,
+                "memberType": memberType,
+                "memberPhones": memberPhones,
+
+            },
+            dataType: "json",
+            type: 'post',
+
+            success: function (res) {
+                if (res.code == 0) {
+                    layer.msg('已发送');
+                    // window.location.href = '/manage/coupon/list'
+
+                    // setTimeout(function () {
+                    // }, 2000);
+                }else {
+                    layer.msg(res.msg);
+                }
+            }
+        })
+    });
+
+
+
+</script>
+</html>

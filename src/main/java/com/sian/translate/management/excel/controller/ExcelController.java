@@ -27,7 +27,7 @@ public class ExcelController {
      * @param page 如果不传导出全部数据
      * @return
      */
-    @GetMapping(value = "/exportmemberUserInfo", produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/exportmemberUserInfo", produces = "application/json;charset=UTF-8")
     ResultVO exportmemberUserInfo(@RequestParam(value = "isMember", required = false, defaultValue = "-1") Integer isMember,
                                   @RequestParam(value = "param", required = false) String param,
                                   @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,

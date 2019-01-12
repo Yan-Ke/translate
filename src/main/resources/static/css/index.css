@@ -1,0 +1,142 @@
+
+.ibox-title{
+    height: 60px;
+    line-height: 60px;
+    padding: 0;
+    border: none;
+    transform: translateY(10px);
+    border-bottom: 1px solid #eee
+}
+.ibox-title h5 {
+    line-height: 60px;
+    font-size: 16px;
+    padding-left: 25px;
+}
+.ibox-title>.ibox-tools{
+    padding-right: 25px;
+}
+
+/*首页*/
+.data div{
+    padding:30px 0;
+    border-radius: 4px;
+}
+.data div>p:first-child{
+    font-weight: bold;
+    font-size: 20px;
+}
+.data div>p:last-child{
+    font-size: 12px;
+}
+.data>a{
+    padding-right: 0;
+}
+.data>a:last-child{
+    padding-right: 15px;
+}
+.Todaydata>a{
+    padding:40px 0;
+    position: relative;
+}
+.Todaydata>a img{
+    display: block;
+    margin-left: 65px;
+    margin-right: 25px;
+}
+.Todaydata>a p:first-child{
+    font-size: 20px;
+    margin-top:2px;
+}
+.Todaydata>a p:last-child{
+    font-size: 12px;
+}
+.Todaydata>a>span{
+    display: block;
+    position: absolute;
+    width: 1px;
+    height: 26px;
+    border-right: 1px solid #f2f2f2;
+    top:50%;
+    margin-top:-13px;
+    right:0;
+}
+.homeList a,.homeList li{
+    height: 45px;
+    line-height: 45px;
+}
+.homeList a:hover{
+    background: #eee;
+}
+.homeList li{
+    border-bottom: 1px solid #f2f2f2;
+}
+.homeList ul>li:last-child{
+    border-bottom: none;
+}
+.homeList li p{
+    overflow: hidden;
+}
+
+
+/*词典*/
+.Dictionary{
+    border:1px solid #f2f2f2;
+    padding:40px 20px 20px;
+    position: relative;
+    border-radius: 4px;
+    margin-top:50px;
+    position: relative;
+}
+.Dictionary>.title{
+    font-weight: bold;
+    padding:10px 0;
+    text-align: center;
+    border-bottom:1px solid #f2f2f2;
+}
+.Dictionary>.number{
+    text-align: center;
+    padding:15px 0;
+    font-size: 12px;
+}
+.Dictionary  .btn-sm{
+    padding:3px 10px;
+    margin-bottom: 0;
+}
+.Dictionary>img{
+    width: 66px;
+    height: 66px;
+    position: absolute;
+    right:50%;
+    margin-right: -33px;
+    top:-33px;
+    border:1px solid #f2f2f2;
+}
+.Dictionary>a{
+    position: absolute;
+    right:20px;
+    top:20px;
+    color:#eee;
+}
+.Dictionary>a:hover{
+    color:#3399ff;
+}
+
+/*资讯中心*/
+.type>span{
+    display: inline-block;
+    font-size: 12px;
+    width: 55px;
+    height: 25px;
+    line-height: 25px;
+    text-align: center;
+    margin-right: 10px;
+    color:#ccc;
+    background: #f2f2f2;
+    cursor: pointer;
+    margin-top:5px;
+    border-radius: 2px;
+}
+.type>.active{
+    background: #3399ff;
+    color:#fff;
+}

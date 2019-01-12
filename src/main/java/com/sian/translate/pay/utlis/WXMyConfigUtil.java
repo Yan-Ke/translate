@@ -31,7 +31,7 @@ public class WXMyConfigUtil implements WXPayConfig {
 
     public WXMyConfigUtil() throws Exception {
 //        String certPath = "证书地址";//从微信商户平台下载的安全证书存放的目录,退款使用
-//        File file = new File(certPath);
+//        file file = new file(certPath);
 //        InputStream certStream = new FileInputStream(file);
 //        this.certData = new byte[(int) file.length()];
 //        certStream.read(this.certData);

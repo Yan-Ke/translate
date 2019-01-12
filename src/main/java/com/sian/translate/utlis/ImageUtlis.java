@@ -120,7 +120,7 @@ public class ImageUtlis {
                                       int width, int height, boolean proportion) {
         try {
             // 获得源文件
-//            File file = new File(inputFile);
+//            file file = new file(inputFile);
             if (!file.exists()) {
                 return false;
             }

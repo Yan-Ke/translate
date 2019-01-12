@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by 廖师兄
@@ -20,6 +21,8 @@ public class JsonUtil {
 	 * @return
 	 */
 	public static String toJson(Object object) {
+		objectMapper.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+
 		try {
 			return objectMapper.writeValueAsString(object);
 		} catch (JsonProcessingException e) {
@@ -33,6 +36,7 @@ public class JsonUtil {
 	 * @return
 	 */
 	public static Object fromJson(String json,Class classType) {
+
 		try {
 			return objectMapper.readValue(json, classType);
 		} catch (IOException e) {
@@ -53,4 +57,6 @@ public class JsonUtil {
 		}
 		return null;
 	}
+
+
 }

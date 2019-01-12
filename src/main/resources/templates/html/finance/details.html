@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <link href="../../css/index.css" rel="stylesheet">
+    <link href="../../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../font/iconfont.css">
+    <link rel="stylesheet" href="../../css/public.css">
+    <style>
+      .table{
+        border:1px solid #f0f0f0;
+        width: 460px;
+        margin:50px 100px;
+      }
+      .table>tbody>tr>td{
+        height: 40px;
+        line-height: 40px;
+        text-indent: 20px;
+        font-size: 12px;
+        padding:0;
+      }
+      .table>tbody>tr>td:first-child{
+        background: #f9f9f9;
+        width: 160px;
+        border-right: 1px solid #f0f0f0;
+      }
+      .table>tbody>tr>td:last-child{
+        width: 300px;
+      }
+    </style>
+</head>
+<body class="graybg">
+<div class="wrapper-content">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>订单详情</h5>
+            <div class="ibox-tools">
+                <a href="javascript:history.back(-1);" class="btn btn-white">返回列表</a>
+            </div>
+        </div>
+        <div class="ibox-content">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td >订单编号</td>
+                        <td th:text="${memberPayRecord.orderId}"></td>
+                    </tr>
+                    <tr>
+                        <td>购买人</td>
+                        <td>
+                            <a th:text="${nickName}" th:href="@{'/manage/member/detail?id=' + ${memberPayRecord.userId}}" class="color-primary">111</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>类型</td>
+                        <td th:text="${memberPayRecord.monthString}"></td>
+                    </tr>
+                    <tr>
+                        <td>价格</td>
+                        <td th:text="${memberPayRecord.actualAmount}"></td>
+                    </tr>
+                    <tr>
+                        <td>优惠券</td>
+                        <td th:text="${couponName == null || couponName ==''}?'---':${memberPayRecord.couponName}"></td>
+                    </tr>
+                    <tr>
+                        <td>实际支付</td>
+                        <td th:text="${memberPayRecord.amount}"></td>
+                    </tr>
+                    <tr>
+                        <td>支付方式</td>
+                        <td th:text="${memberPayRecord.payType == 1}?'支付宝':'微信'"></td>
+                    </tr>
+                    <tr>
+                        <td>支付时间</td>
+                        <td th:text="${memberPayRecord.payTime}"></td>
+                    </tr>
+                    <!--<tr>-->
+                        <!--<td>支付单号</td>-->
+                        <!--<td>1122</td>-->
+                    <!--</tr>-->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body> 
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script type="text/javascript" src="../../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<!-- Input Mask-->
+<script src="../../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- suggest -->
+<script src="../../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../layer/layer.js"></script>
+<script src="../../laydate/laydate/laydate.js"></script>
+<script src="../../layui/layui.js"></script>
+<!--高德地图api-->
+</html>

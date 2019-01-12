@@ -40,7 +40,6 @@ public class ManageUserInfo {
     private String headImage;
 
     /**角色id**/
-    @JsonIgnore
     private Integer role;
 
     /**角色名称**/

@@ -35,4 +35,8 @@ public interface ManageUserService {
 
     /**获取管理员列表**/
     ResultVO geteManageUserList(Integer page, Integer size, HttpSession session);
+
+    ResultVO getManageUserInfo(Integer id, HttpSession session);
+
+    ResultVO editManageUser(Integer id, Integer roleId, String account, String userName, String phone, String password, Integer status, String image, HttpSession session);
 }

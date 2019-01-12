@@ -78,8 +78,9 @@ public class CouponManageController {
                         @RequestParam(value = "beginTime", required = false) String beginTime,
                         @RequestParam(value = "endTime", required = false) String endTime,
                         @RequestParam(value = "day", required = false) Integer day,
+                        @RequestParam(value = "count", required = false) Integer count,
                         HttpSession session) {
-        return counponManageService.editCoupon(id, name, type, fullPrice, reducePrice, beginTime, endTime, day, session);
+        return counponManageService.editCoupon(id, name, type, fullPrice, reducePrice, beginTime, endTime, day,count, session);
     }
 
 

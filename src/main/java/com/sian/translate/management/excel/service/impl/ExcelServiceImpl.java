@@ -519,7 +519,7 @@ public class ExcelServiceImpl implements ExcelService {
                 List<Object> row = new ArrayList();
 
 
-                row.add(financialInfoDTO.getPayTime() == null ? "" : financialInfoDTO.getPayTime());
+                row.add(financialInfoDTO.getPayTimeString() == null ? "" : financialInfoDTO.getPayTimeString());
                 row.add(financialInfoDTO.getTotalCount());
                 row.add(financialInfoDTO.getDayCount());
                 row.add(financialInfoDTO.getTotalAmount() == null ? "" : financialInfoDTO.getTotalAmount());

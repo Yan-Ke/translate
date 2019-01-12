@@ -20,6 +20,10 @@ public class Thesaurus {
     /**词典ID**/
     private  Integer dictionaryId;
 
+    @Transient
+    private  String dictionaryName;
+
+
     /**其中一种语言**/
     private  String contentOne;
 

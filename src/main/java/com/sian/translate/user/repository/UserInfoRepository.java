@@ -123,7 +123,7 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
     long  countAllByPhoneOrNickName(String param);
 
 
-    List<UserInfo> findByIdIn(List<Integer> users);
+    List<UserInfo> findByPhoneIn(String[] phones);
 
 
     List<UserInfo> findByMemberEndTimeIsNotNull();
@@ -158,7 +158,7 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
             "  select date(registration_time) as registration_time, count(*) as count\n" +
             "  from user_info\n" +
             "  group by date(registration_time)\n" +
-            ") b on a.click_date = b.registration_time;\n", nativeQuery = true)
+            ") b on a.click_date = b.registration_time order by a.click_date;\n", nativeQuery = true)
     List<Object[]> getSevenDayUserCount();
 
     /****
@@ -231,7 +231,7 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
             "  select date(registration_time) as registration_time, count(*) as count\n" +
             "  from user_info\n" +
             "  group by date(registration_time)\n" +
-            ") b on a.click_date = b.registration_time;", nativeQuery = true)
+            ") b on a.click_date = b.registration_time order by a.click_date;", nativeQuery = true)
     List<Object[]> getMonthUserCount();
 
 

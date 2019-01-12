@@ -34,11 +34,18 @@ public class MemberPayRecord {
     /**支付金额**/
     private BigDecimal amount;
 
+    /**实际金额**/
+    @Transient
+    private BigDecimal actualAmount;
+
     /**优惠券抵扣金额**/
     private BigDecimal reduceAmount;
 
     /**购买月数**/
     private Integer month;
+
+    @Transient
+    private String monthString;
 
     /**0未支付 1一已支付 2支付失败**/
     private Integer status;

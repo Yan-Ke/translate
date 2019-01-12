@@ -20,9 +20,11 @@ public class SystemConfig {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private  Integer id;
-    /**电话**/
-    private String phone;
+
+    /**电话或标题**/
+    private String field;
     /**内容**/
     private String content;
 
@@ -39,9 +41,18 @@ public class SystemConfig {
     /**修改时间**/
     @JsonIgnore
     private Date updateTime;
-    /**1关于我们 2注册协议**/
+    /**1关于我们 2注册协议3通知公告4帮助中心**/
     @JsonIgnore
     private  Integer type;
+
+    @JsonIgnore
+    private  Integer languageType;
+
+    /**0显示 1隐藏**/
+    private  Integer status;
+
+    @JsonIgnore
+    private  Integer configOrder;
 
 
 

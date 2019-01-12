@@ -10,7 +10,7 @@ public interface CounponManageService {
 
     ResultVO addCoupon(String name, Integer type, String fullPrice, String reducePrice, String beginTime, String endTime, Integer day,Integer count, HttpSession session);
 
-    ResultVO editCoupon(Integer id, String name, Integer type, String fullPrice, String reducePrice, String beginTime, String endTime, Integer day, HttpSession session);
+    ResultVO editCoupon(Integer id, String name, Integer type, String fullPrice, String reducePrice, String beginTime, String endTime, Integer day,Integer count, HttpSession session);
 
     ResultVO deleteCoupon(Integer id, HttpSession session);
 

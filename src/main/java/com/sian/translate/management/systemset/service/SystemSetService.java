@@ -1,6 +1,7 @@
 package com.sian.translate.management.systemset.service;
 
 import com.sian.translate.VO.ResultVO;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 
@@ -12,25 +13,19 @@ public interface SystemSetService {
 
     ResultVO handleFeedback(Integer id, HttpSession session);
 
-    ResultVO addNotify(Integer languageType, String title, String content, HttpSession session);
-
-    ResultVO deleteNotify(Integer id, HttpSession session);
-
-    ResultVO getNotifykList(String title, Integer page, Integer size, HttpSession session);
-
-    ResultVO getHelpCenterList(String title, Integer page, Integer size, HttpSession session);
-
-    ResultVO addHelpCenter(String title, String content, Integer status,HttpSession session);
-
-    ResultVO deleteHelpCenter(Integer id, HttpSession session);
-
-    ResultVO addRegstieProtocol(String content, HttpSession session);
-
-    ResultVO getRegstieProtocol(HttpSession session);
-
-    ResultVO addAboutMe(String phone, String content, HttpSession session);
-
-    ResultVO getAboutMe(HttpSession session);
-
     ResultVO getManageLogList(Integer page, Integer size, HttpSession session);
+
+    ResultVO uploadImage(MultipartFile file);
+
+
+
+    ResultVO addFile(Integer type, String languageType, String field, String content, Integer status, Integer order, HttpSession session);
+
+    ResultVO deleteFile(Integer id, HttpSession session);
+
+    ResultVO editFile(Integer id, Integer type, String languageType, String field, String content, Integer status, Integer order, HttpSession session);
+
+    ResultVO getFileList(Integer type, String field, Integer page, Integer size, HttpSession session);
+
+    ResultVO getTranslateList(Integer type, String filed, Integer page, Integer size, HttpSession session);
 }

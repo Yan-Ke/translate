@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <link href="../../css/index.css" rel="stylesheet">
+    <link href="../../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../font/iconfont.css">
+    <link rel="stylesheet" href="../../css/public.css">
+</head>
+<body class="graybg">
+    <div class="wrapper-content">
+        <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>优惠券列表</h5>
+            <div class="ibox-tools"></div>
+        </div>
+        <div class="ibox-content">
+            <div class="row admin-mt10">
+                <div class="col-sm-8">
+                    <a href="/manage/coupon/add" class="btn btn-primary btn-w-m">新增优惠券</a>
+                </div>
+                <div class="col-sm-4" style="padding-left:0">
+                    <div class="input-group">
+                        <input type="text" id="search" name="search" placeholder="输入优惠券名称查找" class=" form-control" th:value = ${name}>
+                        <span class="input-group-btn">
+                            <button id="findBtn" type="submit" class="btn  btn-primary"> 查找</button>
+                         </span>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table table-hover admin-mt40 table-bordered">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>优惠券名称</th>
+                        <th>使用条件</th>
+                        <th>优惠/元</th>
+                        <th>剩余数量</th>
+                        <th>创建时间</th>
+                        <th class="col-xs-2 text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr id="selectIds" th:each="coupon : ${couponList}">
+                        <td th:text="${coupon.id}"></td>
+                        <td th:text="${coupon.name}"></td>
+                        <td th:text="'满'+${coupon.fullPrice} + '元可使用'"></td>
+                        <td th:text="${coupon.reducePrice}"></td>
+                        <td th:text="${coupon.count}"></td>
+                        <td th:text="${coupon.createTime}"></td>
+                        <td class="text-center">
+                            <a th:href="@{'/manage/coupon/edit?id=' + ${coupon.id}}" class="color-primary admin-mr15">编辑</a>
+                            <a th:onclick="'javascript:deleteCoupon(\''+${coupon.id}+'\');'" class="color-danger">删除</a>
+                        </td>
+                    </tr>
+                    <!--搜索无结果-->
+                        <tr class="not_tr">
+                            <td colspan="7">
+                                <div>
+                                    <img th:style="${couponList.size()}>0?'display:none;':''"  src="../../image/nodat.png" >
+                                    <p class="text-center" th:text="${couponList.size()}<1?'暂无相关信息':''"></p>
+                                </div>
+                            </td>
+                        </tr>
+                </tbody>
+
+            </table>
+            <!--分页-->
+            <div class="text-center">
+                <ul class="pagination">
+                    <li th:class="${indexPage==1}?'disabled' : ''"><a  th:class="${indexPage==1}?'btn disabled' : ''"  th:href="@{'/manage/coupon/list?page=' + ${indexPage-1}+'&name='+${name} }" >上一页</a></li>
+                    <li th:if="${indexPage-3 >=1}" ><a th:href="@{'/manage/coupon/list?page=' + ${indexPage-3}+'&name='+${name}}" th:text="${indexPage -3}" >1</a></li>
+                    <li th:if="${indexPage-2 >=1}" ><a th:href="@{'/manage/coupon/list?page=' + ${indexPage-2}+'&name='+${name}}" th:text="${indexPage -2}" >1</a></li>
+                    <li th:if="${indexPage-1 >=1}" ><a th:href="@{'/manage/coupon/list?page=' + ${indexPage-1}+'&name='+${name}}" th:text="${indexPage -1}" >1</a></li>
+                    <li class="active"><a href="#" th:text="${indexPage}" >1</a></li>
+                    <li th:if="${indexPage+1 <=totalPage}" ><a th:href="@{'/manage/coupon/list?page=' + ${indexPage+1}+'&name='+${name}}" th:text="${indexPage +1}" >1</a></li>
+                    <li th:if="${indexPage+2 <=totalPage}" ><a th:href="@{'/manage/coupon/list?page=' + ${indexPage+2}+'&name='+${name}}" th:text="${indexPage +2}" >1</a></li>
+                    <li th:if="${indexPage+3 <=totalPage}" ><a  th:href="@{'/manage/coupon/list?page=' + ${indexPage+3} +'&name='+${name}}" th:text="${indexPage +3}" >1</a></li>
+
+                    <li th:class="${indexPage==totalPage}?'disabled' : ''" ><a  th:class="${indexPage==totalPage || totalPage < 1}?'btn disabled' : ''"  th:href="@{'/manage/coupon/list?page=' + ${indexPage+1} +'&name='+${name}}">下一页</a></li>
+                </ul><br>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+</body>
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<!-- 自定义js -->
+<!-- <script src="../../js/hplus.js?v=4.1.0"></script> -->
+<script type="text/javascript" src="../../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<!-- Input Mask-->
+<script src="../../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- suggest -->
+<script src="../../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../layer/layer.js"></script>
+<script src="../../layui/layui.js"></script>
+<!--高德地图api-->
+
+<script type="text/javascript" th:inline="javascript">
+
+
+    var page = [[${indexPage}]];
+    var name = [[${name}]];
+    if (name == null || name == "null") {
+        name = '';
+    }
+    console.log(name)
+
+
+    //点击提交
+    $('#findBtn').click(function () {
+        var name = $('#search').val();
+        console.log(name)
+        window.location.href = '/manage/coupon/list?name=' + name;
+    });
+
+
+    function deleteCoupon(id) {
+        layer.confirm('确定删除该优惠券吗', {
+            btn: ['确定', '取消'] //按钮
+        }, function () {
+            $.ajax({
+                url: "/manage/coupon/deleteCoupon",
+                data: {
+                    "id": id,
+                },
+                dataType: "json",
+                type: 'post',
+
+                success: function (res) {
+                    if (res.code == 0) {
+                        layer.msg(res.msg);
+                        window.location.href = '/manage/coupon/list?page=' + page + '&name=' + name;
+                        // setTimeout(function () {
+                        // }, 2000);
+                    }else {
+                        layer.msg(res.msg);
+                    }
+                }
+            })
+        })
+    }
+
+
+
+</script>
+</html>

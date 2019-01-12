@@ -47,6 +47,9 @@ public class Dictionary {
     /**是否会员可见 0不是 1会员可见**/
     private  Integer isMemberVisible;
 
+    @Transient
+    /**词汇量**/
+    private long counts;
 
 
 

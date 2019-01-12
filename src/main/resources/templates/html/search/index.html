@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <link href="../../css/index.css" rel="stylesheet">
+    <link href="../../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../font/iconfont.css">
+    <link rel="stylesheet" href="../../css/public.css">
+</head>
+<body class="graybg">
+<div class="wrapper-content">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>翻译统计</h5>
+            <div class="ibox-tools"></div>
+        </div>
+        <div class="ibox-content">
+
+            <div class="row admin-mt10">
+                <div class="col-sm-6">
+                    合计：<span th:text="${totalElements}" class="color-primary"> </span>  条
+                </div>
+                <div class="col-sm-2" style="padding-right: 0;padding-left: 0">
+                    <select id="searchType"  class="form-control " name="type">
+                        <option value="0">选择查询类型</option>
+                        <option value="1">查询词条</option>
+                        <option value="2">查询用户</option>
+                        <option value="3">无结果</option>
+                    </select>
+                </div>
+                <div class="col-sm-4" style="padding-left:0">
+                    <div class="input-group">
+                        <input type="text" id="search" name="search" placeholder="请输入查询关键词" class=" form-control" th:value="${field}">
+                        <span class="input-group-btn">
+                           <button id="searchBtn" type="submit" class="btn  btn-primary"> 查找</button>
+                         </span>
+                    </div>
+                </div>
+            </div>
+
+
+            <table class="table table-hover admin-mt40 table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>关键词</th>
+                    <th>查询人</th>
+                    <th>结果</th>
+                    <th>查询时间</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr id="selectIds" th:each="userTranslateRecord : ${userTranslateRecordList}">
+                    <td th:text="${userTranslateRecord.id}"></td>
+                    <td th:text="${userTranslateRecord.content}"></td>
+
+                    <td>
+                        <img class="img-circle" width="45" height="45" th:src="${userTranslateRecord.headImage}">
+                        <span th:text="${userTranslateRecord.nickName}" class="admin-p5"></span>
+
+                        <!--/**是否为会员 0 不是 1是 2过期会员**/-->
+                        <img th:src="${userTranslateRecord.vipIcon}" width="25" height="25" class="img-circle">
+
+                    </td>
+                    <td th:text="${userTranslateRecord.translateContent == null || userTranslateRecord.translateContent == ''}?'无结果':${userTranslateRecord.translateContent}">---</td>
+
+                    <td th:text="${userTranslateRecord.createTime}"></td>
+                </tr>
+                <!--搜索无结果-->
+                <tr class="not_tr">
+                    <td colspan="4">
+                        <div>
+                            <img th:style="${userTranslateRecordList.size()}>0?'display:none;':''" src="../../image/nodat.png">
+                            <p class="text-center" th:text="${userTranslateRecordList.size()}<1?'暂无相关信息':''"></p>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+
+            </table>
+            <!--分页-->
+            <div class="text-center">
+                <ul class="pagination">
+                    <li th:class="${indexPage==1}?'disabled' : ''"><a
+                            th:class="${indexPage==1}?'btn disabled' : ''" th:href="@{/manage/system/translateStatistical(page= ${indexPage-1},field=${field},type=${type})}">上一页</a>
+                    </li>
+                    <li th:if="${indexPage-3 >=1}"><a
+                            th:href="@{/manage/system/translateStatistical(page= ${indexPage-3},field=${field},type=${type})}"
+                            th:text="${indexPage -3}">1</a></li>
+                    <li th:if="${indexPage-2 >=1}"><a
+                            th:href="@{/manage/system/translateStatistical(page= ${indexPage-2},field=${field},type=${type})}"
+                            th:text="${indexPage -2}">1</a></li>
+                    <li th:if="${indexPage-1 >=1}"><a
+                            th:href="@{/manage/system/translateStatistical(page= ${indexPage-1},field=${field},type=${type})}"
+                            th:text="${indexPage -1}">1</a></li>
+                    <li class="active"><a href="#" th:text="${indexPage}">1</a></li>
+                    <li th:if="${indexPage+1 <=totalPage}"><a
+                            th:href="@{/manage/system/translateStatistical(page= ${indexPage+1},field=${field},type=${type})}"
+                            th:text="${indexPage +1}">1</a></li>
+                    <li th:if="${indexPage+2 <=totalPage}"><a
+                            th:href="@{/manage/system/translateStatistical(page= ${indexPage+2},field=${field},type=${type})}"
+                            th:text="${indexPage +2}">1</a></li>
+                    <li th:if="${indexPage+3 <=totalPage}"><a
+                            th:href="@{/manage/system/translateStatistical(page= ${indexPage+3},field=${field},type=${type})}"
+                            th:text="${indexPage +3}">1</a></li>
+
+                    <li th:class="${indexPage==totalPage || totalPage < 1}?'disabled' : ''"><a
+                            th:class="${indexPage==totalPage || totalPage < 1}?'btn disabled' : ''" th:href="@{/manage/system/translateStatistical(page= ${indexPage+1},field=${field},type=${type})}">下一页</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<!-- 自定义js -->
+<!-- <script src="../../js/hplus.js?v=4.1.0"></script> -->
+<script type="text/javascript" src="../../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<!-- Input Mask-->
+<script src="../../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- suggest -->
+<script src="../../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../layer/layer.js"></script>
+<script src="../../layui/layui.js"></script>
+<!--高德地图api-->
+
+
+<script th:inline="javascript">
+
+    var field = [[${field}]];
+    var type = [[${type}]];
+
+
+
+    $("#searchType").find("option[value="+type+"]").attr("selected",true);
+
+
+    //点击提交
+    $('#searchBtn').click(function () {
+
+
+        var type=  $("#searchType option:selected").val();
+        field = $('#search').val();
+        if (field == null){
+            field = "";
+        }
+
+        window.location.href = "/manage/system/translateStatistical" + "?field=" + field + "&type=" + type;
+    });
+
+
+
+
+
+</script>
+</html>

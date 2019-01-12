@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 public interface InformationManageService {
 
 
-    ResultVO addInformation(String title, String content, String author, String url,Integer languageType,Integer type, Integer order, Integer isShow, MultipartFile file, HttpSession session);
+    ResultVO addInformation(String title, String content, String author, String url,Integer languageType,Integer type, Integer order, Integer isShow, String image, HttpSession session);
 
     ResultVO editInformotion(Integer information,String title,String content, String author, String url,Integer languageType,Integer type, Integer order, Integer isShow, MultipartFile file, HttpSession session);
 

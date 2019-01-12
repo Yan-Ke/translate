@@ -4,11 +4,8 @@ import com.sian.translate.DTO.PageInfoDTO;
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.hint.enums.HintMessageEnum;
 import com.sian.translate.hint.service.HintMessageService;
-import com.sian.translate.management.systemset.enity.HelpCenter;
-import com.sian.translate.management.systemset.enity.Notify;
-import com.sian.translate.management.systemset.repository.HelpCenterRepository;
-import com.sian.translate.management.systemset.repository.NotifyRepository;
 import com.sian.translate.user.entity.SystemConfig;
+import com.sian.translate.user.entity.UserEducation;
 import com.sian.translate.user.entity.UserFeedback;
 import com.sian.translate.user.entity.UserInfo;
 import com.sian.translate.user.repository.SystemConfigRepositpory;
@@ -58,11 +55,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     SystemConfigRepositpory systemConfigRepositpory;
 
-    @Autowired
-    NotifyRepository notifyRepository;
 
-    @Autowired
-    HelpCenterRepository helpCenterRepository;
 
     @Override
     public ResultVO editUserInfo(MultipartFile file, UserInfo userInfo, String type) {
@@ -73,7 +66,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Optional<UserInfo> userInfoOptional = userInfoRepository.findById(userInfo.getId());
-        if (!userInfoOptional.isPresent()){
+        if (!userInfoOptional.isPresent()) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), type));
         }
         UserInfo resultUserInfo = userInfoOptional.get();
@@ -82,9 +75,10 @@ public class UserServiceImpl implements UserService {
             resultUserInfo.setNickName(userInfo.getNickName());
         }
 
-//        if (!StringUtils.isEmpty(userInfo.getPhone())) {
-//            resultUserInfo.setNickName(userInfo.getPhone());
-//        }
+        if (!StringUtils.isEmpty(userInfo.getPhone())) {
+            resultUserInfo.setPhone(userInfo.getPhone());
+        }
+        resultUserInfo.setUserStatus(userInfo.getUserStatus());
 
         if (userInfo.getSex() != null) {
             resultUserInfo.setSex(userInfo.getSex());
@@ -93,8 +87,21 @@ public class UserServiceImpl implements UserService {
             resultUserInfo.setAge(userInfo.getAge());
         }
 
-        if (!StringUtils.isEmpty(userInfo.getEducation())) {
-            resultUserInfo.setEducation(userInfo.getEducation());
+        if (!StringUtils.isEmpty(userInfo.getEducationId())) {
+
+            Optional<UserEducation> byId = educationRepository.findById(userInfo.getEducationId());
+
+            if (byId.isPresent()) {
+                UserEducation userEducation = byId.get();
+                resultUserInfo.setEducationId(userInfo.getEducationId());
+                if (type.equals("0")) {
+                    resultUserInfo.setEducation(userEducation.getEducationName());
+                } else {
+                    resultUserInfo.setEducation(userEducation.getZangEducationName());
+                }
+
+            }
+
         }
 
         if (file != null && !file.isEmpty()) {
@@ -147,8 +154,8 @@ public class UserServiceImpl implements UserService {
             userInfo.setRegistrationTime(new Date());
             userInfo.setUpdateTime(new Date());
             userInfo.setUserStatus(0);
-        }else{
-            if (userInfo.getUserStatus() == 1){
+        } else {
+            if (userInfo.getUserStatus() == 1) {
                 ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_PROHIBIT.getCode(), type));
             }
         }
@@ -188,18 +195,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResultVO getDucation(String languageType) {
 
-        List<String> educationNameList = new ArrayList<>();
 
-        if (!StringUtils.isEmpty(languageType) && languageType.equals("1")) {
-            if (educationRepository.getAllZangEducationName() != null) {
-                educationNameList.addAll(educationRepository.getAllZangEducationName());
-            }
-        } else {
-            if (educationRepository.getAllChineseEducationName() != null) {
-                educationNameList.addAll(educationRepository.getAllChineseEducationName());
+        List<UserEducation> all = educationRepository.findAll();
+
+        for (UserEducation userEducation : all) {
+            if (!StringUtils.isEmpty(languageType) && languageType.equals("1")) {
+                userEducation.setName(userEducation.getZangEducationName());
+            } else {
+                userEducation.setName(userEducation.getEducationName());
             }
         }
-        return ResultVOUtil.success(educationNameList);
+
+        return ResultVOUtil.success(all);
 
     }
 
@@ -211,14 +218,14 @@ public class UserServiceImpl implements UserService {
      * @param content
      **/
     @Override
-    public ResultVO feedback(String languageType, Integer userId, String content,MultipartFile[] files) {
+    public ResultVO feedback(String languageType, Integer userId, String content, MultipartFile[] files) {
 
         if (userId == null) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
         }
         Optional<UserInfo> userInfoOptional = userInfoRepository.findById(userId);
 
-        if (!userInfoOptional.isPresent()){
+        if (!userInfoOptional.isPresent()) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), languageType));
         }
         if (StringUtils.isEmpty(content) || StringUtils.isEmpty(content.trim())) {
@@ -231,14 +238,14 @@ public class UserServiceImpl implements UserService {
 
         String images = "";
 
-        if (files != null && files.length > 0 ) {
+        if (files != null && files.length > 0) {
             try {
 
                 if (files != null && files.length > 0) {
                     for (int i = 0; i < files.length; i++) {
                         MultipartFile file = files[i];
                         // 保存文件
-                        images += ImageUtlis.loadImage(file) +",";
+                        images += ImageUtlis.loadImage(file) + ",";
 
                     }
                 }
@@ -266,7 +273,7 @@ public class UserServiceImpl implements UserService {
 
         userFeedbackRepositpory.save(userFeedback);
 
-        if (!StringUtils.isEmpty(images)){
+        if (!StringUtils.isEmpty(images)) {
             String[] split = images.split(",");
             List<String> imageList = new ArrayList<>();
 
@@ -355,7 +362,7 @@ public class UserServiceImpl implements UserService {
             UserInfo userInfo = userInfoRepository.findByWeixinOpenid(weixinOpenid);
 
             if (userInfo != null) {
-                if (userInfo.getUserStatus() == 1){
+                if (userInfo.getUserStatus() == 1) {
                     ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_PROHIBIT.getCode(), languageType));
                 }
                 setUserIsMember(userInfo);
@@ -370,7 +377,6 @@ public class UserServiceImpl implements UserService {
     }
 
 
-
     /**
      * 更改用户手机号码
      *
@@ -382,32 +388,32 @@ public class UserServiceImpl implements UserService {
      **/
     @Override
     public ResultVO changePhone(Integer id, String nowPhone, String newPhone, String code, String languageType) {
-        if (id == null){
+        if (id == null) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
         }
-        if (StringUtils.isEmpty(nowPhone)){
+        if (StringUtils.isEmpty(nowPhone)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOW_PHONE_IS_NOT_EMPTY.getCode(), languageType));
         }
-        if (StringUtils.isEmpty(newPhone)){
+        if (StringUtils.isEmpty(newPhone)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NEW_PHONE_IS_NOT_EMPTY.getCode(), languageType));
         }
-        if (StringUtils.isEmpty(code)){
+        if (StringUtils.isEmpty(code)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.CODE_NOT_EMPTY.getCode(), languageType));
         }
 
         Optional<UserInfo> userInfoOptional = userInfoRepository.findById(id);
-        if (!userInfoOptional.isPresent()){
+        if (!userInfoOptional.isPresent()) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), languageType));
         }
         int count = userInfoRepository.countByPhone(newPhone);
 
-        if (count > 0){
+        if (count > 0) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PHONE_USEED.getCode(), languageType));
         }
 
         UserInfo userInfo = userInfoOptional.get();
 
-        if (!userInfo.getPhone().trim().equals(nowPhone.trim())){
+        if (!userInfo.getPhone().trim().equals(nowPhone.trim())) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOW_PHONE_ERROR.getCode(), languageType));
         }
         userInfo.setPhone(newPhone);
@@ -426,12 +432,35 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResultVO getConfig(Integer type, String languageType) {
 
-        if (StringUtils.isEmpty(type)){
+        if (StringUtils.isEmpty(type)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.SYSTEM_CONFIG_TYPE_NOT_EMPPPTY.getCode(), languageType));
         }
-        SystemConfig systemConfig = systemConfigRepositpory.findByType(type);
+        Sort sort = new Sort(Sort.Direction.DESC,"configOrder").and(new Sort(Sort.Direction.DESC, "updateTime"));
 
-        if (systemConfig == null){
+
+        List<SystemConfig> systemConfigList = systemConfigRepositpory.findAll(new Specification<SystemConfig>() {
+            @Override
+            public Predicate toPredicate(Root<SystemConfig> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+
+                List<Predicate> predicate = new ArrayList<>();
+                if (!StringUtils.isEmpty(languageType)) {
+                    predicate.add(criteriaBuilder.equal(root.get("languageType"), languageType));
+                }
+                predicate.add(criteriaBuilder.equal(root.get("type"), type));
+                predicate.add(criteriaBuilder.equal(root.get("status"), 0));
+
+                return criteriaBuilder.and(predicate.toArray(new Predicate[predicate.size()]));
+
+            }
+        }, sort);
+
+        SystemConfig systemConfig = new SystemConfig();
+
+        if (systemConfigList != null && systemConfigList.size() > 0){
+            systemConfig = systemConfigList.get(0);
+        }
+
+        if (systemConfig == null) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.SYSTEM_CONFIG_EMPPPTY.getCode(), languageType));
         }
 
@@ -454,25 +483,29 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResultVO getNotifkList(String languageType, Integer page, Integer size) {
 
-        Sort sort = new Sort(Sort.Direction.DESC,"updateTime");
+        Sort sort = new Sort(Sort.Direction.DESC,"configOrder").and(new Sort(Sort.Direction.DESC, "updateTime"));
 
-        if (page < 1){
+        if (page < 1) {
             page = 1;
         }
-        if (size < 1){
+        if (size < 1) {
             size = 1;
         }
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        Page<Notify> notifyPage = notifyRepository.findAll(new Specification<Notify>() {
+        Page<SystemConfig> notifyPage = systemConfigRepositpory.findAll(new Specification<SystemConfig>() {
             @Override
-            public Predicate toPredicate(Root<Notify> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+            public Predicate toPredicate(Root<SystemConfig> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
 
                 List<Predicate> predicate = new ArrayList<>();
                 if (!StringUtils.isEmpty(languageType)) {
-                    predicate.add(criteriaBuilder.equal(root.get("languageType"),  languageType));
+                    predicate.add(criteriaBuilder.equal(root.get("languageType"), languageType));
                 }
+                predicate.add(criteriaBuilder.equal(root.get("type"), 3));
+                predicate.add(criteriaBuilder.equal(root.get("status"), 0));
+
+
                 return criteriaBuilder.and(predicate.toArray(new Predicate[predicate.size()]));
 
             }
@@ -499,17 +532,34 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResultVO getHelpCenterList(String languageType, Integer page, Integer size) {
 
-        Sort sort = new Sort(Sort.Direction.DESC,"updateTime");
 
-        if (page < 1){
+        Sort sort = new Sort(Sort.Direction.DESC,"configOrder").and(new Sort(Sort.Direction.DESC, "updateTime"));
+
+        if (page < 1) {
             page = 1;
         }
-        if (size < 1){
+        if (size < 1) {
             size = 1;
         }
-        Pageable pageable = PageRequest.of(page - 1 , size, sort);
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        Page<HelpCenter> notifyPage = helpCenterRepository.findAllByStatus(0, pageable);
+
+        //1关于我们 2注册协议3通知公告4帮助中心
+        Page<SystemConfig> notifyPage = systemConfigRepositpory.findAll(new Specification<SystemConfig>() {
+            @Override
+            public Predicate toPredicate(Root<SystemConfig> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+
+                List<Predicate> predicate = new ArrayList<>();
+                if (!StringUtils.isEmpty(languageType)) {
+                    predicate.add(criteriaBuilder.equal(root.get("languageType"), languageType));
+                }
+                predicate.add(criteriaBuilder.equal(root.get("type"), 4));
+                predicate.add(criteriaBuilder.equal(root.get("status"), 0));
+
+                return criteriaBuilder.and(predicate.toArray(new Predicate[predicate.size()]));
+
+            }
+        }, pageable);
 
         PageInfoDTO pageInfoDTO = new PageInfoDTO();
         pageInfoDTO.setTotalPages(notifyPage.getTotalPages());
@@ -518,18 +568,23 @@ public class UserServiceImpl implements UserService {
         pageInfoDTO.setSize(size);
         pageInfoDTO.setList(notifyPage.getContent());
 
-        return ResultVOUtil.success(pageInfoDTO);       }
+        return ResultVOUtil.success(pageInfoDTO);
+    }
 
     private void setUserIsMember(UserInfo userInfo) {
         if (userInfo.getMemberBeginTime() != null
                 && userInfo.getMemberEndTime() != null) {
-            if (CommonUtlis.isEffectiveDate(new Date(), userInfo.getMemberBeginTime(), userInfo.getMemberEndTime())){
+            if (CommonUtlis.isEffectiveDate(new Date(), userInfo.getMemberBeginTime(), userInfo.getMemberEndTime())) {
                 userInfo.setIsMember(1);
-            }else{
+                userInfo.setVipIcon(CommonUtlis.VIPICON1);
+            } else {
                 userInfo.setIsMember(2);
+                userInfo.setVipIcon(CommonUtlis.VIPICON2);
             }
-        }else{
+        } else {
             userInfo.setIsMember(0);
+            userInfo.setVipIcon(CommonUtlis.VIPICON0);
+
         }
     }
 

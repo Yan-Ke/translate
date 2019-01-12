@@ -28,6 +28,7 @@ import javax.persistence.Query;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -145,7 +146,7 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         if (StringUtils.isEmpty(userId)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOT_LOGIN.getCode(), languageType));
         }
-        if (StringUtils.isEmpty(explainChinese)) {
+        if (explainChinese == null || StringUtils.isEmpty(explainChinese.trim())) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.EXPLAIN_CHINESE_NOT_EMPTY.getCode(), languageType));
         }
 //        if (StringUtils.isEmpty(explainZang)){
@@ -257,29 +258,27 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         if (size < 1) {
             size = 1;
         }
-        StringBuilder dataSql = new StringBuilder("SELECT pay_time as payTime,count(1) as dayCount,SUM(amount) as dayAmount FROM user_order ");
+        StringBuilder dataSql = new StringBuilder("SELECT DATE_FORMAT(pay_time,'%Y-%m-%d') AS payTime,COUNT(1) AS dayCount,SUM(amount) AS dayAmount FROM user_order ");
+        StringBuilder countSql = new StringBuilder("SELECT count(DISTINCT( DATE_FORMAT(pay_time,'%Y-%m-%d'))) as count FROM user_order ");
+        StringBuilder totalSql = new StringBuilder("SELECT COUNT(1) AS totalCount,SUM(amount) AS totalAmount FROM user_order ");
 
-        StringBuilder countSql = new StringBuilder("SELECT count(DISTINCT pay_time) AS count FROM user_order ");
+        if (StringUtils.isEmpty(beginTime) && !StringUtils.isEmpty(endTime)){
+            beginTime = endTime;
+        }
 
-
+        if (StringUtils.isEmpty(endTime) && !StringUtils.isEmpty(beginTime)){
+            endTime = beginTime;
+        }
 
         Date payBeginDate = null;
         Date payEndDate = null;
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
         if (!StringUtils.isEmpty(beginTime)){
+
             try {
-                long beginTimelong = Long.valueOf(beginTime);
-
-
-                if (beginTime.length() == 10 || beginTime.length() == 13) {
-                    if (beginTime.length() == 10) {
-                        beginTimelong = beginTimelong * 1000;
-                    }
-                } else {
-                    return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PAY_TIME_FORMAT_ERROR.getCode(), languageType));
-                }
-
-                payBeginDate = new Date(beginTimelong);
+                payBeginDate = sdf.parse(beginTime);
             } catch (Exception e) {
                 e.printStackTrace();
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PAY_TIME_FORMAT_ERROR.getCode(), languageType));
@@ -287,18 +286,7 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         }
         if (!StringUtils.isEmpty(endTime)){
             try {
-                long endTimelong = Long.valueOf(endTime);
-
-
-                if (endTime.length() == 10 || endTime.length() == 13) {
-                    if (endTime.length() == 10) {
-                        endTimelong = endTimelong * 1000;
-                    }
-                } else {
-                    return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PAY_TIME_FORMAT_ERROR.getCode(), languageType));
-                }
-
-                payEndDate = new Date(endTimelong);
+                payEndDate = sdf.parse(endTime);
             } catch (Exception e) {
                 e.printStackTrace();
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PAY_TIME_FORMAT_ERROR.getCode(), languageType));
@@ -310,31 +298,58 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         StringBuilder whereSql = new StringBuilder(" WHERE status = 1");
 
         if (payBeginDate != null){
-            whereSql.append(" AND pay_time >= :payBeginDate");
+            whereSql.append(" AND TO_DAYS(pay_time) >= TO_DAYS(:payBeginDate)");
         }
         if (payEndDate != null){
-            whereSql.append(" AND pay_time <= :payEndDate");
+            whereSql.append(" AND TO_DAYS(pay_time) <= TO_DAYS(:payEndDate)");
         }
 
 
         //组装sql语句
-        dataSql.append(whereSql).append(" GROUP BY pay_time ORDER BY pay_time DESC");
+        dataSql.append(whereSql).append(" GROUP BY DATE_FORMAT(pay_time,'%Y-%m-%d') ORDER BY DATE_FORMAT(pay_time, '%Y-%m-%d') DESC");
         countSql.append(whereSql);
+        totalSql.append(whereSql);
+
+
 
         //创建本地sql查询实例
         Query dataQuery = entityManager.createNativeQuery(dataSql.toString());
         Query countQuery = entityManager.createNativeQuery(countSql.toString());
+        Query totalQuery = entityManager.createNativeQuery(totalSql.toString());
 
         //设置参数
 
         if (payBeginDate != null){
             dataQuery.setParameter("payBeginDate", payBeginDate);
             countQuery.setParameter("payBeginDate", payBeginDate);
+            totalQuery.setParameter("payBeginDate", payBeginDate);
+
 
         }
         if (payEndDate != null){
             dataQuery.setParameter("payEndDate", payEndDate);
             countQuery.setParameter("payEndDate", payEndDate);
+            totalQuery.setParameter("payEndDate", payEndDate);
+
+        }
+
+        List resultList = totalQuery.getResultList();
+
+
+        long totalCount = 0;
+        BigDecimal sumAmount = BigDecimal.ZERO;
+
+        if (resultList.size() > 0){
+
+            Object[] objects = (Object[]) resultList.get(0);
+
+            if (objects[0] != null){
+                BigInteger temp = (BigInteger) objects[0];
+                totalCount = temp.longValue();
+            }
+            if (objects[1] != null){
+                sumAmount = (BigDecimal) objects[1];
+            }
         }
 
         dataQuery.setFirstResult(page - 1);
@@ -347,9 +362,6 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         List result =  page - 1 <= totalPages  ? dataQuery.getResultList() : Collections.emptyList();
 
 
-        long totalCount = memberpayRecordRepository.countByStatus(1);
-
-        BigDecimal sumAmount = memberpayRecordRepository.getSumAmountByStatus(1);
 
 
         List<FinancialInfoDTO> content = new ArrayList<>();
@@ -358,7 +370,8 @@ public class ManageMemberServiceImpl implements ManageMemberService {
 
             FinancialInfoDTO financialInfoDTO = new FinancialInfoDTO();
             if (objects[0] != null){
-                financialInfoDTO.setPayTime((Date) objects[0]);
+//                financialInfoDTO.setPayTime((Date) objects[0]);
+                financialInfoDTO.setPayTimeString((String) objects[0]);
             }
             if (objects[1] != null){
                 BigInteger dayCount = (BigInteger) objects[1];
@@ -367,6 +380,7 @@ public class ManageMemberServiceImpl implements ManageMemberService {
             if (objects[2] != null){
                 financialInfoDTO.setDayAmount((BigDecimal) objects[2]);
             }
+
             financialInfoDTO.setTotalAmount(sumAmount);
             financialInfoDTO.setTotalCount(totalCount);
             content.add(financialInfoDTO);
@@ -474,25 +488,26 @@ public class ManageMemberServiceImpl implements ManageMemberService {
 
         StringBuilder countSql = new StringBuilder("SELECT count(1) FROM user_order uo LEFT JOIN user_info as ui on ui.id = uo.user_id left join coupon as c on c.id = uo.coupon_id ");
 
+        StringBuilder totalSql = new StringBuilder("SELECT SUM(amount) AS totalAmoun  from user_order as uo LEFT JOIN user_info as ui on ui.id = uo.user_id left join coupon as c on c.id = uo.coupon_id ");
 
+
+        if (StringUtils.isEmpty(beginTime) && !StringUtils.isEmpty(endTime)){
+            beginTime = endTime;
+        }
+
+        if (StringUtils.isEmpty(endTime) && !StringUtils.isEmpty(beginTime)){
+            endTime = beginTime;
+        }
 
         Date payBeginDate = null;
         Date payEndDate = null;
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
         if (!StringUtils.isEmpty(beginTime)){
+
             try {
-                long beginTimelong = Long.valueOf(beginTime);
-
-
-                if (beginTime.length() == 10 || beginTime.length() == 13) {
-                    if (beginTime.length() == 10) {
-                        beginTimelong = beginTimelong * 1000;
-                    }
-                } else {
-                    return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PAY_TIME_FORMAT_ERROR.getCode(), languageType));
-                }
-
-                payBeginDate = new Date(beginTimelong);
+                payBeginDate = sdf.parse(beginTime);
             } catch (Exception e) {
                 e.printStackTrace();
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PAY_TIME_FORMAT_ERROR.getCode(), languageType));
@@ -500,18 +515,7 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         }
         if (!StringUtils.isEmpty(endTime)){
             try {
-                long endTimelong = Long.valueOf(endTime);
-
-
-                if (endTime.length() == 10 || endTime.length() == 13) {
-                    if (endTime.length() == 10) {
-                        endTimelong = endTimelong * 1000;
-                    }
-                } else {
-                    return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PAY_TIME_FORMAT_ERROR.getCode(), languageType));
-                }
-
-                payEndDate = new Date(endTimelong);
+                payEndDate = sdf.parse(endTime);
             } catch (Exception e) {
                 e.printStackTrace();
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PAY_TIME_FORMAT_ERROR.getCode(), languageType));
@@ -522,54 +526,81 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         //拼接where条件
         StringBuilder whereSql = new StringBuilder(" WHERE uo.status = 1");
 
+
         if (payBeginDate != null){
-            whereSql.append(" AND uo.pay_time >= :payBeginDate");
+            whereSql.append(" AND TO_DAYS(uo.pay_time) >= TO_DAYS(:payBeginDate)");
+
         }
         if (payEndDate != null){
-            whereSql.append(" AND uo.pay_time <= :payEndDate");
+            whereSql.append(" AND TO_DAYS(uo.pay_time) <= TO_DAYS(:payEndDate)");
+
         }
 
         if (!StringUtils.isEmpty(orderNo)){
             whereSql.append(" AND uo.order_id like :orderNo");
+
         }
         if (!StringUtils.isEmpty(nickName)){
             whereSql.append(" AND ui.nick_name like :nickName");
+
         }
-        if (month != null){
+        if (month != null && month > 0){
             whereSql.append(" AND uo.month = :month");
+
         }
 
         //组装sql语句
         dataSql.append(whereSql).append(" order by uo.pay_time desc");
         countSql.append(whereSql);
+        totalSql.append(whereSql);
 
         //创建本地sql查询实例
         Query dataQuery = entityManager.createNativeQuery(dataSql.toString());
         Query countQuery = entityManager.createNativeQuery(countSql.toString());
+        Query totalQuery = entityManager.createNativeQuery(totalSql.toString());
 
         //设置参数
 
         if (payBeginDate != null){
             dataQuery.setParameter("payBeginDate", payBeginDate);
             countQuery.setParameter("payBeginDate", payBeginDate);
+            totalQuery.setParameter("payBeginDate", payBeginDate);
 
         }
         if (payEndDate != null){
             dataQuery.setParameter("payEndDate", payEndDate);
             countQuery.setParameter("payEndDate", payEndDate);
+            totalQuery.setParameter("payEndDate", payEndDate);
+
         }
 
         if (!StringUtils.isEmpty(orderNo)){
             dataQuery.setParameter("orderNo", "%" + orderNo + "%");
             countQuery.setParameter("orderNo", "%"+ orderNo + "%");
+            totalQuery.setParameter("orderNo", "%"+ orderNo + "%");
+
         }
         if (!StringUtils.isEmpty(nickName)){
             dataQuery.setParameter("nickName", "%"+ nickName + "%");
             countQuery.setParameter("nickName", "%" + nickName + "%");
+            totalQuery.setParameter("nickName", "%" + nickName + "%");
+
         }
-        if (month != null){
+        if (month != null && month > 0){
             dataQuery.setParameter("month", month);
             countQuery.setParameter("month", month);
+            totalQuery.setParameter("month", month);
+
+        }
+
+
+        List resultList = totalQuery.getResultList();
+        BigDecimal sumAmount = BigDecimal.ZERO;
+
+        if (resultList.size() > 0){
+            if (resultList.get(0) != null){
+                sumAmount = (BigDecimal) resultList.get(0);
+            }
         }
 
         dataQuery.setFirstResult(page - 1);
@@ -583,6 +614,8 @@ public class ManageMemberServiceImpl implements ManageMemberService {
         List result =  page - 1 <= totalPages  ? dataQuery.getResultList() : Collections.emptyList();
 
 //        List<Object[]> result = memberpayRecordRepository.findAllMemberRecords((page - 1) * size, size);
+
+
 
         List<UserRecordDTO> content = new ArrayList<>();
         for (Object item : result) {
@@ -634,17 +667,38 @@ public class ManageMemberServiceImpl implements ManageMemberService {
             if (objects[14] != null){
                 userRecordDTO.setCouponName((String) objects[14]);
             }
+            userRecordDTO.setTotalAmount(sumAmount);
 
+
+            if (userRecordDTO.getMonth() == 1){
+                userRecordDTO.setMonthString("月");
+            }else  if (userRecordDTO.getMonth() == 3){
+                userRecordDTO.setMonthString("季度");
+            }else  if (userRecordDTO.getMonth() == 6){
+                userRecordDTO.setMonthString("半年");
+            }else  if (userRecordDTO.getMonth() == 12){
+                userRecordDTO.setMonthString("年");
+            }
+
+            if (userRecordDTO.getReduceAmount() != null){
+                userRecordDTO.setActualAmount(userRecordDTO.getAmount().add(userRecordDTO.getReduceAmount()));
+            }else{
+                userRecordDTO.setActualAmount(userRecordDTO.getAmount());
+            }
 
             if (userRecordDTO.getMemberBeginTime() != null
                     && userRecordDTO.getMemberEndTime() != null) {
                 if (CommonUtlis.isEffectiveDate(new Date(), userRecordDTO.getMemberBeginTime(), userRecordDTO.getMemberEndTime())) {
                     userRecordDTO.setIsMember(1);
+                    userRecordDTO.setVipIcon(CommonUtlis.VIPICON1);
                 } else {
                     userRecordDTO.setIsMember(2);
+                    userRecordDTO.setVipIcon(CommonUtlis.VIPICON2);
                 }
             } else {
                 userRecordDTO.setIsMember(0);
+                userRecordDTO.setVipIcon(CommonUtlis.VIPICON0);
+
             }
 
             content.add(userRecordDTO);
@@ -670,11 +724,29 @@ public class ManageMemberServiceImpl implements ManageMemberService {
                 && userInfo.getMemberEndTime() != null) {
             if (CommonUtlis.isEffectiveDate(new Date(), userInfo.getMemberBeginTime(), userInfo.getMemberEndTime())) {
                 userInfo.setIsMember(1);
+                userInfo.setVipIcon(CommonUtlis.VIPICON1);
             } else {
+                userInfo.setVipIcon(CommonUtlis.VIPICON2);
                 userInfo.setIsMember(2);
             }
         } else {
+            userInfo.setVipIcon(CommonUtlis.VIPICON0);
             userInfo.setIsMember(0);
         }
+
+        /**用户性别 0未知1男2女3保密**/
+        if(userInfo.getSex() == null || userInfo.getSex() == 0){
+            userInfo.setSexString("未知");
+        }else if (userInfo.getSex() == 1){
+            userInfo.setSexString("男");
+        }else if (userInfo.getSex() == 2){
+            userInfo.setSexString("女");
+        }else if (userInfo.getSex() == 3){
+            userInfo.setSexString("保密");
+        }
+
+
     }
+
+
 }

@@ -28,13 +28,13 @@ public class InformationManageController {
                             @RequestParam(value = "content", required = false) String content,
                             @RequestParam(value = "author", required = false) String author,
                             @RequestParam(value = "url", required = false) String url,
-                            @RequestParam(value = "languageType", required = false) Integer languageType,
+                            @RequestParam(value = "languageType", required = false,defaultValue = "0") Integer languageType,
                             @RequestParam(value = "type", required = false) Integer type,
                             @RequestParam(value = "order", required = false, defaultValue = "0") Integer order,
                             @RequestParam(value = "isShow", required = false, defaultValue = "1") Integer isShow,
-                            @RequestParam(value = "file", required = false) MultipartFile file,
+                            @RequestParam(value = "image", required = false) String image,
                             HttpSession session) {
-        return informationManageService.addInformation(title, content, author, url, languageType, type, order, isShow, file, session);
+        return informationManageService.addInformation(title, content, author, url, languageType, type, order, isShow, image, session);
     }
 
     /****
@@ -49,10 +49,10 @@ public class InformationManageController {
                              @RequestParam(value = "content", required = false) String content,
                              @RequestParam(value = "author", required = false) String author,
                              @RequestParam(value = "url", required = false) String url,
-                             @RequestParam(value = "languageType", required = false) Integer languageType,
+                             @RequestParam(value = "languageType", required = false,defaultValue = "0") Integer languageType,
                              @RequestParam(value = "type", required = false) Integer type,
-                             @RequestParam(value = "order", required = false) Integer order,
-                             @RequestParam(value = "isShow", required = false) Integer isShow,
+                             @RequestParam(value = "order", required = false, defaultValue = "0") Integer order,
+                             @RequestParam(value = "isShow", required = false, defaultValue = "1") Integer isShow,
                              @RequestParam(value = "file", required = false) MultipartFile file,
                              HttpSession session) {
         return informationManageService.editInformotion(informationId, title, content, author, url, languageType, type, order, isShow, file, session);

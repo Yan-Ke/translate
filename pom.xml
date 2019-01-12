@@ -93,6 +93,18 @@
             <version>3.16</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.dcssn</groupId>
+            <artifactId>ueditor-spring-boot-starter</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.46</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

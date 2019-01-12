@@ -17,12 +17,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.criteria.*;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -42,7 +45,7 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
 
 
     @Override
-    public ResultVO addDictionaryr(String name, Integer type, Integer isMemberVisible, MultipartFile image, HttpSession session) {
+    public ResultVO addDictionaryr(String name, Integer type, Integer isMemberVisible, String image, HttpSession session) {
         String languageType = "0";
 
 
@@ -62,21 +65,14 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
             isMemberVisible = 1;
         }
 
-        if (image == null || image.isEmpty()){
+        if (StringUtils.isEmpty(image)){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.DICTIONARY_IMAGE_NOT_EMPTY.getCode(), languageType));
-        }
-        String imagePath = "";
-        try {
-            imagePath = ImageUtlis.loadImage(image);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_FORMAT_ERROR.getCode(), languageType));
         }
 
         Dictionary dictionary = new Dictionary();
         dictionary.setName(name);
         dictionary.setType(type);
-        dictionary.setImage(imagePath);
+        dictionary.setImage(image);
         dictionary.setIsMemberVisible(isMemberVisible);
         dictionary.setUserId(userId);
         dictionary.setCreateTime(new Date());
@@ -181,6 +177,11 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
         }
         List<Dictionary> all = dictionaryRepository.findAll();
 
+        for (int i = 0; i < all.size(); i++) {
+            Dictionary dictionary = all.get(i);
+            dictionary.setCounts(thesaurusRepository.countByDictionaryId(dictionary.getId()));
+        }
+
         return ResultVOUtil.success(all);
     }
 
@@ -209,13 +210,35 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
         Sort sort = new Sort(Sort.Direction.DESC,"updateTime");
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
-        Page<Thesaurus> thesaurusPage ;
-        if (StringUtils.isEmpty(name)){
-            thesaurusPage = thesaurusRepository.findByDictionaryId(id, pageable);
-        }else{
-            name = "%" + name + "%";
-            thesaurusPage = thesaurusRepository.findByDictionaryIdAndAndContentOneLike(id,name, pageable);
-        }
+//        Page<Thesaurus> thesaurusPage ;
+//        if (StringUtils.isEmpty(name)){
+//            thesaurusPage = thesaurusRepository.findByDictionaryId(id, pageable);
+//        }else{
+//            name = "%" + name + "%";
+//            thesaurusPage = thesaurusRepository.findByDictionaryIdAndAndContentOneLike(id,name, pageable);
+//        }
+
+        String finalName = name;
+        Page<Thesaurus> thesaurusPage = thesaurusRepository.findAll(new Specification<Thesaurus>() {
+            @Override
+            public Predicate toPredicate(Root<Thesaurus> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+
+                List<Predicate> predicate = new ArrayList<>();
+                predicate.add(criteriaBuilder.equal(root.get("dictionaryId") , id));
+
+                if (!StringUtils.isEmpty(finalName)) {
+
+
+                    Predicate predicate1 = criteriaBuilder.like(root.get("contentOne"), "%" + finalName + "%");
+                    predicate1 = criteriaBuilder.or(criteriaBuilder.like(root.get("contentTwo") , "%" + finalName + "%"), predicate1);
+
+                    predicate.add(predicate1);
+
+                }
+                return criteriaBuilder.and(predicate.toArray(new Predicate[predicate.size()]));
+
+            }
+        }, pageable);
 
 
         long totalElements = thesaurusPage.getTotalElements();
@@ -341,5 +364,33 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
         String logmsg = "删除词条"+"("+thesaurus.getContentOne()+"->"+thesaurus.getContentTwo()+")";
 
         return ResultVOUtil.success(logmsg);
+    }
+
+    @Override
+    public ResultVO getNewThesaurus() {
+
+        Sort sort = new Sort(Sort.Direction.DESC,"updateTime");
+        Pageable pageable = PageRequest.of(0, 5, sort);
+
+
+        Page<Thesaurus> all = thesaurusRepository.findAll(pageable);
+
+        List<Thesaurus> thesaurusList = all.getContent();
+
+        for (Thesaurus thesaurus : thesaurusList) {
+            thesaurus.setDictionaryName("");
+            Integer dictionaryId = thesaurus.getDictionaryId();
+            if (dictionaryId != null){
+                Optional<Dictionary> byId = dictionaryRepository.findById(dictionaryId);
+                if (byId.isPresent()){
+                    thesaurus.setDictionaryName(byId.get().getName());
+                }
+            }
+
+
+        }
+
+
+        return ResultVOUtil.success(all.getContent());
     }
 }

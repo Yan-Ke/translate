@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../image/favicon.ico">
+    <link href="../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../css/animate.css" rel="stylesheet">
+    <link href="../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../css/plugins/iCheck/custom.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="../css/index.css" rel="stylesheet">
+    <link href="../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../css/plugins/colorpicker/css/bootstrap-colorpicker.min.css" rel="stylesheet">
+    <link href="../css/plugins/cropper/cropper.min.css" rel="stylesheet">
+    <link href="../css/plugins/switchery/switchery.css" rel="stylesheet">
+    <link href="../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link href="../css/plugins/nouslider/jquery.nouislider.css" rel="stylesheet">
+    <link href="../css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+    <link href="../css/plugins/ionRangeSlider/ion.rangeSlider.css" rel="stylesheet">
+    <link href="../css/plugins/ionRangeSlider/ion.rangeSlider.skinFlat.css" rel="stylesheet">
+    <link href="../css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" rel="stylesheet">
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <link rel="stylesheet" href="../font/iconfont.css">
+    <link rel="stylesheet" href="../css/public.css">
+</head>
+
+<body class="fixed-sidebar full-height-layout gray-bg">
+<div id="wrapper">
+    <!--左侧导航开始-->
+    <nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="nav-close"><i class="fa fa-times-circle"></i>
+    </div>
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+            <li class="nav-header" style="padding: 20px;background: none">
+                <div class="dropdown profile-element text-center">
+                    <img alt="image" class="img-circle" width="65"  height="65" src="../image/logo2.jpg">
+                </div>
+                <div class="logo-element">
+                    <img alt="image" class="img-circle" width="25" height="25" src="../image/logo2.jpg">
+                </div>
+            </li>
+            <li class="target">
+                <a href="#">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span class="nav-label">系统首页</span>
+                    <span class="fa arrow"></span>
+                </a>
+                <ul class="nav nav-second-level">
+                    <li class="pageChange">
+                        <a href="/manage/home">系统首页</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="target">
+                <a href="#">
+                    <i class="iconfont icon-huodong"></i>
+                    <span class="nav-label">会员管理</span>
+                    <span class="fa arrow"></span>
+                </a>
+                <ul class="nav nav-second-level">
+                    <li class="pageChange">
+                        <a href="/manage/member/list">会员列表</a>
+                    </li>
+                    <li class="pageChange">
+                        <a href="/manage/member/set">会员资费</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="target">
+                <a href="#">
+                    <i class="iconfont icon-xiaoshou"></i>
+                    <span class="nav-label">词典管理</span>
+                    <span class="fa arrow"></span>
+                </a>
+                <ul class="nav nav-second-level">
+                    <li class="pageChange">
+                        <a href="/manage/dictionary/list">词典列表</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="target">
+                <a href="#">
+                    <i class="iconfont icon-kehu"></i>
+                    <span class="nav-label">优惠券</span>
+                    <span class="fa arrow"></span>
+                </a>
+                <ul class="nav nav-second-level">
+                    <li class="pageChange">
+                        <a href="/manage/coupon/list">优惠券列表</a>
+                    </li>
+                    <li class="pageChange">
+                        <a href="/manage/coupon/grant">发放优惠券</a>
+                    </li>
+                    <li class="pageChange">
+                        <a href="/manage/coupon/record">发放记录</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="target">
+                <a href="#">
+                    <i class="iconfont icon-shezhi"></i>
+                    <span class="nav-label">资讯中心</span>
+                    <span class="fa arrow"></span>
+                </a>
+                <ul class="nav nav-second-level">
+                    <li class="pageChange">
+                        <a href="/manage/information/list">资讯列表</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="target">
+                <a href="#">
+                    <i class="iconfont icon-shezhi"></i>
+                    <span class="nav-label">财务中心</span>
+                    <span class="fa arrow"></span>
+                </a>
+                <ul class="nav nav-second-level">
+                    <li class="pageChange">
+                        <a href="/manage/fiance/record">购买记录</a>
+                    </li>
+                    <li class="pageChange">
+                        <a href="/manage/fiance/reportForm">财务报表</a>
+                    </li>
+                </ul>
+            </li>
+            <li class="target">
+                <a href="#">
+                    <i class="iconfont icon-shezhi"></i>
+                    <span class="nav-label">系统设置</span>
+                    <span class="fa arrow"></span>
+                </a>
+                <ul class="nav nav-second-level">
+                    <li class="pageChange">
+                        <a href="/manage/system/adminIndex">管理员</a>
+                    </li>
+                    <li class="pageChange">
+                        <a href="/manage/system/roleIndex">角色管理</a>
+                    </li>
+                    <li class="pageChange">
+                        <a href="/manage/system/feedbackPending">反馈管理</a>
+                    </li>
+                    <li class="pageChange">
+                        <a href="/manage/system/fileIndex">文档中心</a>
+                    </li>
+                    <li class="pageChange">
+                        <a href="/manage/system/translateStatistical">翻译统计</a>
+                    </li>
+                    <li class="pageChange">
+                        <a href="/manage/system/manageLog">管理日志</a>
+                    </li>
+                    <li class="pageChange">
+                        <a href="/manage/system/about">关于我们</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</nav>
+    <!--左侧导航结束-->
+    <!--右侧部分开始-->
+    <div id="page-wrapper" class="gray-bg dashbard-1" >
+        <div class="row border-bottom" >
+            <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+                <div class="navbar-header">
+                    <!-- 侧边导航栏显示隐藏 -->
+                    <!-- <a class="navbar-minimalize minimalize-styl-2  " href="#">
+                    <i class="fa fa-bars"></i> 
+                    </a> -->
+                    <p style="font-size:22px;font-weight: bold;margin: 12px 15px;">藏语翻译APP后台管理中心</p>
+                </div>
+                <ul class="nav navbar-top-links navbar-right">
+                    <li class="loginOut">
+                        <a >退出</a>
+                    </li>
+                </ul>
+                <div class="profile">
+                    <span><img alt="" style="border:1px solid #f0f0f0" class="img-circle"src="../image/logo2.jpg" th:src=${user.headImage}/></span>
+                    <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                       <span class="clear">
+                            <span class="block m-t-xs">
+                               <strong class="font-bold" th:text=${user.roleName}></strong>
+                            </span>
+                           <span class="text-muted-a text-xs block" th:text=${user.account}></span>
+                        </span>     
+                    </a>
+                </div>
+            </nav>
+        </div>
+        <div class="row J_mainContent" id="content-main">
+            <iframe id="pageFrame" class="J_iframe" name="iframe0" width="100%" height="100%" src="/manage/home" frameborder="0" seamless=""></iframe>
+        </div>
+    </div>
+</div>
+</div>
+<!--右侧部分结束-->
+</div>
+<!-- 全局js -->
+<script src="../js/jquery.min.js?v=2.1.4"></script>
+<script src="../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<!-- 自定义js -->
+<script src="../js/hplus.js?v=4.1.0"></script>
+<script type="text/javascript" src="../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<script src="../js/plugins/jsKnob/jquery.knob.js"></script>
+<!-- Input Mask-->
+<script src="../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- Data picker -->
+<script src="../js/plugins/datapicker/bootstrap-datepicker.js"></script>
+<!-- Prettyfile -->
+<script src="../js/plugins/prettyfile/bootstrap-prettyfile.js"></script>
+<!-- layerDate -->
+<script src="../js/plugins/layer/laydate/laydate.js"></script>
+<!-- NouSlider -->
+<script src="../js/plugins/nouslider/jquery.nouislider.min.js"></script>
+<!-- Switchery -->
+<script src="../js/plugins/switchery/switchery.js"></script>
+<!-- suggest -->
+<script src="../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<!-- IonRangeSlider -->
+<script src="../js/plugins/ionRangeSlider/ion.rangeSlider.min.js"></script>
+<!-- iCheck -->
+<script src="../js/plugins/iCheck/icheck.min.js"></script>
+<!-- MENU -->
+<script src="../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<!-- Color picker -->
+<script src="../js/plugins/colorpicker/bootstrap-colorpicker.min.js"></script>
+<!-- Clock picker -->
+<script src="../js/plugins/clockpicker/clockpicker.js"></script>
+<!-- Image cropper -->
+<script src="../js/plugins/cropper/cropper.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../layer/layer.js"></script>
+<script src="../layui/layui.js"></script>
+<!--高德地图api-->
+<script>
+
+    $('.loginOut').click(function() {
+        layer.confirm('确定退出吗', {
+            btn: ['确定', '取消'] //按钮
+        }, function() {
+            $.ajax({
+                url : "/manage/user/quitLogin",
+                dataType:"json",
+                type:'post',
+                success: function(res) {
+                    if (res.code == 0) {
+                        layer.msg(res.msg);
+                        window.location.href = '/manage/login'
+                        // setTimeout(function () {
+                        // }, 2000);
+                    }
+                }
+            })
+        })
+    });
+    $('a').click(function(e){
+            e.preventDefault();
+
+        if($(this).attr('href')!='#'){
+            $('#pageFrame').attr('src', $(this).attr('href'));
+        }
+    });
+</script>
+</body>
+
+</html>

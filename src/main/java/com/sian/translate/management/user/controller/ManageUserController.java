@@ -112,6 +112,31 @@ public class ManageUserController {
     }
 
     /****
+     * 新增管理员
+     * @param roleId 角色id
+     * @param account 用户名
+     * @param userName 真实姓名
+     * @param phone 手机号码
+     * @param password 密码
+     * @param status 0正常1禁用
+     * @param image 头像
+     * @return
+     */
+    @PostMapping(value = "/editManageUser", produces = "application/json;charset=UTF-8")
+    ResultVO editManageUser(@RequestParam(value = "id", required = false) Integer id,
+                           @RequestParam(value = "roleId", required = false) Integer roleId,
+                           @RequestParam(value = "account", required = false) String account,
+                           @RequestParam(value = "userName", required = false) String userName,
+                           @RequestParam(value = "phone", required = false) String phone,
+                           @RequestParam(value = "password", required = false) String password,
+                           @RequestParam(value = "status", required = false) Integer status,
+                           @RequestParam(value = "image", required = false) String image,
+                           HttpSession session) {
+        ResultVO resultVO = manageUserService.editManageUser(id,roleId, account, userName, phone, password, status, image, session);
+        return resultVO;
+    }
+
+    /****
      * 删除管理员
      * @param id 用户id
      * @return
@@ -145,6 +170,16 @@ public class ManageUserController {
                    @RequestParam(value = "password", required = false) String password,
                    HttpSession session) {
         ResultVO resultVO = manageUserService.login(account, password, session);
+        return resultVO;
+    }
+
+    /****
+     *  获取用户信息
+     * @return
+     */
+    @GetMapping(value = "/login", produces = "application/json;charset=UTF-8")
+    ResultVO getManageUserInfo(@RequestParam(value = "id", required = false) Integer id,HttpSession session) {
+        ResultVO resultVO = manageUserService.getManageUserInfo(id, session);
         return resultVO;
     }
 

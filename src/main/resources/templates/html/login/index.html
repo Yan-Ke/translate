@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="藏语翻译APP后台管理中心">
+    <meta name="description" content="藏语翻译APP后台管理中心">
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.css?v=4.4.0" rel="stylesheet">
+
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/public.css" rel="stylesheet">
+    <link href="../../font/iconfont.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layer/skin/layer.css">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <script>if (window.top !== window.self) {
+        window.top.location = window.location;
+    }</script>
+    <style>
+
+    .forget{
+        font-size: 14px !important;
+        text-align: center;
+        margin-top: 10px;
+        color:#aeaeae;
+        cursor: pointer;
+    }
+    .top_tittle{
+        background: #fff;
+        height: 100px;
+        position: fixed;
+        top:0;
+        left: 0;
+        width: 100%;
+        font-size: 36px;
+        color:#2c8deb;
+        line-height: 100px;
+        padding-left: 100px;
+    }
+    </style>
+</head>
+
+<body>
+<div class="background_img">
+    <div class="whitebg" style="height:380px;margin-top:-160px;">
+        <p class="admin-mt20 text-center">登录 | 后台登陆管理系统</p>
+        <div class="admin-mt40">
+            <div class="form-group">
+                <div class="input-group m-b">
+                    <span class="input-group-addon">
+                        <i class="iconfont icon-yonghu1"></i>
+                    </span>
+                    <input type="text" id="username" placeholder="用户名" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="input-group m-b">
+                    <span class="input-group-addon">
+                        <i class="iconfont icon-Password"></i>
+                    </span>
+                    <input type="password" id="password" placeholder="密码" class="form-control">
+                </div>
+            </div>
+             <div class="row">
+                <div class="col-sm-8 form-group">
+                    <div class="input-group ">
+                            <span class="input-group-addon">
+                        <i class="iconfont icon-ecurityCode"></i>
+                    </span>
+                        <input type="text" id="verifycode" placeholder="验证码" class="form-control">
+                    </div>
+
+                </div>
+                <div class="col-sm-4" style="padding-left:0;">
+                    <img id="verifycode_img" style="width: 100%;height: 34px;" title="点击更换" src="{:captcha_src()}"
+                         onclick="this.src='{:captcha_src()}?seed='+Math.random()"></div>
+            </div>
+        </div>
+        <button style="margin-top:20px;padding:8px 0;font-size: 18px;" type="button" id="logining"
+                class="btn btn-primary block full-width m-b">登 录
+        </button>
+        <p class="forget">忘记密码?</p>
+    </div>
+    <i class="top_tittle">
+        藏语翻译app后台管理系统
+    </i>
+</div>
+</div>
+
+
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+
+<script src="../../layer/layer.js"></script>
+<script src="../../layui/layui.js"></script>
+<script type="text/javascript">
+    //点击提交
+    $('#logining').click(function () {
+        var username = $('#username').val();
+        var password = $('#password').val();
+        var verifycode = $('#verifycode').val();
+
+        if (username == '') {
+            layer.msg('请填写用户名');
+            return;
+        }
+        if (password == '') {
+            layer.msg('请填写密码');
+            return;
+        }
+        // if (verifycode == '') {
+        //     layer.msg('请填写验证码');
+        //     return;
+        // }
+
+
+        $.ajax({
+            url: "/manage/user/login",
+            data: {
+                "account": username,
+                "password": password,
+                // "verifycode" :verifycode ,
+
+            },
+            dataType: 'json',
+            type: 'post',
+            success: function (res) {
+                console.log(res)
+                if (res.code == 0) {
+                    layer.msg("登陆成功");
+                    window.location.href = '/manage/index'
+
+                } else {
+                    // $('#verifycode_img').attr('src','/captcha?seed='+Math.random());
+                    layer.msg(res.msg);
+                }
+            },
+            err: function (res) {
+                console.log(res);
+            }
+        })
+    });
+
+    // 回车键
+    $('html').bind('keydown', function (e) {
+        if (e.keyCode == 13) {
+            $('#logining').click();
+        }
+    });
+
+    $('.forget').click(function(){
+        layer.alert('忘记密码请联系超级管理员');
+    });
+
+</script>
+</body>
+
+</html>

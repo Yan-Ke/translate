@@ -3,10 +3,7 @@ package com.sian.translate.coupon.enity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 /***
@@ -56,6 +53,14 @@ public class UserCouponRecord {
 
     /**使用订单号**/
     private String useOrderNo;
+
+
+    @Transient
+    /**会员图标**/
+    private String vipIcon;
+
+    @Transient
+    private String useStatus;
 
 
 

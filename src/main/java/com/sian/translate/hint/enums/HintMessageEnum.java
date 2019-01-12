@@ -48,7 +48,7 @@ public enum HintMessageEnum {
     /**后台提示信息 不需要藏语**/
     ACCOUNT_NOT_EMPTY(1001,"登录名不能为空"),
     NOT_LOGIN(1002,"登陆已过期或未登陆,请登陆。"),
-    EXPLAIN_CHINESE_NOT_EMPTY(1003,"请输入会员权限说明(中文)"),
+    EXPLAIN_CHINESE_NOT_EMPTY(1003,"请输入会员权限说明"),
     EXPLAIN_ZANG_NOT_EMPTY(1004,"请输入会员权限说明(藏文)"),
     MEMBER_AMOUNT_NOT_EMPTY(1005,"请输入会员资费金额"),
     MEBER_MONTH_NOT_EMPTY(1006,"请输入会员月数"),
@@ -112,6 +112,9 @@ public enum HintMessageEnum {
     COUPON_GRANT_MEMBER_TYPE_NOT_EMPTY(1049,"请选择会员类型"),
     COUPON_COUNT_ERROR(1050,"优惠券数量不能为空或小于等于0"),
     COUPON_MEMBER_PHONE_ERROR(1051,"用户手机格式有误"),
+    COUPON_IS_NULL(2052,"请选择优惠券"),
+
+
 
 
     MEMBER_MONTY_AMOUNT_NOT_EMPTY(1052,"请输入会员月资费金额"),
@@ -133,7 +136,7 @@ public enum HintMessageEnum {
     STATUS_IS_NOT_EMPTY(1062,"状态不能为空"),
     ROLE_NAME_IS_EXIST(1063,"该角色名称已经存在"),
 
-    ROLE_ID_IS_NOT_EMPTY(1064,"角色ID不能为空"),
+    ROLE_ID_IS_NOT_EMPTY(1064,"请选择角色"),
     ROLE_IS_NOT_EXIST(1065,"该角色不存在"),
 
 
@@ -168,6 +171,13 @@ public enum HintMessageEnum {
 
 
     DAY_NOT_EMPTY(1086,"天数不能位空"),
+
+
+    FILE_TYPE_NOT_EMPTY(1087,"请选择文档类型"),
+    FILE_FILED_NOT_EMPTY(1088,"文档名称不能为空"),
+    FILE_CONTENT_NOT_EMPTY(1089,"文档内容不能为空"),
+
+    FILE_IS_NOT_EXIST(1090,"文档不存在"),
 
 
     ;

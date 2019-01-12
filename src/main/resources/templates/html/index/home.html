@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <link href="../../css/index.css" rel="stylesheet">
+    <link href="../../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../font/iconfont.css">
+    <link rel="stylesheet" href="../../css/public.css">
+    <script src="../../js/plugins/echarts/echarts-all.js"></script>
+    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+
+
+</head>
+<body class="graybg">
+ <div class="wrapper-content">
+   <p class="wrapper-content whitebg">
+       欢迎访问藏语翻译app后台管理中心，祝你工作愉快！
+   </p>
+   <div class="row admin-mt15 data">
+       <a href="" class="col-xs-3 text_center white">
+          <div  style="background: #ffa81f">
+              <p th:text="${statisticalCountDTO.totalUserCount}"></p>
+              <p>用户总数</p>
+         </div>
+     </a>
+     <a href="" class="col-xs-3 text_center white">
+      <div  style="background:#2e8ded">
+          <p th:text="${statisticalCountDTO.totalOrderCount}"></p>
+          <p>订单总数</p>
+
+
+      </div>
+     </a>
+     <a href="" class="col-xs-3 text_center white">
+      <div  style="background: #33cc66">
+          <p th:text="${statisticalCountDTO.totalThesaurusCount}"></p>
+         <p>词条总数</p>
+     </div>
+    </a>
+    <a href="" class="col-xs-3 text_center white">
+      <div  style="background: #0c9">
+          <p th:text="${statisticalCountDTO.totalInformationCount}"></p>
+          <p>资讯总数</p>
+     </div>
+    </a>
+</div>
+<p class="admin-mt30">今日数据</p>    
+<div class="admin-mt10 whitebg admin_flex Todaydata">
+   <a href="" class="admin_flex1">
+       <div class="admin_flex">
+           <img src="../../image/a1.jpg" width="50" height="50" alt="">
+           <div class="admin_flex11">
+               <p th:text="${statisticalCountDTO.todayUserCount}"></p>
+               <p>用户新增</p>
+           </div>
+       </div>
+       <span></span>
+   </a>
+   <a href="" class="admin_flex1">
+       <div class="admin_flex">
+           <img src="../../image/a1.jpg" width="50" height="50" alt="">
+           <div class="admin_flex11">
+               <p th:text="${statisticalCountDTO.todayOrderCount}"></p>
+               <p>订单新增数</p>
+           </div>
+       </div>
+       <span></span>
+   </a>
+   <a href="" class="admin_flex1">
+       <div class="admin_flex">
+           <img src="../../image/a1.jpg" width="50" height="50" alt="">
+           <div class="admin_flex11">
+               <p th:text="${statisticalCountDTO.todayOrderAmount}"></p>
+               <p>订单新增额</p>
+           </div>
+       </div>
+       <span></span>
+   </a>
+   <a href="" class="admin_flex1">
+       <div class="admin_flex">
+           <img src="../../image/a1.jpg" width="50" height="50" alt="">
+           <div class="admin_flex11">
+               <p th:text="${statisticalCountDTO.feeedBackCount}"></p>
+               <p>待处理反馈</p>
+           </div>
+       </div>
+   </a>
+</div>
+<div class="row admin-mt30">
+   <div class="col-xs-6">
+       <p>订单趋势</p>
+       <div class="whitebg admin-mt10 wrapper-content">
+           <button id="sevenOrder" class="btn btn-white font-s12" type="button">近7日趋势</button>
+           <button id="monthOrder" class="btn btn-white font-s12" type="button">近30日趋势</button>
+           <div id="main" style="width: 100%;height:338px;margin-top:15px;"></div>
+            <script>
+                var myOrderChart = echarts.init(document.getElementById('main'));
+
+                getOrderCountByType(1);
+
+                $('#sevenOrder').click(function () {
+                    getOrderCountByType(1);
+
+                });
+
+                $('#monthOrder').click(function () {
+                    getOrderCountByType(2);
+                });
+
+                function getOrderCountByType(type)
+                {
+                    //用户等待
+                    // myChart.showLoading(
+                    //     {text: 'Loding...'  }
+                    // );
+
+
+                    //发送Ajax请求
+                    $.ajax({
+                        url : "/manage/statistical/getOrderStatistical?type="+type,
+                        dataType:"json",
+                        type:'get',
+                        success:function(json){
+
+                            //自定义变量
+                            var date=[];
+                            var count=[];
+
+                            var data = json.data;  //拿到后台的数据
+                            for ( var i = 0; i <data.length; i++){
+                                date.push(data[i].date);
+                                count.push(data[i].count);
+                            }
+
+
+
+                            var orderOption = {
+                                xAxis: {
+                                    type: 'category',
+                                    data: date
+                                },
+                                yAxis: {
+                                    type: 'value'
+                                },
+                                series: [
+                                    {
+                                        name: '订单趋势',
+                                        type: 'line',
+                                        stack: '总量',
+                                        data: count
+                                    }
+                                ]
+                            };
+                            // myChart.hideLoading();
+                            myOrderChart.setOption(orderOption,true);
+
+                        }
+                    });
+                }
+
+            </script>
+       </div>
+   </div>
+   <div class="col-xs-6">
+       <p>新增用户趋势</p>
+       <div class="whitebg admin-mt10 wrapper-content">
+           <button id="sevenUser" class="btn btn-white font-s12" type="button">近7日趋势</button>
+           <button id="monthUser" class="btn btn-white font-s12" type="button">近30日趋势</button>
+           <div id="main1" style="width: 100%;height:338px;margin-top:15px;"></div>
+            <script>
+
+                var myChart = echarts.init(document.getElementById('main1'));
+
+                getUserCountByType(1);
+
+                $('#sevenUser').click(function () {
+                    getUserCountByType(1);
+
+                });
+
+                $('#monthUser').click(function () {
+                    getUserCountByType(2);
+                });
+
+                function getUserCountByType(type)
+                {
+                    //用户等待
+                    // myChart.showLoading(
+                    //     {text: 'Loding...'  }
+                    // );
+
+
+                    //发送Ajax请求
+                    $.ajax({
+                        url : "/manage/statistical/geUserStatistical?type="+type,
+                        dataType:"json",
+                        type:'get',
+                        success:function(json){
+
+                            //自定义变量
+                            var data=[];
+                            var date=[];
+                            var count=[];
+
+                            data = json.data;  //拿到后台的数据
+                            for ( var i = 0; i <data.length; i++){
+                                date.push(data[i].date);
+                                count.push(data[i].count);
+                            }
+
+
+
+                            var option = {
+                                xAxis: {
+                                    type: 'category',
+                                    data: date
+                                },
+                                yAxis: {
+                                    type: 'value'
+                                },
+                                series: [
+                                    {
+                                        name: '订单趋势',
+                                        type: 'line',
+                                        stack: '总量',
+                                        data: count
+                                    }
+                                ]
+                            };
+                            // myChart.hideLoading();
+                            myChart.setOption(option,true);
+
+                        }
+                    });
+                }
+
+
+
+
+
+                </script>    
+       </div>
+   </div>
+</div> 
+<div class="row admin-mt30">
+    <div class="col-xs-6">
+        <p class="admin_flexjust">
+            <span>最新资讯</span>
+            <a href="/manage/information/list" class="color-default font-s12">查看更多></a>
+        </p>
+        <div class="whitebg admin-mt10 wrapper-content homeList">
+            <ul>
+                <li class="admin_flexjust">
+                    <span>公告标题</span>
+                    <span>发布时间</span>
+                </li>
+
+                <li>
+                    <a th:href="${informationList.size()}<=0?'#':@{'/manage/information/detail?id=' + ${informationList[0].id}}" class="admin_flexjust">
+                        <p th:text="${informationList.size()}<=0?'':${informationList[0].title}"></p>
+                        <p class="color-default" th:text="${informationList.size()}<=0?'':${informationList[0].createTimeString}"></p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="${informationList.size()}<=1?'#':@{'/manage/information/detail?id=' + ${informationList[1].id}}" class="admin_flexjust">
+                        <p th:text="${informationList.size()}<=1?'':${informationList[1].title}"></p>
+                        <p class="color-default" th:text="${informationList.size()}<=1?'':${informationList[1].createTimeString}"></p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="${informationList.size()}<=2?'#':@{'/manage/information/detail?id=' + ${informationList[2].id}}" class="admin_flexjust">
+                        <p th:text="${informationList.size()}<=2?'':${informationList[2].title}"></p>
+                        <p class="color-default" th:text="${informationList.size()}<=2?'':${informationList[2].createTimeString}"></p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="${informationList.size()}<=3?'#':@{'/manage/information/detail?id=' + ${informationList[3].id}}" class="admin_flexjust">
+                        <p th:text="${informationList.size()}<=3?'':${informationList[3].title}"></p>
+                        <p class="color-default" th:text="${informationList.size()}<=3?'':${informationList[3].createTimeString}"></p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="${informationList.size()}<=4?'#':@{'/manage/information/detail?id=' + ${informationList[4].id}}" class="admin_flexjust">
+                        <p th:text="${informationList.size()}<=4?'':${informationList[4].title}"></p>
+                        <p class="color-default" th:text="${informationList.size()}<=4?'':${informationList[4].createTimeString}"></p>
+                    </a>
+                </li>
+                <!--<li>-->
+                    <!--<a href="" class="admin_flexjust">-->
+                        <!--<p>轻松学藏学院</p>-->
+                        <!--<p class="color-default">2018-09-09 12:12</p>-->
+                    <!--</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="" class="admin_flexjust">-->
+                        <!--<p>轻松学藏学院</p>-->
+                        <!--<p class="color-default">2018-09-09 12:12</p>-->
+                    <!--</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="" class="admin_flexjust">-->
+                        <!--<p>轻松学藏学院</p>-->
+                        <!--<p class="color-default">2018-09-09 12:12</p>-->
+                    <!--</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="" class="admin_flexjust">-->
+                        <!--<p>轻松学藏学院</p>-->
+                        <!--<p class="color-default">2018-09-09 12:12</p>-->
+                    <!--</a>-->
+                <!--</li>-->
+                <!--<li>-->
+                    <!--<a href="" class="admin_flexjust">-->
+                        <!--<p>轻松学藏学院</p>-->
+                        <!--<p class="color-default">2018-09-09 12:12</p>-->
+                    <!--</a>-->
+                <!--</li>-->
+            </ul>
+        </div>
+    </div>
+    <div class="col-xs-6">
+        <p class="admin_flexjust">
+            <span>最新词条</span>
+            <a href="" class="color-default font-s12">查看更多></a>
+        </p>
+        <div class="whitebg admin-mt10 wrapper-content homeList">
+            <ul>
+                <li class="admin_flexjust">
+                    <span>词条</span>
+                    <span>词条</span>
+                </li>
+                <li>
+
+                    <a th:href="${thesaurusList.size()}<=0?'#':@{'/manage/dictionary/detail?dictionaryName=' + ${thesaurusList[0].dictionaryName}+'&thesaurusId='+${thesaurusList[0].dictionaryId}+'&type='+${thesaurusList[0].type} +'&id='+${thesaurusList[0].id}+'&contentOne='+${thesaurusList[1].contentOne}+'&contentTwo='+${thesaurusList[0].contentTwo}}" class="admin_flexjust">
+                        <p th:text="${thesaurusList.size()}<=0?'':${thesaurusList[0].contentOne}"></p>
+                        <p class="color-default" th:text="${thesaurusList.size()}<=0?'':${thesaurusList[0].contentTwo}"></p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="${thesaurusList.size()}<=1?'#':@{'/manage/dictionary/detail?dictionaryName=' + ${thesaurusList[0].dictionaryName}+'&thesaurusId='+${thesaurusList[1].dictionaryId}+'&type='+${thesaurusList[1].type} +'&id='+${thesaurusList[1].id}+'&contentOne='+${thesaurusList[1].contentOne}+'&contentTwo='+${thesaurusList[1].contentTwo}}" class="admin_flexjust">
+                        <p th:text="${thesaurusList.size()}<=1?'':${thesaurusList[1].contentOne}"></p>
+                        <p class="color-default" th:text="${thesaurusList.size()}<=1?'':${thesaurusList[1].contentTwo}"></p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="${thesaurusList.size()}<=2?'#':@{'/manage/dictionary/detail?dictionaryName=' + ${thesaurusList[0].dictionaryName}+'&thesaurusId='+${thesaurusList[2].dictionaryId}+'&type='+${thesaurusList[2].type} +'&id='+${thesaurusList[2].id}+'&contentOne='+${thesaurusList[2].contentOne}+'&contentTwo='+${thesaurusList[2].contentTwo}}" class="admin_flexjust">
+                        <p th:text="${thesaurusList.size()}<=2?'':${thesaurusList[2].contentOne}"></p>
+                        <p class="color-default" th:text="${thesaurusList.size()}<=2?'':${thesaurusList[2].contentTwo}"></p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="${thesaurusList.size()}<=3?'#':@{'/manage/dictionary/detail?dictionaryName=' + ${thesaurusList[0].dictionaryName}+'&thesaurusId='+${thesaurusList[3].dictionaryId}+'&type='+${thesaurusList[3].type} +'&id='+${thesaurusList[3].id}+'&contentOne='+${thesaurusList[3].contentOne}+'&contentTwo='+${thesaurusList[3].contentTwo}}" class="admin_flexjust">
+                        <p th:text="${thesaurusList.size()}<=3?'':${thesaurusList[3].contentOne}"></p>
+                        <p class="color-default" th:text="${thesaurusList.size()}<=3?'':${thesaurusList[3].contentTwo}"></p>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="${thesaurusList.size()}<=4?'#':@{'/manage/dictionary/detail?dictionaryName=' + ${thesaurusList[0].dictionaryName}+'&thesaurusId='+${thesaurusList[4].dictionaryId}+'&type='+${thesaurusList[4].type} +'&id='+${thesaurusList[4].id}+'&contentOne='+${thesaurusList[4].contentOne}+'&contentTwo='+${thesaurusList[4].contentTwo}}" class="admin_flexjust">
+                        <p th:text="${thesaurusList.size()}<=4?'':${thesaurusList[4].contentOne}"></p>
+                        <p class="color-default" th:text="${thesaurusList.size()}<=4?'':${thesaurusList[4].contentTwo}"></p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div> 
+</div>
+</body> 
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<!-- 自定义js -->
+<!-- <script src="../../js/hplus.js?v=4.1.0"></script> -->
+<script type="text/javascript" src="../../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<!-- Input Mask-->
+<script src="../../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- suggest -->
+<script src="../../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../layer/layer.js"></script>
+<script src="../../layui/layui.js"></script>
+<!--高德地图api-->
+
+</html>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <link href="../../css/index.css" rel="stylesheet">
+    <link href="../../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../font/iconfont.css">
+    <link rel="stylesheet" href="../../css/public.css">
+    <style>
+        ul{
+            border-bottom: 1px solid #f0f0f0;
+        }
+        ul>li{
+            display: inline-block;
+            height: 50px;
+            line-height: 50px;
+            width: 100px;
+            text-align: center;
+            border-bottom: 1px solid #f0f0f0;
+            position: relative;
+            top:1px;
+            cursor: pointer;
+        }
+        ul>.active{
+            border-color: #fff;
+        }
+        .tab{
+            margin-top:50px;
+        }
+        .tab>div{
+            display: none;
+        }
+        .tab>.active{
+            display: block;
+        }
+    </style>
+</head>
+<body class="graybg">
+<div class="wrapper-content">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+            <h5>会员详情</h5>
+            <div class="ibox-tools">
+                <a href="javascript:history.back(-1);" class="btn btn-white">返回列表</a>
+            </div>
+        </div>
+        <div class="ibox-content" style="padding:40px 150px 40px 80px;">
+            <ul>
+                <li class="active"  onclick="_tab(0)">基本信息</li>
+                <li onclick="_tab(1)">vip信息</li>
+            </ul>
+            <div class="tab">
+                <div class="active">
+                    <div class="form-horizontal m-t">
+                        <div class="form-group  admin-mt20">
+                            <label class="col-sm-2 control-label">
+                                会员
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7">
+                                <img th:src="${userInfo.headSmallImage}" class="img-circle" width="45" height="45" >
+                                <span id="nickName" th:text="${userInfo.nickName}" class="admin-p5"></span>
+                                <span id="sex" th:text="${userInfo.sexString}" class="admin-p5"></span>
+                            </div>
+                        </div>
+                        <div class="form-group  admin-mt20">
+                            <label class="col-sm-2 control-label">
+                                手机号码
+                                <span class="white"></span>
+                            </label>
+                            <div class="col-sm-7">
+                                <input   id="phone" th:value="${userInfo.phone}"  class="form-control" type="text"  placeholder="请输入手机号码">
+                            </div>
+                        </div>
+                        <div class="form-group  admin-mt20">
+                            <label class="col-sm-2 control-label">
+                                年龄
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7">
+                                <input  id="age" th:value="${userInfo.age}" class="form-control" type="text"  placeholder="请输入年龄">
+                            </div>
+                        </div>
+                        <div class="form-group  admin-mt20">
+                            <label class="col-sm-2 control-label">
+                                学历
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7">
+                                <select class="form-control "  id = "education" >
+                                    <option value="0">请选择学历</option>
+                                    <option value="1">小学</option>
+                                    <option value="2">初中</option>
+                                    <option value="3">高中</option>
+                                    <option value="4">大专</option>
+                                    <option value="5">本科</option>
+                                    <option value="6">硕士</option>
+                                    <option value="7">博士</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group  admin-mt20">
+                            <label class="col-sm-2 control-label">
+                                第三方账号绑定
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7">
+                                <img  th:src="${userInfo.weixinOpenid == null || userInfo.weixinOpenid == ''} ?'../../image/wechat2.png' : '../../image/wechat1.png'" class="img-circle admin-mr15" width="45" height="45" src="../../image/wechat.png">
+                                <img th:src="${userInfo.qqOpenid == null || userInfo.qqOpenid == ''} ?'../../image/qq2.png' : '../../image/qq1.png'" class="img-circle" width="45" height="45" src="../../image/qq.png">
+                            </div>
+                        </div>
+                        <div class="form-group  admin-mt20">
+                            <label class="col-sm-2 control-label">
+                                状态
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7 admin-mt5">
+                                <label for="yes_status" class="admin-mr15">
+                                    <input id="yes_status" type="radio" name="show" value="0">
+                                    <span>正常</span>
+                                </label>
+                                <label for="not_status">
+                                    <input id="not_status" type="radio" name="show" value="1">
+                                    <span>禁用</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group  admin-mt20">
+                            <label class="col-sm-2 control-label">
+                                注册时间
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7">
+                                <p th:text="${userInfo.registrationTimeString}" class="form-control-static"></p>
+                            </div>
+                        </div>
+                        <div class="form-group  admin-mt20">
+                            <label class="col-sm-2 control-label">
+                                最近登录
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7">
+                                <p th:text="${userInfo.loginTimeString}" class="form-control-static"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div >
+                    <div class="form-horizontal m-t">
+                        <div class="form-group  admin-mt20">
+                            <label class="col-sm-2 control-label">
+                                是否vip
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7 admin-mt5" >
+                                <label for="member" class="admin-mr15">
+                                    <input disabled="disabled" id="member" type="radio" name="vip"  value="1">
+                                    <span>是</span>
+                                </label>
+                                <label for="not_member">
+                                    <input disabled="disabled" id="not_member" type="radio" name="vip" value="2">
+                                    <span>否</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group  admin-mt20" th:style="${userInfo.isMember == 1}?'display: block': 'display: none' " >
+                            <label class="col-sm-2 control-label">
+                                套餐类型
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7 admin-mt5" disabled="disabled">
+                                <label for="year" class="admin-mr15">
+                                    <input   disabled="disabled" id="year" type="radio" name="type"  value="1">
+                                    <span>年</span>
+                                </label>
+                                <label for="half_year">
+                                    <input   disabled="disabled" id="half_year" type="radio" name="type" value="2">
+                                    <span>半年</span>
+                                </label>
+                                <label for="quarter">
+                                    <input   disabled="disabled" id="quarter" type="radio" name="type" value="3">
+                                    <span>季度</span>
+                                </label>
+                                <label for="month">
+                                    <input   disabled="disabled" id="month" type="radio" name="type" value="4">
+                                    <span>月</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group  admin-mt20" th:style="${userInfo.isMember == 1}?'display: block': 'display: none' " >
+                            <label class="col-sm-2 control-label">
+                                购买时间
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7">
+                                <input th:value="${userInfo.buyTimeString}" disabled="disabled" type="text" class="layui-input purchase"  placeholder="请选择购买时间" >
+                            </div>
+                        </div>
+                        <div class="form-group  admin-mt20" th:style="${userInfo.isMember == 1}?'display: block': 'display: none' " >
+                            <label class="col-sm-2 control-label">
+                                到期时间
+                                <span class="white">*</span>
+                            </label>
+                            <div class="col-sm-7">
+                                <input th:value="${userInfo.memberEndTimeString}" disabled="disabled" type="text" class="layui-input Expire"  placeholder="请选择到期时间" >
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-horizontal">
+                <div class="form-group  admin-mt30">
+                    <div class="col-sm-7 col-sm-offset-2">
+
+                        <button  class="btn btn-primary" type="button" id="submit">保存</button>
+
+                        <a href="javascript:history.back(-1);" class="btn btn-white">返回列表</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<!-- 自定义js -->
+<!-- <script src="../../js/hplus.js?v=4.1.0"></script> -->
+<script type="text/javascript" src="../../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<!-- Input Mask-->
+<script src="../../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- suggest -->
+<script src="../../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../layer/layer.js"></script>
+<script src="../../laydate/laydate/laydate.js"></script>
+<script src="../../layui/layui.js"></script>
+<script th:inline="javascript">
+
+    laydate.render({
+        elem: '.purchase'
+        ,type: 'datetime'
+    });
+    laydate.render({
+        elem: '.Expire'
+        ,type: 'datetime'
+    });
+
+
+    var userStatus = [[${userInfo.userStatus}]] ;
+    var isMember = [[${userInfo.isMember}]] ;
+    var memberMonth = [[${userInfo.memberMonth}]] ;
+    var educationId = [[${userInfo.educationId}]] ;
+    var id = [[${userInfo.id}]] ;
+
+
+
+    console.log(userStatus)
+
+    if (userStatus == 0){
+        $("input[id='yes_status']").prop("checked", true);
+    } else{
+        $("input[id='not_status']").prop("checked", true);
+    }
+    if (isMember == 1){
+        $("input[id='member']").prop("checked", true);
+    } else{
+        $("input[id='not_member']").prop("checked", true);
+    }
+
+    switch (memberMonth) {
+        case 12:
+            $("input[id='year']").prop("checked", true);
+            break;
+        case 6:
+            $("input[id='half_year']").prop("checked", true);
+            break;
+        case 3:
+            $("input[id='quarter']").prop("checked", true);
+            break;
+        case 1:
+            $("input[id='month']").prop("checked", true);
+            break;
+    }
+    console.log(educationId)
+    $("#education").find("option[value="+educationId+"]").attr("selected",true);
+
+
+
+    //点击保存
+    $('#submit').click(function () {
+
+        var age = $('#age').val();
+        var phone = $('#phone').val();
+        var status = $('#status').val();
+        var education=  $("#education option:selected").val();
+        var status = $("input[name='show']:checked").val();
+
+        $.ajax({
+            url: "/user/editUserInfo",
+            data: {
+                "id": id,
+                "age": age,
+                "phone": phone,
+                "status": status,
+                "education": education,
+
+            },
+            dataType: 'json',
+            type: 'post',
+            success: function (res) {
+                console.log(res)
+                if (res.code == 0) {
+                    layer.msg("保存成功");
+                    window.location.href = '/manage/member/list'
+                } else {
+                    // $('#verifycode_img').attr('src','/captcha?seed='+Math.random());
+                    layer.msg(res.msg);
+                }
+            },
+            err: function (res) {
+                console.log(res);
+            }
+        })
+    });
+
+
+    $('.type').on('click','span',function(){
+        $('.type>span').removeClass('active');
+        $(this).addClass('active');
+        if ($(this).text() == "文章") {
+            type = 0;
+        }else{
+            type = 1;
+        }
+    });
+
+    function _tab(index){
+        $('.tab>div').removeClass('active');
+        $('.tab>div').eq(index).addClass('active');
+    }
+</script>
+</html>

@@ -14,6 +14,7 @@ import com.sian.translate.management.user.repository.ManageUserRoleRepository;
 import com.sian.translate.management.user.service.ManageUserService;
 import com.sian.translate.utlis.CommonUtlis;
 import com.sian.translate.utlis.ImageUtlis;
+import com.sian.translate.utlis.JsonUtil;
 import com.sian.translate.utlis.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
@@ -47,6 +49,9 @@ public class ManageUserServiceImpl implements ManageUserService {
 
     @Autowired
     ManageResourceRepository manageResourceRepository;
+
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
 
 
     /*******
@@ -99,6 +104,7 @@ public class ManageUserServiceImpl implements ManageUserService {
                 userInfo.setManageResourceList(manageResourceList);
             }
         }
+        stringRedisTemplate.opsForValue().set("user_"+userID, JsonUtil.toJson(userInfo));
 
         return ResultVOUtil.success(userInfo);
     }
@@ -194,13 +200,19 @@ public class ManageUserServiceImpl implements ManageUserService {
         if (!StringUtils.isEmpty(roleName)){
 
             long count = manageUserRoleRepository.countByRoleName(roleName);
-            if (count > 0){
+            boolean isSelf = roleName.equals(manageUserRole.getRoleName());
+
+            if (count > 0 && !isSelf){
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ROLE_NAME_IS_EXIST.getCode(), languageType));
             }
             manageUserRole.setRoleName(roleName);
+        }else {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ROLE_NAME_IS_NOT_EMPTY.getCode(), languageType));
         }
         if (!StringUtils.isEmpty(resoureId)){
             manageUserRole.setResoureId(resoureId);
+        }else {
+            manageUserRole.setResoureId("");
         }
 
         if (status != null){
@@ -214,7 +226,8 @@ public class ManageUserServiceImpl implements ManageUserService {
         String losmsg = "编辑角色"+manageUserRole.getRoleName();
 
 
-        return ResultVOUtil.success(manageUserRole,losmsg);    }
+        return ResultVOUtil.success(manageUserRole,losmsg);
+    }
 
     /**
      * 获取模块列表
@@ -410,7 +423,7 @@ public class ManageUserServiceImpl implements ManageUserService {
         ManageUserInfo manageUserInfo = new ManageUserInfo();
         manageUserInfo.setAccount(account);
         manageUserInfo.setUsername(userName);
-        if (!StringUtils.isEmpty(password)){
+        if (!StringUtils.isEmpty(phone)){
             manageUserInfo.setPhone(phone);
         }
         if (StringUtils.isEmpty(password)){
@@ -526,6 +539,145 @@ public class ManageUserServiceImpl implements ManageUserService {
         pageInfoDTO.setList(manageUserInfoPage.getContent());
 
         return ResultVOUtil.success(pageInfoDTO);
+    }
+
+    @Override
+    public ResultVO getManageUserInfo(Integer id, HttpSession session) {
+
+
+        String userInfoString = stringRedisTemplate.opsForValue().get("user_" + id);
+
+        ManageUserInfo manageUserInfo = null;
+        if (!StringUtils.isEmpty(userInfoString)) {
+            manageUserInfo = (ManageUserInfo) JsonUtil.fromJson(userInfoString, ManageUserInfo.class);
+        }else {
+            Optional<ManageUserInfo> manageUserInfoOptiona = manageUserInfoRepository.findById(id);
+
+            manageUserInfo = manageUserInfoOptiona.get();
+
+            session.setAttribute(ManageUserService.SESSION_KEY, manageUserInfo.getId());
+
+            Optional<ManageUserRole> byId = manageUserRoleRepository.findById(manageUserInfo.getRole());
+
+            if (byId.isPresent()){
+                ManageUserRole manageUserRole = byId.get();
+                String resoureId = manageUserRole.getResoureId();
+                if (!StringUtils.isEmpty(resoureId)){
+                    String[] split = resoureId.split(",");
+                    List<Integer> ids = new ArrayList<>();
+                    for (String s : split) {
+                        ids.add(Integer.valueOf(s));
+                    }
+                    List<ManageResource> manageResourceList = manageResourceRepository.findAllByIdIn(ids);
+                    manageUserInfo.setManageResourceList(manageResourceList);
+                }
+            }
+            stringRedisTemplate.opsForValue().set("user_"+id, JsonUtil.toJson(manageUserInfo));
+        }
+
+
+        return ResultVOUtil.success(manageUserInfo);
+    }
+
+    @Override
+    public ResultVO editManageUser(Integer id, Integer roleId, String account, String userName, String phone, String password, Integer status, String image, HttpSession session) {
+
+        String languageType = "0";
+
+        Integer userId = (Integer) session.getAttribute(ManageUserService.SESSION_KEY);
+
+        if (StringUtils.isEmpty(userId)) {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOT_LOGIN.getCode(), languageType));
+        }
+
+        if (StringUtils.isEmpty(id)) {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
+        }
+
+        Optional<ManageUserInfo> manageUserInfoOptional = manageUserInfoRepository.findById(id);
+
+        if (!manageUserInfoOptional.isPresent()) {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), languageType));
+        }
+        if (roleId == null || roleId < 1){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ROLE_ID_IS_NOT_EMPTY.getCode(), languageType));
+        }
+
+
+        Optional<ManageUserRole> manageUserRoleOptiona = manageUserRoleRepository.findById(roleId);
+
+        if (!manageUserRoleOptiona.isPresent()){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ROLE_IS_NOT_EXIST.getCode(), languageType));
+        }
+
+        if (StringUtils.isEmpty(account)){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ACCOUNT_NOT_EMPTY.getCode(), languageType));
+        }
+
+        long accountCount = manageUserInfoRepository.countByAccount(account);
+        ManageUserInfo manageUserInfo = manageUserInfoOptional.get();
+
+        if (accountCount > 0 && !account.equals(manageUserInfo.getAccount())){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.MANAGE_ACCOUNT_IS_EXIST.getCode(), languageType));
+        }
+
+        if (account.length() > 12 || account.length() < 4)
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.MANAGE_ACCOUNT_LENGTH_ERROR.getCode(), languageType));
+
+        if (!CommonUtlis.isNumerOrLetter(account)){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.MANAGE_ACCOUNT_FORMAT_ERROR.getCode(), languageType));
+        }
+        if (StringUtils.isEmpty(userName)){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.MANAGE_USERNAME_NOT_EMPTY.getCode(), languageType));
+        }
+
+        ManageUserRole manageUserRole = manageUserRoleOptiona.get();
+
+
+        manageUserInfo.setRoleName(manageUserRole.getRoleName());
+        manageUserInfo.setRole(roleId);
+        manageUserInfo.setAccount(account);
+        manageUserInfo.setUsername(userName);
+        manageUserInfo.setPhone(phone);
+
+        if (!StringUtils.isEmpty(password)){
+
+            String md5Password = DigestUtils.md5DigestAsHex(password.getBytes());
+            manageUserInfo.setPassword(md5Password);
+
+        }
+
+        if (!StringUtils.isEmpty(image)){
+            manageUserInfo.setHeadImage(image);
+        }else {
+            manageUserInfo.setHeadImage("");
+        }
+
+        manageUserInfo.setUserStatus(status);
+        manageUserInfo.setUpdateUser(userId);
+        manageUserInfo.setUpdateTime(new Date());
+
+        String resoureId = manageUserRole.getResoureId();
+        if (!StringUtils.isEmpty(resoureId)){
+            String[] split = resoureId.split(",");
+            List<Integer> ids = new ArrayList<>();
+            for (String s : split) {
+                ids.add(Integer.valueOf(s));
+            }
+            List<ManageResource> manageResourceList = manageResourceRepository.findAllByIdIn(ids);
+            manageUserInfo.setManageResourceList(manageResourceList);
+        }
+
+        manageUserInfoRepository.save(manageUserInfo);
+
+        String losmsg = "编辑用户"+manageUserInfo.getAccount();
+
+        stringRedisTemplate.opsForValue().set("user_"+id, JsonUtil.toJson(manageUserInfo));
+
+
+        return ResultVOUtil.success(manageUserInfo,losmsg);
+
+
     }
 
 

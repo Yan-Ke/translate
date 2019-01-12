@@ -1,9 +1,14 @@
 package com.sian.translate.utlis;
 
+import com.alibaba.fastjson.JSON;
 import com.sian.translate.hint.enums.HintMessageEnum;
+import com.sian.translate.management.ueditor.enity.Ueditor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -15,6 +20,12 @@ import java.util.*;
 
 @Slf4j
 public class CommonUtlis {
+
+    /**是否为会员 0 不是 1是 2过期会员**/
+    public static final String VIPICON0 = "../../image/vip2.png";
+    public static final String VIPICON1 = "../../image/vip1.png";
+    public static final String VIPICON2 = "../../image/vip3.png";
+
 
 
     /*****
@@ -264,6 +275,42 @@ public class CommonUtlis {
 
         return ipAddress;
     }
+
+    public static String uploadImg(MultipartFile file,
+                            HttpServletRequest request) throws IOException {
+        Ueditor ueditor = new Ueditor();
+
+        String path = request.getSession().getServletContext()
+                .getRealPath("ueditor/jsp/upload/image");
+        String ct = file.getContentType();
+        String fileType = "";
+        if (ct.indexOf("/") > 0) {
+            fileType = ct.substring(ct.indexOf("/") + 1);
+        }
+        String fileName = UUID.randomUUID() + "." + fileType;
+        File targetFile = new File(path);
+        if (!targetFile.exists()) {
+            targetFile.mkdirs();
+        }
+        File targetFile2 = new File(path + "/" + fileName);
+        if (!targetFile2.exists()) {
+            targetFile2.createNewFile();
+        }
+        // 保存
+        try {
+            file.transferTo(targetFile2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        ueditor.setState("SUCCESS");
+        ueditor.setTitle(fileName);
+        ueditor.setOriginal(fileName);
+        ueditor.setUrl("/ueditor/jsp/upload/image" + File.separator + fileName);
+        System.out.println(JSON.toJSONString(ueditor));
+        return JSON.toJSONString(ueditor);
+    }
+
 
 
 }

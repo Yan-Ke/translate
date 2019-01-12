@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <title>藏语翻译APP后台管理中心</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html" />
+    <![endif]-->
+    <link rel="shortcut icon"  type="images/x-icon" href="../../image/favicon.ico">
+    <link href="../../css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="../../css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="../../css/animate.css" rel="stylesheet">
+    <link href="../../css/style.css?v=4.1.0" rel="stylesheet">
+    <link href="../../css/style.css" rel="stylesheet">
+    <link href="../../css/index.css" rel="stylesheet">
+    <link href="../../css/plugins/chosen/chosen.css" rel="stylesheet">
+    <link href="../../css/plugins/jasny/jasny-bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../layui/css/layui.css">
+    <link rel="stylesheet" href="../../font/iconfont.css">
+    <link rel="stylesheet" href="../../css/public.css">
+</head>
+<body class="graybg">
+    <div class="wrapper-content">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <div class="row">
+                    <div class="col-sm-4"> </div>
+                    <div class="col-sm-4"> 
+                       <div class="admin_flex">
+                           <a href="pending.html" class="admin_flex1  text-center">
+                               待处理
+                           </a>
+                           <a href="javascript:;" class="admin_flex1 color-primary text-center">
+                               已处理
+                           </a>
+                       </div>
+                    </div>
+                    <div class="col-sm-4"> </div>
+                </div>
+            </div>
+            <div class="ibox-content admin-mt30">
+                <div class="row admin-mt10">
+                    <div class="col-sm-6">
+                        <p class="admin-mt10">合计：<span class="color-primary">25条</span></p>
+                    </div>
+                    <div class="col-sm-6" style="padding-left:0">
+                        <div class="row">
+                        <div class="col-sm-3" style="padding-right: 0">
+                            <select class="form-control "  name="type">
+                                 <option value="0">请选择搜索类型</option>
+                                 <option value="1">反馈人</option>
+                                 <option value="2">反馈内容</option>
+                             </select> 
+                        </div>
+                        <div class="col-sm-9" style="padding-left: 0">
+                           <div class="input-group">
+                            <input type="text" id="search" name="search" placeholder="请输入关键词查找" class=" form-control"> 
+                            <span class="input-group-btn">
+                               <button type="submit" class="btn  btn-primary"> 查找</button>
+                             </span>
+                        </div> 
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <table class="table table-hover admin-mt40 table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>反馈人</th>
+                            <th>反馈内容</th>
+                            <th>反馈时间</th>
+                            <th class="col-xs-2 text-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>
+                              <div class="admin_flex">
+                                  <img class="img-circle"  width="45" height="45" src="../../image/a3.jpg">
+                                  <div class="admin_flex1 admin-pl10 admin-mt5">
+                                      <p>姓名</p>
+                                      <p>手机号码</p>
+                                  </div>
+                              </div>
+                            </td>
+                            <td>1</td>
+                            <td>1</td>
+                            <td class="text-center">
+                                <a href="javascript:;">已处理</a>
+                            </td>
+                        </tr>
+                        <!--搜索无结果-->
+                            <tr class="not_tr">
+                                <td colspan="5">
+                                    <div>
+                                        <img src="../../image/nodat.png">
+                                        <p class="text-center">暂无相关信息</p>
+                                    </div>
+                                </td>
+                            </tr>
+                    </tbody>
+
+                </table>
+                <!--分页-->
+                <div class="text-center">
+                    <ul class="pagination">
+                        <li class="disabled">
+                          <span>«</span>
+                        </li> 
+                        <li class="active">
+                          <span>1</span>
+                        </li>
+                        <li>
+                          <a href="/san/user/index.html?pag e=2">2</a>
+                        </li>
+                        <li>
+                          <a href="/san/user/index.html?page=3">3</a>
+                        </li>
+                        <li>
+                          <a href="/san/user/index.html?page=4">4</a>
+                        </li>
+                        <li>
+                          <a href="/san/user/index.html?page=5">5</a>
+                        </li>
+                        <li>
+                          <a href="/san/user/index.html?page=6">6</a>
+                        </li> 
+                        <li>
+                          <a href="/san/user/index.html?page=2">»</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+    </div>
+    </div>
+</body> 
+<!-- 全局js -->
+<script src="../../js/jquery.min.js?v=2.1.4"></script>
+<script src="../../js/bootstrap.min.js?v=3.3.6"></script>
+<script src="../../js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="../../js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<!-- 自定义js -->
+<!-- <script src="../../js/hplus.js?v=4.1.0"></script> -->
+<script type="text/javascript" src="../../js/contabs.js"></script>
+<!-- Chosen -->
+<script src="../../js/plugins/chosen/chosen.jquery.js"></script>
+<!-- JSKnob -->
+<!-- Input Mask-->
+<script src="../../js/plugins/jasny/jasny-bootstrap.min.js"></script>
+<!-- suggest -->
+<script src="../../js/plugins/suggest/bootstrap-suggest.min.js"></script>
+<script src="../../js/common.js"></script>
+<script src="../../layer/layer.js"></script>
+<script src="../../layui/layui.js"></script>
+<!--高德地图api-->
+</html>

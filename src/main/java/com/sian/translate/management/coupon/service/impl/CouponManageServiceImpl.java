@@ -29,6 +29,7 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -62,13 +63,13 @@ public class CouponManageServiceImpl implements CounponManageService {
         if (StringUtils.isEmpty(userId)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOT_LOGIN.getCode(), languageType));
         }
-        Sort sort = new Sort(Sort.DEFAULT_DIRECTION, "createTime");
+        Sort sort = new Sort(Sort.Direction.DESC, "createTime");
 
         if (page < 1) {
             page = 1;
         }
         if (size < 1) {
-            size = 20;
+            size = (int)couponRepository.count();
         }
         Page<Coupon> datas;
 
@@ -115,12 +116,13 @@ public class CouponManageServiceImpl implements CounponManageService {
 
 
         if (StringUtils.isEmpty(fullPrice)) {
-            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_FULL_PRICE_NOT_EMPTY.getCode(), languageType));
+            fullPrice= "0";
+//            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_FULL_PRICE_NOT_EMPTY.getCode(), languageType));
         }
         BigDecimal fullPriceBigDecimal;
         try {
             fullPriceBigDecimal = new BigDecimal(fullPrice);
-            if (fullPriceBigDecimal.compareTo(BigDecimal.ZERO) < 0) {
+            if (fullPriceBigDecimal.compareTo(BigDecimal.ZERO)  == -1) {
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_FULL_PRICE_LESS_ZERO.getCode(), languageType));
             }
         } catch (Exception e) {
@@ -142,11 +144,11 @@ public class CouponManageServiceImpl implements CounponManageService {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_REDUCE_PRICE_FORMAT_ERROR.getCode(), languageType));
         }
 
-        if (StringUtils.isEmpty(beginTime)) {
+        if (type == 0 && StringUtils.isEmpty(beginTime)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_BEGIN_TIME_NOT_EMPTY.getCode(), languageType));
         }
 
-        if (StringUtils.isEmpty(endTime)) {
+        if (type == 0 && StringUtils.isEmpty(endTime)) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_END_TIME_NOT_EMPTY.getCode(), languageType));
         }
 
@@ -154,30 +156,15 @@ public class CouponManageServiceImpl implements CounponManageService {
         Date beginTimeDate = null;
         Date endTimeDate = null;
 
+
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
         if (type == 0) {
             try {
-                long begin = Long.valueOf(beginTime);
-                long end = Long.valueOf(endTime);
+                beginTimeDate = sdf.parse(beginTime);
+                endTimeDate = sdf.parse(endTime);
 
-
-                if (beginTime.length() == 10 || beginTime.length() == 13) {
-                    if (beginTime.length() == 10) {
-                        begin = begin * 1000;
-                    }
-                } else {
-                    return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_TIME_FORMAT_ERROR.getCode(), languageType));
-                }
-
-                if (endTime.length() == 10 || endTime.length() == 13) {
-                    if (endTime.length() == 10) {
-                        end = end * 1000;
-                    }
-                } else {
-                    return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_TIME_FORMAT_ERROR.getCode(), languageType));
-                }
-
-                beginTimeDate = new Date(begin);
-                endTimeDate = new Date(end);
             } catch (Exception e) {
                 e.printStackTrace();
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_TIME_FORMAT_ERROR.getCode(), languageType));
@@ -216,7 +203,7 @@ public class CouponManageServiceImpl implements CounponManageService {
     }
 
     @Override
-    public ResultVO editCoupon(Integer id, String name, Integer type, String fullPrice, String reducePrice, String beginTime, String endTime, Integer day, HttpSession session) {
+    public ResultVO editCoupon(Integer id, String name, Integer type, String fullPrice, String reducePrice, String beginTime, String endTime, Integer day,Integer count, HttpSession session) {
         String languageType = "0";
 
         Integer userId = (Integer) session.getAttribute(ManageUserService.SESSION_KEY);
@@ -326,6 +313,10 @@ public class CouponManageServiceImpl implements CounponManageService {
         }
         coupon.setUpdateUser(userId);
         coupon.setUpdateTime(new Date());
+
+        if (count != null && count > 0){
+            coupon.setCount(count);
+        }
         couponRepository.save(coupon);
 
         String logmsg = "修改优惠券:"+coupon.getName();
@@ -377,7 +368,7 @@ public class CouponManageServiceImpl implements CounponManageService {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOT_LOGIN.getCode(), languageType));
         }
         if (id == null) {
-            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_ID_NOT_EMPTY.getCode(), languageType));
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_IS_NULL  .getCode(), languageType));
         }
 
         if (type == null || (type != 0 && type != 1 && type != 2)) {
@@ -422,16 +413,8 @@ public class CouponManageServiceImpl implements CounponManageService {
         if (type == 0) {
             String[] split = memberPhones.split(",");
             if (split.length > 0) {
-                List<Integer> list = new ArrayList<>();
 
-                try {
-                    Arrays.stream(split).forEach(s ->list.add(Integer.valueOf(s)));
-
-                }catch (Exception e){
-                    return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.COUPON_MEMBER_PHONE_ERROR.getCode(), languageType));
-                }
-
-                List<UserInfo> userInfoList = userInfoRepository.findByIdIn(list);
+                List<UserInfo> userInfoList = userInfoRepository.findByPhoneIn(split);
                 saveUserCouponRecord(id, coupon, receiveTime, userInfoList);
             }
 
@@ -486,14 +469,35 @@ public class CouponManageServiceImpl implements CounponManageService {
         int totalElements = (int) userCouponRecordPage.getTotalElements();
         int totalPages = userCouponRecordPage.getTotalPages();
 
+        List<UserCouponRecord> content = userCouponRecordPage.getContent();
+        content.stream().forEach(userCouponRecord -> setUserCouponRecordVipAndUseStatus(userCouponRecord));
         PageInfoDTO pageInfoDTO = new PageInfoDTO();
         pageInfoDTO.setPage(page);
         pageInfoDTO.setSize(size);
         pageInfoDTO.setTotalElements(totalElements);
         pageInfoDTO.setTotalPages(totalPages);
-        pageInfoDTO.setList(userCouponRecordPage.getContent());
+        pageInfoDTO.setList(content);
 
         return ResultVOUtil.success(pageInfoDTO);
+    }
+
+    private void setUserCouponRecordVipAndUseStatus(UserCouponRecord userCouponRecord) {
+
+        if (userCouponRecord.getIsMember() != null){
+            if (userCouponRecord.getIsMember() == 0){
+                userCouponRecord.setVipIcon(CommonUtlis.VIPICON0);
+            }else if (userCouponRecord.getIsMember() == 1){
+                userCouponRecord.setVipIcon(CommonUtlis.VIPICON1);
+            }else if (userCouponRecord.getIsMember() == 1){
+                userCouponRecord.setVipIcon(CommonUtlis.VIPICON2);
+            }
+        }
+        if (StringUtils.isEmpty(userCouponRecord.getUseOrderNo())){
+            userCouponRecord.setUseStatus("未使用");
+        }else {
+            userCouponRecord.setUseStatus("已使用");
+        }
+
     }
 
 

@@ -23,6 +23,8 @@ public interface MemberPayRecordRepository extends JpaRepository<MemberPayRecord
      */
     Page<MemberPayRecord> findByUserId(Integer userId, Pageable pageable);
 
+
+
     /***
      * 获取所有用户购买记录
      * @return
@@ -82,6 +84,7 @@ public interface MemberPayRecordRepository extends JpaRepository<MemberPayRecord
     BigDecimal getSumAmountByStatus(Integer status);
 
 
+
     /****
      * 获取7日内数据
      * @return
@@ -104,8 +107,8 @@ public interface MemberPayRecordRepository extends JpaRepository<MemberPayRecord
             ") a left join (\n" +
             "  select date(pay_time) as pay_time, count(*) as count\n" +
             "  from user_order\n" +
-            "  group by date(pay_time)\n" +
-            ") b on a.click_date = b.pay_time;\n", nativeQuery = true)
+            " group by date(pay_time)" +
+            ") b on a.click_date = b.pay_time order by a.click_date ;", nativeQuery = true)
     List<Object[]> getSevenDayOrderCount();
 
 
@@ -179,7 +182,7 @@ public interface MemberPayRecordRepository extends JpaRepository<MemberPayRecord
             "  select date(pay_time) as pay_time, count(*) as count\n" +
             "  from user_order\n" +
             "  group by date(pay_time)\n" +
-            ") b on a.click_date = b.pay_time;", nativeQuery = true)
+            ") b on a.click_date = b.pay_time order by a.click_date;", nativeQuery = true)
     List<Object[]> getMonthOrderCount();
 
 

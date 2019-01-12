@@ -25,6 +25,9 @@ public class UserRecordDTO implements Serializable {
     /**购买月数**/
     private int month;
 
+    private String monthString;
+
+
     /**购买时间**/
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date payTime;
@@ -34,6 +37,10 @@ public class UserRecordDTO implements Serializable {
 
     /**优惠券抵扣金额**/
     private BigDecimal reduceAmount;
+
+    /**实际金额**/
+    private BigDecimal actualAmount;
+
 
     /**0未支付 1一已支付 2支付失败**/
     private int status;
@@ -63,10 +70,15 @@ public class UserRecordDTO implements Serializable {
 
     private int isMember;
 
+    private String vipIcon;
+
+    /**订单总金额**/
+    private BigDecimal totalAmount;
+
     public UserRecordDTO() {
     }
 
-    public UserRecordDTO(int id, int userId, BigDecimal amount, int month, Date payTime, int couponId, BigDecimal reduceAmount, int status, String orderId, int payType, String nickName, String headBigImage, Date memberBeginTime, Date memberEndTime, String couponName) {
+    public UserRecordDTO(int id, int userId, BigDecimal amount, int month, Date payTime, int couponId, BigDecimal reduceAmount, int status, String orderId, int payType, String nickName, String headBigImage, Date memberBeginTime, Date memberEndTime, String couponName,BigDecimal totalAmount) {
         this.id = id;
         this.userId = userId;
         this.amount = amount;
@@ -82,6 +94,7 @@ public class UserRecordDTO implements Serializable {
         this.memberBeginTime = memberBeginTime;
         this.memberEndTime = memberEndTime;
         this.couponName = couponName;
+        this.totalAmount =totalAmount;
     }
 
 

@@ -45,7 +45,7 @@ public class HttpAspect {
      * 定义AOP扫描路径
      * 第一个注解只扫描aopTest方法
      */
-    @Pointcut("execution(* com.sian.translate.management.*.controller.*.*(..))")
+    @Pointcut("execution(* com.sian.translate.management.*.service.*.*(..))")
     public void log(){}
 
     /**
@@ -137,8 +137,11 @@ public class HttpAspect {
             Object value = stringObjectEntry.getValue();
             result += "\""+key+"\""+":"+"\""+value+"\""+",";
         }
-        result = result.substring(0, result.length() - 1);
-        result = "{"+result+"}";
+        if (result.length() > 0){
+            result = result.substring(0, result.length() - 1);
+            result = "{"+result+"}";
+        }
+
         return result;
     }
 
