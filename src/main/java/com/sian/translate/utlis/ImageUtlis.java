@@ -10,12 +10,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletRequest;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.HashMap;
 
 @Slf4j
@@ -38,10 +38,10 @@ public class ImageUtlis {
     //获取图片链接
     private String imgPath;
 
-    public static HashMap<String,String> loadImageAndcompressImg(MultipartFile file) throws IOException {
+    public static HashMap<String,String> loadImageAndcompressImg(MultipartFile file,HttpServletRequest request) throws IOException {
 
         //获取本机IP
-        String host = InetAddress.getLocalHost().getHostAddress();
+        String host = CommonUtlis.getIpAddr(request);
         String port = loadConfig.getPort();
         String rootPath = loadConfig.getRootPath();
         String sonPath = loadConfig.getSonPath();
@@ -170,10 +170,10 @@ public class ImageUtlis {
     }
 
 
-    public static String loadImage(MultipartFile file) throws IOException {
+    public static String loadImage(MultipartFile file,HttpServletRequest request) throws IOException {
 
         //获取本机IP
-        String host = InetAddress.getLocalHost().getHostAddress();
+        String host = CommonUtlis.getIpAddr(request);
         String port = loadConfig.getPort();
         String rootPath = loadConfig.getRootPath();
         String sonPath = loadConfig.getSonPath();
@@ -200,4 +200,6 @@ public class ImageUtlis {
         return orginalPath;
 
     }
+
+
 }

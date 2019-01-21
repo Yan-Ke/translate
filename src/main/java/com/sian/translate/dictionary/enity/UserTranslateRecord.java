@@ -19,6 +19,10 @@ public class UserTranslateRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Integer id;
 
+    /**词典id**/
+    private  Integer dictionaryId;
+
+
     /**翻译内容**/
     private String content;
 

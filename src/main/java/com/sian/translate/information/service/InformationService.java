@@ -12,6 +12,9 @@ public interface InformationService {
      * @param size  条数
      * @return
      */
-    ResultVO getInformationList(String languageType,Integer page ,Integer size);
+    ResultVO getInformationList(Integer userId,String languageType,Integer type,Integer advLocation,Integer page ,Integer size);
 
+    ResultVO readInformation(String languageType, Integer informationId, Integer userId);
+
+    ResultVO zanInformation(String languageType, Integer informationId, Integer type, Integer userId);
 }

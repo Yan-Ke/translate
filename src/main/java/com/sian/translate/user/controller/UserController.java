@@ -6,8 +6,11 @@ import com.sian.translate.user.service.UserService;
 import com.sian.translate.utlis.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
 
 @Slf4j
 @RestController
@@ -18,6 +21,8 @@ public class UserController {
     @Autowired
     UserService userService;
 
+
+
     /***
      * 第三方登陆
      * @param languageType 语言 0 汉语 1 藏语
@@ -25,10 +30,11 @@ public class UserController {
      */
     @PostMapping("/thridLogin")
     public ResultVO thridLogin(@RequestParam(value = "weixinOpenid", required = false) String weixinOpenid,
-                                       @RequestParam(value = "qqOpenid", required = false) String qqOpenid,
-                                       @RequestParam(value = "languageType", required = false) String languageType) {
+                               @RequestParam(value = "qqOpenid", required = false) String qqOpenid,
+                               @RequestParam(value = "languageType", required = false) String languageType,
+                               @RequestParam(value = "deviceId", required = false) String deviceId) {
 
-        return userService.thridLogin(weixinOpenid, qqOpenid, languageType);
+        return userService.thridLogin(weixinOpenid, qqOpenid, languageType,deviceId);
     }
 
 
@@ -42,28 +48,33 @@ public class UserController {
      */
     @PostMapping("/thridLoginRegister")
     public ResultVO thridLoginRegister(@RequestParam(value = "phone", required = false) String phone,
-                               @RequestParam(value = "code", required = false) String code,
-                               @RequestParam(value = "nickName", required = false) String nickName,
-                               @RequestParam(value = "weixinOpenid", required = false) String weixinOpenid,
-                               @RequestParam(value = "qqOpenid", required = false) String qqOpenid,
-                               @RequestParam(value = "sex", required = false) Integer sex,
-                               @RequestParam(value = "imagePath", required = false) String imagePath,
-                               @RequestParam(value = "languageType", required = false) String languageType) {
+                                       @RequestParam(value = "code", required = false) String code,
+                                       @RequestParam(value = "nickName", required = false) String nickName,
+                                       @RequestParam(value = "weixinOpenid", required = false) String weixinOpenid,
+                                       @RequestParam(value = "qqOpenid", required = false) String qqOpenid,
+                                       @RequestParam(value = "sex", required = false) Integer sex,
+                                       @RequestParam(value = "imagePath", required = false) String imagePath,
+                                       @RequestParam(value = "languageType", required = false) String languageType,
+                                       @RequestParam(value = "deviceId", required = false) String deviceId) {
 
         UserInfo userInfo = new UserInfo();
         userInfo.setNickName(nickName);
-        userInfo.setQqOpenid(qqOpenid);
-        userInfo.setWeixinOpenid(weixinOpenid);
+        if (!StringUtils.isEmpty(qqOpenid)) {
+            userInfo.setQqOpenid(qqOpenid);
+        }
+        if (!StringUtils.isEmpty(weixinOpenid)) {
+            userInfo.setWeixinOpenid(weixinOpenid);
+        }
         userInfo.setPhone(phone);
         userInfo.setSex(sex);
         userInfo.setHeadSmallImage(imagePath);
         userInfo.setHeadBigImage(imagePath);
         userInfo.setOrignalImage(imagePath);
+        userInfo.setDeviceId(deviceId);
 
 
         return userService.thridLoginRegister(code, userInfo, languageType);
     }
-
 
 
     /****
@@ -76,10 +87,10 @@ public class UserController {
     @PostMapping(value = "/login", produces = "application/json;charset=UTF-8")
     ResultVO login(@RequestParam(value = "phone", required = false) String phone,
                    @RequestParam(value = "code", required = false) String code,
-                   @RequestParam(value = "languageType", required = false) String languageType) {
-
+                   @RequestParam(value = "languageType", required = false) String languageType,
+                   @RequestParam(value = "deviceId", required = false) String deviceId) {
         //1.直接登陆
-        ResultVO resultVO = userService.login(phone, code, languageType);
+        ResultVO resultVO = userService.login(phone, code, languageType,deviceId);
         return resultVO;
     }
 
@@ -90,7 +101,8 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/getInfo", produces = "application/json;charset=UTF-8")
-    ResultVO getUserInfo(@RequestParam(value = "id", required = false) Integer id, @RequestParam(value = "languageType", required = false) String languageType) {
+    ResultVO getUserInfo(@RequestParam(value = "userId", required = false) Integer id,
+                         @RequestParam(value = "languageType", required = false) String languageType) {
         ResultVO resultVO = userService.getUserinfo(id, languageType);
         return resultVO;
     }
@@ -106,6 +118,7 @@ public class UserController {
         ResultVO resultVO = userService.getDucation(languageType);
         return resultVO;
     }
+
     /***
      * 修改用户信息
      * @param nickName 昵称
@@ -121,11 +134,11 @@ public class UserController {
                                  @RequestParam(value = "nickName", required = false) String nickName,
                                  @RequestParam(value = "sex", required = false) Integer sex,
                                  @RequestParam(value = "age", required = false) Integer age,
-                                 @RequestParam(value = "education", required = false) Integer educationId,
-                                 @RequestParam(value = "status", required = false,defaultValue = "0") Integer status,
+                                 @RequestParam(value = "educationId", required = false) Integer educationId,
+                                 @RequestParam(value = "status", required = false, defaultValue = "0") Integer status,
                                  @RequestParam(value = "phone", required = false) String phone,
-                                 @RequestParam(value = "languageType", required = false,defaultValue = "0") String languageType,
-                                 @RequestParam(value = "image", required = false) MultipartFile file) {
+                                 @RequestParam(value = "languageType", required = false, defaultValue = "0") String languageType,
+                                 @RequestParam(value = "image", required = false) MultipartFile file, HttpServletRequest request) {
 
         UserInfo userInfo = new UserInfo();
         userInfo.setId(id);
@@ -138,9 +151,8 @@ public class UserController {
         userInfo.setEducationId(educationId);
 
 
-        return userService.editUserInfo(file, userInfo, languageType);
+        return userService.editUserInfo(file, userInfo, languageType, request);
     }
-
 
 
     /****
@@ -151,8 +163,8 @@ public class UserController {
     ResultVO feedback(@RequestParam(value = "languageType", required = false) String languageType,
                       @RequestParam(value = "userId", required = false) Integer userId,
                       @RequestParam(value = "content", required = false) String content,
-                      @RequestParam(value = "images", required = false) MultipartFile[] files) {
-        ResultVO resultVO = userService.feedback(languageType, userId, content,files);
+                      @RequestParam(value = "images", required = false) MultipartFile[] files, HttpServletRequest request) {
+        ResultVO resultVO = userService.feedback(languageType, userId, content, files, request);
         return resultVO;
     }
 
@@ -166,13 +178,13 @@ public class UserController {
      * @return
      */
     @PostMapping(value = "/changePhone", produces = "application/json;charset=UTF-8")
-    ResultVO changePhone(@RequestParam(value = "id", required = false) Integer id,
+    ResultVO changePhone(@RequestParam(value = "userId", required = false) Integer id,
                          @RequestParam(value = "nowPhone", required = false) String nowPhone,
                          @RequestParam(value = "newPhone", required = false) String newPhone,
                          @RequestParam(value = "code", required = false) String code,
                          @RequestParam(value = "languageType", required = false) String languageType) {
 
-        return userService.changePhone(id,nowPhone, newPhone,code, languageType);
+        return userService.changePhone(id, nowPhone, newPhone, code, languageType);
     }
 
     /***
@@ -183,8 +195,8 @@ public class UserController {
      */
 
     @GetMapping(value = "/getConfig", produces = "application/json;charset=UTF-8")
-    ResultVO getConfig(@RequestParam(value = "type", required = false,defaultValue = "0") Integer type, @RequestParam(value = "languageType", required = false) String languageType) {
-        return userService.getConfig(type,languageType);
+    ResultVO getConfig(@RequestParam(value = "type", required = false, defaultValue = "0") Integer type, @RequestParam(value = "languageType", required = false) String languageType) {
+        return userService.getConfig(type, languageType);
     }
 
     /***
@@ -205,9 +217,9 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/getNotifykList", produces = "application/json;charset=UTF-8")
-    ResultVO getNotifkList(@RequestParam(value = "languageType", required = false,defaultValue = "0") String languageType,
-                            @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-                            @RequestParam(value = "size", required = false, defaultValue = "20") Integer size) {
+    ResultVO getNotifkList(@RequestParam(value = "languageType", required = false, defaultValue = "0") String languageType,
+                           @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                           @RequestParam(value = "size", required = false, defaultValue = "20") Integer size) {
         return userService.getNotifkList(languageType, page, size);
     }
 
@@ -216,10 +228,21 @@ public class UserController {
      * @return
      */
     @GetMapping(value = "/getHelpCenterList", produces = "application/json;charset=UTF-8")
-    ResultVO getHelpCenterList(@RequestParam(value = "languageType", required = false,defaultValue = "0") String languageType,
+    ResultVO getHelpCenterList(@RequestParam(value = "languageType", required = false, defaultValue = "0") String languageType,
                                @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
                                @RequestParam(value = "size", required = false, defaultValue = "20") Integer size) {
         return userService.getHelpCenterList(languageType, page, size);
+    }
+
+    /****
+     * 检测用户是否在其他地方登陆
+     * @return
+     */
+    @GetMapping(value = "/checkLogin", produces = "application/json;charset=UTF-8")
+    ResultVO checkLogin(@RequestParam(value = "languageType", required = false, defaultValue = "0") String languageType,
+                               @RequestParam(value = "userId", required = false, defaultValue = "1") Integer userId,
+                               @RequestParam(value = "deviceId", required = false) String deviceId) {
+        return userService.checkLogin(languageType, userId, deviceId);
     }
 
 

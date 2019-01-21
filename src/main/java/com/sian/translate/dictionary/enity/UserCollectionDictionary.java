@@ -23,6 +23,9 @@ public class UserCollectionDictionary {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Integer id;
 
+    /**词典id**/
+    private  Integer dictionaryId;
+
     /**翻译内容**/
     private String content;
 
@@ -39,6 +42,10 @@ public class UserCollectionDictionary {
     /**创建时间**/
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
+
+
+    /**0句子翻译 1单词翻译**/
+    private Integer isWord;
 
 
 

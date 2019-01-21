@@ -3,6 +3,7 @@ package com.sian.translate.management.systemset.service;
 import com.sian.translate.VO.ResultVO;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 public interface SystemSetService {
@@ -15,7 +16,7 @@ public interface SystemSetService {
 
     ResultVO getManageLogList(Integer page, Integer size, HttpSession session);
 
-    ResultVO uploadImage(MultipartFile file);
+    ResultVO uploadImage(MultipartFile file, HttpServletRequest request);
 
 
 
@@ -23,9 +24,10 @@ public interface SystemSetService {
 
     ResultVO deleteFile(Integer id, HttpSession session);
 
-    ResultVO editFile(Integer id, Integer type, String languageType, String field, String content, Integer status, Integer order, HttpSession session);
 
     ResultVO getFileList(Integer type, String field, Integer page, Integer size, HttpSession session);
 
     ResultVO getTranslateList(Integer type, String filed, Integer page, Integer size, HttpSession session);
+
+    ResultVO editFile(Integer id, Integer type, String languageType, String field, String content, Integer status, Integer order, String email, String qq, String weixin, HttpSession session);
 }

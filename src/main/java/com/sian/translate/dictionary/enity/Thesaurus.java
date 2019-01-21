@@ -52,4 +52,7 @@ public class Thesaurus {
     /**翻译后的结果**/
     private String translateResult;
 
+    /**图片地址**/
+    private String image;
+
 }

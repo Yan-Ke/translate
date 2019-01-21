@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Slf4j
@@ -96,8 +97,11 @@ public class SystemSetController {
                      @RequestParam(value = "content", required = false) String content,
                      @RequestParam(value = "status", required = false, defaultValue = "0") Integer status,
                      @RequestParam(value = "order", required = false, defaultValue = "0") Integer order,
-                     HttpSession session) {
-        return systemSetService.editFile(id,type, languageType, field, content,status,order, session);
+                      @RequestParam(value = "email", required = false) String email,
+                      @RequestParam(value = "qq", required = false) String qq,
+                      @RequestParam(value = "weixin", required = false) String weixin,
+                      HttpSession session) {
+        return systemSetService.editFile(id,type, languageType, field, content,status,order,email,qq,weixin, session);
     }
 
     /****
@@ -143,8 +147,8 @@ public class SystemSetController {
      * @return
      */
     @PostMapping(value = "/uploadImage", produces = "application/json;charset=UTF-8")
-    ResultVO uploadImage(@RequestParam(value = "file", required = false) MultipartFile file) {
-        return systemSetService.uploadImage(file);
+    ResultVO uploadImage(@RequestParam(value = "file", required = false) MultipartFile file, HttpServletRequest request) {
+        return systemSetService.uploadImage(file,request);
     }
 
 }

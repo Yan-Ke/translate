@@ -1,7 +1,6 @@
 package com.sian.translate.management.user.service;
 
 import com.sian.translate.VO.ResultVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
 
@@ -28,7 +27,7 @@ public interface ManageUserService {
     ResultVO getRoleList(HttpSession session);
 
     /**新增管理员**/
-    ResultVO addManageUser(Integer roleId, String account, String userName, String phone, String password, Integer status, MultipartFile image, HttpSession session);
+    ResultVO addManageUser(Integer roleId, String account, String userName, String phone, String password, Integer status, String image, HttpSession session);
 
     /**删除管理员**/
     ResultVO deleteManageUser(Integer id, HttpSession session);

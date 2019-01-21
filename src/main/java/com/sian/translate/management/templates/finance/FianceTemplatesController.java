@@ -63,7 +63,7 @@ public class FianceTemplatesController {
         map.put("nickName", nickName);
         map.put("month", month);
 
-        return new ModelAndView("/html/finance/record.html", map);
+        return new ModelAndView("html/finance/record.html", map);
     }
 
     @RequestMapping("/fiance/reportForm")
@@ -85,7 +85,7 @@ public class FianceTemplatesController {
         map.put("endTime", endTime);
 
 
-        return new ModelAndView("/html/finance/report_form.html", map);
+        return new ModelAndView("html/finance/report_form.html", map);
     }
 
     @RequestMapping("/fiance/details")
@@ -123,7 +123,7 @@ public class FianceTemplatesController {
         map.put("couponName", couponName);
 
 
-        return new ModelAndView("/html/finance/details.html", map);
+        return new ModelAndView("html/finance/details.html", map);
     }
 
 

@@ -77,8 +77,20 @@
 
                 </div>
                 <div class="col-sm-4" style="padding-left:0;">
-                    <img id="verifycode_img" style="width: 100%;height: 34px;" title="点击更换" src="{:captcha_src()}"
-                         onclick="this.src='{:captcha_src()}?seed='+Math.random()"></div>
+                    <!--<img id="imgVerify" style="width: 100%;height: 34px;" title="点击更换"-->
+                         <!--onclick="getVerify(this);">-->
+                    <a href="javascript:void(0);" title="点击更换验证码">
+
+                        <img id="imgVerify" src="http://localhost:8080/manage/user/imagecode?+Math.random()"  alt="更换验证码" height="36" width="100%"   onclick="getVerify(this);">
+
+
+<!--
+                        <img id="imgVerify" src="http://39.104.188.55:8001/manage/user/imagecode?+Math.random()"  alt="更换验证码" height="36" width="100%"   onclick="getVerify(this);">
+-->
+
+                    </a>
+                </div>
+
             </div>
         </div>
         <button style="margin-top:20px;padding:8px 0;font-size: 18px;" type="button" id="logining"
@@ -100,6 +112,15 @@
 <script src="../../layer/layer.js"></script>
 <script src="../../layui/layui.js"></script>
 <script type="text/javascript">
+
+    //获取验证码
+    function getVerify(obj){
+        obj.src = "http://localhost:8080/" + "/manage/user/imagecode?"+Math.random();
+        // obj.src = "http://39.104.188.55:8001" + "/manage/user/imagecode?"+Math.random();
+
+    }
+
+
     //点击提交
     $('#logining').click(function () {
         var username = $('#username').val();
@@ -114,10 +135,10 @@
             layer.msg('请填写密码');
             return;
         }
-        // if (verifycode == '') {
-        //     layer.msg('请填写验证码');
-        //     return;
-        // }
+        if (verifycode == '') {
+            layer.msg('请填写验证码');
+            return;
+        }
 
 
         $.ajax({
@@ -125,8 +146,8 @@
             data: {
                 "account": username,
                 "password": password,
-                // "verifycode" :verifycode ,
-
+                "verifycode" :verifycode ,
+            //
             },
             dataType: 'json',
             type: 'post',

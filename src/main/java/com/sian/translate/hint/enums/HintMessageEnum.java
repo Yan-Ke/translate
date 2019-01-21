@@ -41,6 +41,17 @@ public enum HintMessageEnum {
     PAY_FORMAT_ERROR(33,"支付金额格式有误"),
     TRANSLATE_TYPE_EMPTY(34,"翻译类型不能为空"),
     TRANSLATE_RESULT_EMPTY(35,"还没有收录该单词"),
+    INFORMATION_ID_NOT_EMPTY(36,"资讯ID不能为空"),
+    INFORMATION_NOT_EXIST(37,"该条资讯记录不存在或被删除"),
+    INFORMATION_ALREADY_ZAN(38,"已经赞过该条资讯"),
+    ADV_LOCAITION_NOT_EMPTY(39,"请选择广告位置"),
+    DICTIONARY_ID_NOT_EMPTY(40,"词典ID不能为空"),
+    DICTIONARY_NOT_EXIST(41,"该词典不存在"),
+    MEMBER_DOWN(42,"该词典仅允许会员下载"),
+    DEVICE_ID_NOT_EMPTY(43,"设备ID不能为空"),
+    QQ_IS_BAND(44,"qq已被绑定"),
+    WEIXIN_IS_BAND(45,"微信已被绑定"),
+    IS_WORD_IS_EMPTY(46,"请选择收藏类型"),
 
 
 
@@ -78,8 +89,6 @@ public enum HintMessageEnum {
     INFORMATION_CONTENT_URL_NOT_EMPTY(1025,"资讯内容和外部链接不能同时为空"),
     INFORMATION_TYPE_NOT_EMPTY(1025,"资讯类型不能为空"),
     INFORMATION_LANGUAGETYPE_NOT_EMPTY(1026,"资讯语言类型不能为空"),
-    INFORMATION_ID_NOT_EMPTY(1027,"资讯ID不能为空"),
-    INFORMATION_NOT_EXIST(1028,"该条资讯记录不存在"),
 
     COUPON_NAME_NOT_EMPTY(1029,"优惠卷名称不能为空"),
     COUPON_CONTENT_NOT_EMPTY(1030,"优惠卷内容不能为空"),
@@ -97,8 +106,6 @@ public enum HintMessageEnum {
     DICTIONARY_NAME_NOT_EMPTY(1040,"词典名称不能为空"),
     DICTIONARY_TYPE_NOT_EMPTY(1041,"词典语言不能为空"),
     DICTIONARY_IMAGE_NOT_EMPTY(1042,"词典图片不能为空"),
-    DICTIONARY_ID_NOT_EMPTY(1143,"词典ID不能为空"),
-    DICTIONARY_NOT_EXIST(1144,"该词典不存在"),
 
 
 
@@ -178,6 +185,11 @@ public enum HintMessageEnum {
     FILE_CONTENT_NOT_EMPTY(1089,"文档内容不能为空"),
 
     FILE_IS_NOT_EXIST(1090,"文档不存在"),
+
+    NOT_AUTHORITY(1091,"无权限操作"),
+    EMAIL_NOT_EMPTY(1092,"邮箱不能为空"),
+    QQ_NOT_EMPTY(1093,"QQ不能为空"),
+    WEIXIN_NOT_EMPTY(1094,"微信不能为空"),
 
 
     ;

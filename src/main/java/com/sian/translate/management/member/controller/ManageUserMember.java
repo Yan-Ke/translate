@@ -2,10 +2,13 @@ package com.sian.translate.management.member.controller;
 
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.management.member.service.ManageMemberService;
+import com.sian.translate.user.entity.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Slf4j
@@ -26,10 +29,11 @@ public class ManageUserMember {
     @GetMapping(value = "/getMemberList", produces = "application/json;charset=UTF-8")
     ResultVO getMemberList(@RequestParam(value = "isMember", required = false,defaultValue = "-1") Integer isMember,
                            @RequestParam(value = "param", required = false)String param,
+                           @RequestParam(value = "month", required = false)Integer month,
                            @RequestParam(value = "page", required = false,defaultValue = "1")Integer page,
                            @RequestParam(value = "size", required = false,defaultValue = "20")Integer size,
                            HttpSession session) {
-        return  manageMemberService.getMemberList(isMember,param,page,size,session);
+        return  manageMemberService.getMemberList(isMember,param,month,page,size,session);
 
     }
 
@@ -112,5 +116,40 @@ public class ManageUserMember {
     }
 
 
+
+    /***
+     * 修改用户信息
+     * @param nickName 昵称
+     * @param sex 性别 1男 2女
+     * @param age 年龄
+     * @param educationId 学历ID
+     * @param languageType 语言 0 汉语 1 藏语
+     * @param file 头像
+     * @return
+     */
+    @PostMapping("/editUserInfo")
+    public ResultVO editUserInfo(@RequestParam(value = "userId", required = false) Integer id,
+                                 @RequestParam(value = "nickName", required = false) String nickName,
+                                 @RequestParam(value = "sex", required = false) Integer sex,
+                                 @RequestParam(value = "age", required = false) Integer age,
+                                 @RequestParam(value = "education", required = false) Integer educationId,
+                                 @RequestParam(value = "status", required = false,defaultValue = "0") Integer status,
+                                 @RequestParam(value = "phone", required = false) String phone,
+                                 @RequestParam(value = "languageType", required = false,defaultValue = "0") String languageType,
+                                 @RequestParam(value = "image", required = false) MultipartFile file,HttpSession session, HttpServletRequest request) {
+
+        UserInfo userInfo = new UserInfo();
+        userInfo.setId(id);
+        userInfo.setNickName(nickName);
+//        userInfo.setPhone(phone);
+        userInfo.setSex(sex);
+        userInfo.setAge(age);
+        userInfo.setPhone(phone);
+        userInfo.setUserStatus(status);
+        userInfo.setEducationId(educationId);
+
+
+        return manageMemberService.editUserInfo(file, userInfo, languageType,session,request);
+    }
 
 }

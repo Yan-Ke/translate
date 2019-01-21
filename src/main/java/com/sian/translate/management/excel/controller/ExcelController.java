@@ -30,12 +30,13 @@ public class ExcelController {
     @RequestMapping(value = "/exportmemberUserInfo", produces = "application/json;charset=UTF-8")
     ResultVO exportmemberUserInfo(@RequestParam(value = "isMember", required = false, defaultValue = "-1") Integer isMember,
                                   @RequestParam(value = "param", required = false) String param,
+                                  @RequestParam(value = "month", required = false, defaultValue = "0") Integer month,
                                   @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                                   @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
                                   HttpServletResponse response, HttpSession session) {
 
         try {
-            ResultVO resultVO = excelService.exportmemberUserInfo(isMember, response, page, size, param, session);
+            ResultVO resultVO = excelService.exportmemberUserInfo(isMember, response, month,page, size, param, session);
             if (resultVO.getCode() == 0) {
                 return null;
             } else {

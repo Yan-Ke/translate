@@ -37,7 +37,7 @@ public class DictionaryTemplatesController {
 
         map.put("dictionaryList", dictionaryList);
 
-        return new ModelAndView("/html/dictionary/index.html", map);
+        return new ModelAndView("html/dictionary/index.html", map);
     }
 
     @RequestMapping("/dictionary/thesaurus")
@@ -65,7 +65,7 @@ public class DictionaryTemplatesController {
         setType(type, map);
 
 
-        return new ModelAndView("/html/dictionary/thesaurus.html", map);
+        return new ModelAndView("html/dictionary/thesaurus.html", map);
     }
 
 
@@ -78,7 +78,7 @@ public class DictionaryTemplatesController {
         map.put("type", type);
         map.put("dictionaryName", dictionaryName);
 
-        return new ModelAndView("/html/dictionary/import.html", map);
+        return new ModelAndView("html/dictionary/import.html", map);
     }
     @RequestMapping("/dictionary/detail")
     public ModelAndView deatil(Integer id,Integer thesaurusId, Integer type,String dictionaryName, String contentOne,String contentTwo,Map<String, Object> map) {
@@ -92,13 +92,13 @@ public class DictionaryTemplatesController {
 
 
 
-        return new ModelAndView("/html/dictionary/details.html", map);
+        return new ModelAndView("html/dictionary/details.html", map);
     }
 
     @RequestMapping("/dictionary/add")
     public ModelAndView add(Map<String, Object> map) {
 
-        return new ModelAndView("/html/dictionary/add.html", map);
+        return new ModelAndView("html/dictionary/add.html", map);
     }
 
     @RequestMapping("/dictionary/addEntry")
@@ -109,7 +109,7 @@ public class DictionaryTemplatesController {
 
         map.put("dictionaryName", dictionaryName);
 
-        return new ModelAndView("/html/dictionary/add_Entry.html", map);
+        return new ModelAndView("html/dictionary/add_Entry.html", map);
     }
 
     private void setType(Integer type, Map<String, Object> map) {

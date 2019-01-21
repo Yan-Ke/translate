@@ -6,10 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface ThesaurusRepository extends JpaRepository<Thesaurus,Integer> {
 
 
-    Thesaurus findFirstByContentOneAndType(String contentOne,int type);
+    Thesaurus findFirstByContentOneAndDictionaryId(String contentOne,int dictionaryId);
 
     long countByContentOne(String contentOne);
 
@@ -19,6 +21,7 @@ public interface ThesaurusRepository extends JpaRepository<Thesaurus,Integer> {
 
     Page<Thesaurus> findByDictionaryId(Integer dictionrayId, Pageable pageable);
 
+    List<Thesaurus> findByDictionaryId(Integer dictionrayId);
 
 //    Page<Thesaurus> findByDictionaryIdAndContentOneLikeOrContentTwoLike(Integer dictionrayId,String contentOne, Pageable pageable);
 

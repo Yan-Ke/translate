@@ -10,6 +10,7 @@ import com.sian.translate.member.service.MemberService;
 import com.sian.translate.user.entity.UserInfo;
 import com.sian.translate.user.repository.UserInfoRepository;
 import com.sian.translate.user.service.impl.UserServiceImpl;
+import com.sian.translate.utlis.CommonUtlis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -51,11 +52,12 @@ public class MemberTemplatesController {
     @RequestMapping("/member/list")
     public ModelAndView list(@RequestParam(value = "isMember", required = false, defaultValue = "-1") Integer isMember,
                              @RequestParam(value = "paramName", required = false) String paramName,
+                             @RequestParam(value = "month", required = false, defaultValue = "0") Integer month,
                              @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
                              @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
                              HttpSession session, Map<String, Object> map) {
 
-        ResultVO informotionList = manageMemberService.getMemberList(isMember, paramName, page, size, session);
+        ResultVO informotionList = manageMemberService.getMemberList(isMember, paramName,month, page, size, session);
         PageInfoDTO pageInfoDTO = (PageInfoDTO) informotionList.getData();
         List<UserInfo> userInfoList = (List<UserInfo>) pageInfoDTO.getList();
         map.put("userInfoList", userInfoList);
@@ -67,8 +69,10 @@ public class MemberTemplatesController {
         userInfoList.stream().forEach(userInfo -> setUserInfoDate(userInfo));
 
         map.put("isMember", isMember);
+        map.put("month", month);
 
-        return new ModelAndView("/html/member/index.html", map);
+
+        return new ModelAndView("html/member/index.html", map);
     }
 
 
@@ -93,7 +97,7 @@ public class MemberTemplatesController {
         }
 
 
-        return new ModelAndView("/html/member/set.html", map);
+        return new ModelAndView("html/member/set.html", map);
     }
 
     @RequestMapping("/member/detail")
@@ -107,12 +111,26 @@ public class MemberTemplatesController {
 
         map.put("userInfo", userinfo);
 
-        return new ModelAndView("/html/member/details.html", map);
+        return new ModelAndView("html/member/details.html", map);
     }
 
 
 
     private void setUserInfoDate(UserInfo userinfo) {
+
+        if (userinfo.getMemberBeginTime() != null
+                && userinfo.getMemberEndTime() != null) {
+            if (CommonUtlis.isEffectiveDate(new Date(), userinfo.getMemberBeginTime(), userinfo.getMemberEndTime())) {
+                userinfo.setIsMember(1);
+                userinfo.setVipIcon(CommonUtlis.VIPICON1);
+            } else {
+                userinfo.setVipIcon(CommonUtlis.VIPICON2);
+                userinfo.setIsMember(2);
+            }
+        } else {
+            userinfo.setVipIcon(CommonUtlis.VIPICON0);
+            userinfo.setIsMember(0);
+        }
 
         /**用户性别 0未知1男2女3保密**/
         if(userinfo.getSex() == null || userinfo.getSex() == 0){

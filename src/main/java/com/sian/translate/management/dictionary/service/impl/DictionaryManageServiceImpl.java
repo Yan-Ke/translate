@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.criteria.*;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,7 +46,7 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
 
 
     @Override
-    public ResultVO addDictionaryr(String name, Integer type, Integer isMemberVisible, String image, HttpSession session) {
+    public ResultVO addDictionaryr(String name, Integer type, Integer isMemberVisible, String image, HttpSession session, HttpServletRequest request) {
         String languageType = "0";
 
 
@@ -87,7 +88,7 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
     }
 
     @Override
-    public ResultVO editDictionaryr(Integer id, String name, Integer type, Integer isMemberVisible, MultipartFile image, HttpSession session) {
+    public ResultVO editDictionaryr(Integer id, String name, Integer type, Integer isMemberVisible, MultipartFile image, HttpSession session, HttpServletRequest request) {
         String languageType = "0";
 
         Integer userId = (Integer) session.getAttribute(ManageUserService.SESSION_KEY);
@@ -120,7 +121,7 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
 
         if (image != null && !image.isEmpty()){
             try {
-                imagePath = ImageUtlis.loadImage(image);
+                imagePath = ImageUtlis.loadImage(image,request);
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_FORMAT_ERROR.getCode(), languageType));
@@ -256,7 +257,7 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
     }
 
     @Override
-    public ResultVO addThesaurus(Integer id, String contentOne, String contentTwo, HttpSession session) {
+    public ResultVO addThesaurus(Integer id, String contentOne, String contentTwo, String image,HttpSession session) {
 
         String languageType = "0";
 
@@ -283,6 +284,11 @@ public class DictionaryManageServiceImpl implements DictionaryManageService {
 
 
         Thesaurus thesaurus = new Thesaurus();
+
+        if (!StringUtils.isEmpty(image)){
+            thesaurus.setImage(image);
+        }
+
         thesaurus.setContentOne(contentOne);
         thesaurus.setContentTwo(contentTwo);
         thesaurus.setType(dictionary.getType());

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Date;
@@ -29,7 +30,7 @@ public class BannerManageServiceImpl implements BannerManageService {
     BannerRepository bannerRepository;
 
     @Override
-    public ResultVO addBanner(String content, String url,Integer type,MultipartFile file,HttpSession session) {
+    public ResultVO addBanner(String content, String url, Integer type, MultipartFile file, HttpServletRequest request,HttpSession session) {
 
         String languageType = "0";
 
@@ -55,7 +56,7 @@ public class BannerManageServiceImpl implements BannerManageService {
         }
         String imagePath = "";
         try {
-            imagePath = ImageUtlis.loadImage(file);
+            imagePath = ImageUtlis.loadImage(file,request);
         } catch (IOException e) {
             e.printStackTrace();
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_FORMAT_ERROR.getCode(), languageType));
@@ -80,7 +81,7 @@ public class BannerManageServiceImpl implements BannerManageService {
     }
 
     @Override
-    public ResultVO editBanner(Integer bannerId,String content, String url, Integer type, MultipartFile file, HttpSession session) {
+    public ResultVO editBanner(Integer bannerId,String content, String url, Integer type, MultipartFile file, HttpServletRequest request,HttpSession session) {
         String languageType = "0";
 
 
@@ -104,7 +105,7 @@ public class BannerManageServiceImpl implements BannerManageService {
 
         if (file != null){
             try {
-                imagePath = ImageUtlis.loadImage(file);
+                imagePath = ImageUtlis.loadImage(file,request);
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_FORMAT_ERROR.getCode(), languageType));

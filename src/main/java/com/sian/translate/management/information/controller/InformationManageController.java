@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /***
@@ -32,9 +33,13 @@ public class InformationManageController {
                             @RequestParam(value = "type", required = false) Integer type,
                             @RequestParam(value = "order", required = false, defaultValue = "0") Integer order,
                             @RequestParam(value = "isShow", required = false, defaultValue = "1") Integer isShow,
+                            @RequestParam(value = "lookCount", required = false, defaultValue = "0") Integer lookCount,
+                            @RequestParam(value = "zan", required = false, defaultValue = "0") Integer zan,
+                            @RequestParam(value = "advLocation", required = false, defaultValue = "0") Integer advLocation,
+                            @RequestParam(value = "recommend", required = false, defaultValue = "0") Integer recommend,
                             @RequestParam(value = "image", required = false) String image,
                             HttpSession session) {
-        return informationManageService.addInformation(title, content, author, url, languageType, type, order, isShow, image, session);
+        return informationManageService.addInformation(title, content, author, url, languageType, type, order, isShow, image,lookCount,zan,advLocation,recommend,session);
     }
 
     /****
@@ -53,9 +58,15 @@ public class InformationManageController {
                              @RequestParam(value = "type", required = false) Integer type,
                              @RequestParam(value = "order", required = false, defaultValue = "0") Integer order,
                              @RequestParam(value = "isShow", required = false, defaultValue = "1") Integer isShow,
-                             @RequestParam(value = "file", required = false) MultipartFile file,
-                             HttpSession session) {
-        return informationManageService.editInformotion(informationId, title, content, author, url, languageType, type, order, isShow, file, session);
+                             @RequestParam(value = "lookCount", required = false, defaultValue = "0") Integer lookCount,
+                             @RequestParam(value = "zan", required = false, defaultValue = "0") Integer zan,
+                             @RequestParam(value = "advLocation", required = false, defaultValue = "0") Integer advLocation,
+                             @RequestParam(value = "recommend", required = false, defaultValue = "0") Integer recommend,
+                             @RequestParam(value = "image", required = false) String image,
+                             HttpSession session, HttpServletRequest request) {
+
+        return informationManageService.editInformotion(informationId,title, content, author, url, languageType, type, order, isShow, image,lookCount,zan,advLocation,recommend,session);
+
     }
 
     /****

@@ -186,6 +186,8 @@
                         window.location.href = '/manage/dictionary/thesaurus?page=' + page + '&name=' + name+"&id="+id+"&type="+type+"&dictionaryName="+dictionaryName;
                         // setTimeout(function () {
                         // }, 2000);
+                    }else {
+                        layer.msg(res.msg);
                     }
                 }
             })

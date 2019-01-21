@@ -58,14 +58,13 @@ public class SystemSetTemplatesController {
                                    HttpSession session, Map<String, Object> map) {
 
         ResultVO resultVO = manageUserService.geteManageUserList(page, size, session);
-
         PageInfoDTO pageInfoDTO = (PageInfoDTO) resultVO.getData();
         List<ManageUserInfo> manageUserInfoList = (List<ManageUserInfo>) pageInfoDTO.getList();
         map.put("manageUserInfoList", manageUserInfoList);
         map.put("indexPage", pageInfoDTO.getPage());
         map.put("totalPage", pageInfoDTO.getTotalPages());
 
-        return new ModelAndView("/html/admin/index.html", map);
+        return new ModelAndView("html/admin/index.html", map);
     }
 
     @RequestMapping("/system/adminEdit")
@@ -84,7 +83,7 @@ public class SystemSetTemplatesController {
 
         }
 
-        return new ModelAndView("/html/admin/edit.html", map);
+        return new ModelAndView("html/admin/edit.html", map);
     }
 
     @RequestMapping("/system/adminAdd")
@@ -97,7 +96,7 @@ public class SystemSetTemplatesController {
         map.put("manageUserRoleList",manageUserRoleList);
 
 
-        return new ModelAndView("/html/admin/add.html", map);
+        return new ModelAndView("html/admin/add.html", map);
     }
 
 
@@ -110,7 +109,7 @@ public class SystemSetTemplatesController {
         map.put("manageUserRoleList", manageUserRoleList);
 
 
-        return new ModelAndView("/html/role/index.html", map);
+        return new ModelAndView("html/role/index.html", map);
     }
 
     @RequestMapping("/system/roleAdd")
@@ -148,7 +147,7 @@ public class SystemSetTemplatesController {
 
         }
 
-        return new ModelAndView("/html/role/add.html", map);
+        return new ModelAndView("html/role/add.html", map);
     }
 
     @RequestMapping("/system/roleEdit")
@@ -185,7 +184,7 @@ public class SystemSetTemplatesController {
 
         }
 
-        return new ModelAndView("/html/role/edit.html", map);
+        return new ModelAndView("html/role/edit.html", map);
     }
     /****
      * 获取用户反馈列表
@@ -216,7 +215,7 @@ public class SystemSetTemplatesController {
         map.put("status", status);
 
 
-        return new ModelAndView("/html/feedback/pending.html", map);
+        return new ModelAndView("html/feedback/pending.html", map);
     }
 
     @RequestMapping("/system/fileIndex")
@@ -237,13 +236,13 @@ public class SystemSetTemplatesController {
         map.put("type", type);
 
 
-        return new ModelAndView("/html/file/index.html", map);
+        return new ModelAndView("html/file/index.html", map);
     }
 
     @RequestMapping("/system/fileAdd")
     public ModelAndView fileAdd(HttpSession session, Map<String, Object> map) {
 
-        return new ModelAndView("/html/file/add.html", map);
+        return new ModelAndView("html/file/add.html", map);
     }
 
 
@@ -258,7 +257,7 @@ public class SystemSetTemplatesController {
             map.put("systemConfig", systemConfig);
         }
 
-        return new ModelAndView("/html/file/edit.html", map);
+        return new ModelAndView("html/file/edit.html", map);
     }
 
 
@@ -291,7 +290,7 @@ public class SystemSetTemplatesController {
         map.put("type", type);
 
 
-        return new ModelAndView("/html/search/index.html", map);
+        return new ModelAndView("html/search/index.html", map);
     }
 
     @RequestMapping("/system/manageLog")
@@ -309,7 +308,7 @@ public class SystemSetTemplatesController {
         map.put("totalElements", pageInfoDTO.getTotalElements());
 
 
-        return new ModelAndView("/html/journal/index.html", map);
+        return new ModelAndView("html/journal/index.html", map);
     }
 
     @RequestMapping("/system/about")
@@ -333,7 +332,7 @@ public class SystemSetTemplatesController {
 
 
 
-        return new ModelAndView("/html/about/index.html", map);
+        return new ModelAndView("html/about/index.html", map);
     }
 
 

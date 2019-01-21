@@ -4,10 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 
@@ -26,6 +23,7 @@ public class SystemConfig {
     /**电话或标题**/
     private String field;
     /**内容**/
+    @Column(columnDefinition = "text")
     private String content;
 
     /**创建人**/
@@ -54,8 +52,11 @@ public class SystemConfig {
     @JsonIgnore
     private  Integer configOrder;
 
+    private String email;
 
+    private String qq;
 
+    private String weixin;
 
 
 }

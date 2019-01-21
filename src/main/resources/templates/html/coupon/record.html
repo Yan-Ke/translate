@@ -131,11 +131,28 @@
     }
     console.log(name)
 
-    //点击提交
+
+    //点击保存
     $('#findBtn').click(function () {
         var name = $('#search').val();
         console.log(name)
-        window.location.href = '/manage/coupon/record?name=' + name;
+
+        $.ajax({
+            url: "/manage/coupon/record",
+            data: {
+                "name": name,
+            },
+            dataType: "json",
+            type: 'post',
+
+            success: function (res) {
+                if (res.code == 0) {
+                    layer.msg(res.msg);
+                }else {
+                    layer.msg(res.msg);
+                }
+            }
+        })
     });
 
 

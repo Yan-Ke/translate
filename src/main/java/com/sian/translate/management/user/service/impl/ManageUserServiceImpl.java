@@ -13,7 +13,6 @@ import com.sian.translate.management.user.repository.ManageUserInfoRepository;
 import com.sian.translate.management.user.repository.ManageUserRoleRepository;
 import com.sian.translate.management.user.service.ManageUserService;
 import com.sian.translate.utlis.CommonUtlis;
-import com.sian.translate.utlis.ImageUtlis;
 import com.sian.translate.utlis.JsonUtil;
 import com.sian.translate.utlis.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +21,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,8 +46,8 @@ public class ManageUserServiceImpl implements ManageUserService {
     @Autowired
     ManageResourceRepository manageResourceRepository;
 
-    @Autowired
-    StringRedisTemplate stringRedisTemplate;
+//    @Autowired
+//    StringRedisTemplate stringRedisTemplate;
 
 
     /*******
@@ -104,7 +100,7 @@ public class ManageUserServiceImpl implements ManageUserService {
                 userInfo.setManageResourceList(manageResourceList);
             }
         }
-        stringRedisTemplate.opsForValue().set("user_"+userID, JsonUtil.toJson(userInfo));
+//        stringRedisTemplate.opsForValue().set("user_"+userID, JsonUtil.toJson(userInfo));
 
         return ResultVOUtil.success(userInfo);
     }
@@ -255,24 +251,29 @@ public class ManageUserServiceImpl implements ManageUserService {
 
         List<ManageResourceDTO> manageResourceDTOList = new ArrayList<>();
 
-        Map<String, List<ManageResource>> collect = manageResourceList.stream().collect(Collectors.groupingBy(ManageResource::getParentName));
+        if (manageResourceList.size() > 0){
+            Map<String, List<ManageResource>> collect = manageResourceList.stream().collect(Collectors.groupingBy(ManageResource::getParentName));
 
-        for (Map.Entry<String, List<ManageResource>> stringListEntry : collect.entrySet()) {
-            ManageResourceDTO manageResourceDTO = new ManageResourceDTO();
-            manageResourceDTO.setParentName(stringListEntry.getKey());
-            List<HashMap<String,String>> resourceList = new ArrayList<>();
+            for (Map.Entry<String, List<ManageResource>> stringListEntry : collect.entrySet()) {
+                ManageResourceDTO manageResourceDTO = new ManageResourceDTO();
+                manageResourceDTO.setParentName(stringListEntry.getKey());
+                List<HashMap<String,String>> resourceList = new ArrayList<>();
 
-            List<ManageResource> manageResources = stringListEntry.getValue();
+                List<ManageResource> manageResources = stringListEntry.getValue();
 
-            for (ManageResource manageResource : manageResources) {
-                HashMap<String,String> map = new HashMap<>();
-                map.put("id", manageResource.getId()+"");
-                map.put("resourceName", manageResource.getResourceName()+"");
-                resourceList.add(map);
+                for (ManageResource manageResource : manageResources) {
+                    HashMap<String,String> map = new HashMap<>();
+                    map.put("id", manageResource.getId()+"");
+                    map.put("resourceName", manageResource.getResourceName()+"");
+                    resourceList.add(map);
+                }
+                manageResourceDTO.setResourceList(resourceList);
+                manageResourceDTOList.add(manageResourceDTO);
             }
-            manageResourceDTO.setResourceList(resourceList);
-            manageResourceDTOList.add(manageResourceDTO);
         }
+
+
+
 
         return ResultVOUtil.success(manageResourceDTOList);
     }
@@ -339,7 +340,7 @@ public class ManageUserServiceImpl implements ManageUserService {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), languageType));
         }
 
-        List<ManageUserRole> all = manageUserRoleRepository.findAll();
+        List<ManageUserRole> all = manageUserRoleRepository.findAllByIdNot(1);
 
         return ResultVOUtil.success(all);
     }
@@ -357,7 +358,7 @@ public class ManageUserServiceImpl implements ManageUserService {
      * @param session
      **/
     @Override
-    public ResultVO addManageUser(Integer roleId, String account, String userName, String phone, String password, Integer status, MultipartFile image, HttpSession session) {
+    public ResultVO addManageUser(Integer roleId, String account, String userName, String phone, String password, Integer status, String image, HttpSession session) {
 
         String languageType = "0";
 
@@ -407,16 +408,6 @@ public class ManageUserServiceImpl implements ManageUserService {
         }
 
 
-        String imagePath = "";
-
-        if (image != null && !image.isEmpty()){
-            try {
-                imagePath = ImageUtlis.loadImage(image);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_FORMAT_ERROR.getCode(), languageType));
-            }
-        }
 
         ManageUserRole manageUserRole = manageUserRoleOptional.get();
 
@@ -432,8 +423,8 @@ public class ManageUserServiceImpl implements ManageUserService {
         String md5Password = DigestUtils.md5DigestAsHex(password.getBytes());
         manageUserInfo.setPassword(md5Password);
 
-        if (!StringUtils.isEmpty(imagePath)){
-            manageUserInfo.setHeadImage(imagePath);
+        if (!StringUtils.isEmpty(image)){
+            manageUserInfo.setHeadImage(image);
         }
 
         manageUserInfo.setRole(roleId);
@@ -528,7 +519,7 @@ public class ManageUserServiceImpl implements ManageUserService {
 
         Pageable pageable = PageRequest.of(page - 1, size, sort);
 
-        Page<ManageUserInfo> manageUserInfoPage = manageUserInfoRepository.findAll(pageable);
+        Page<ManageUserInfo> manageUserInfoPage = manageUserInfoRepository.findAllByAccountNot("admin",pageable);
 
         PageInfoDTO pageInfoDTO = new PageInfoDTO();
 
@@ -545,7 +536,8 @@ public class ManageUserServiceImpl implements ManageUserService {
     public ResultVO getManageUserInfo(Integer id, HttpSession session) {
 
 
-        String userInfoString = stringRedisTemplate.opsForValue().get("user_" + id);
+//        String userInfoString = stringRedisTemplate.opsForValue().get("user_" + id);
+        String userInfoString = "";
 
         ManageUserInfo manageUserInfo = null;
         if (!StringUtils.isEmpty(userInfoString)) {
@@ -555,7 +547,6 @@ public class ManageUserServiceImpl implements ManageUserService {
 
             manageUserInfo = manageUserInfoOptiona.get();
 
-            session.setAttribute(ManageUserService.SESSION_KEY, manageUserInfo.getId());
 
             Optional<ManageUserRole> byId = manageUserRoleRepository.findById(manageUserInfo.getRole());
 
@@ -572,7 +563,7 @@ public class ManageUserServiceImpl implements ManageUserService {
                     manageUserInfo.setManageResourceList(manageResourceList);
                 }
             }
-            stringRedisTemplate.opsForValue().set("user_"+id, JsonUtil.toJson(manageUserInfo));
+//            stringRedisTemplate.opsForValue().set("user_"+id, JsonUtil.toJson(manageUserInfo));
         }
 
 
@@ -672,7 +663,7 @@ public class ManageUserServiceImpl implements ManageUserService {
 
         String losmsg = "编辑用户"+manageUserInfo.getAccount();
 
-        stringRedisTemplate.opsForValue().set("user_"+id, JsonUtil.toJson(manageUserInfo));
+//        stringRedisTemplate.opsForValue().set("user_"+id, JsonUtil.toJson(manageUserInfo));
 
 
         return ResultVOUtil.success(manageUserInfo,losmsg);

@@ -4,13 +4,15 @@ import com.sian.translate.VO.ResultVO;
 import com.sian.translate.user.entity.UserInfo;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+
 public interface UserService {
 
     /**修改用户资料**/
-    ResultVO editUserInfo(MultipartFile multipartFile,UserInfo userInfo,String type);
+    ResultVO editUserInfo(MultipartFile multipartFile,UserInfo userInfo,String type, HttpServletRequest request);
 
     /**登陆**/
-    ResultVO login(String phone,String code,String type);
+    ResultVO login(String phone,String code,String type,String deviceId);
 
     /**获取用户信息**/
     ResultVO getUserinfo(Integer id,String type);
@@ -19,13 +21,13 @@ public interface UserService {
     ResultVO getDucation(String languageType);
 
     /**用户帮助反馈**/
-    ResultVO feedback(String languageType, Integer userId, String content,MultipartFile[] file);
+    ResultVO feedback(String languageType, Integer userId, String content,MultipartFile[] file, HttpServletRequest request);
 
     /**第三方登陆后注册**/
     ResultVO thridLoginRegister(String code, UserInfo userInfo, String languageType);
 
     /**第三方登陆**/
-    ResultVO thridLogin(String weixinOpenid, String qqOpenid, String languageType);
+    ResultVO thridLogin(String weixinOpenid, String qqOpenid, String languageType,String deviceId);
 
     /**更改用户手机号码**/
     ResultVO changePhone(Integer id, String nowPhone, String newPhone, String code, String languageType);
@@ -38,4 +40,7 @@ public interface UserService {
 
     /**获取帮助中心列表**/
     ResultVO getHelpCenterList(String languageType, Integer page, Integer size);
+
+    /**客户端轮询检测用户是其他地方登陆**/
+    ResultVO checkLogin(String languageType, Integer userId, String deviceId);
 }

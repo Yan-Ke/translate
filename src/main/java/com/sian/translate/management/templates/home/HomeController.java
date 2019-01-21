@@ -63,7 +63,7 @@ public class HomeController {
             map.put("user",userInfo);
 
         }
-        return new ModelAndView("/html/index.html", map);
+        return new ModelAndView("html/index.html", map);
     }
 
     @RequestMapping("/home")
@@ -87,7 +87,7 @@ public class HomeController {
 
 
 
-        return new ModelAndView("/html/index/home.html", map);
+        return new ModelAndView("html/index/home.html", map);
     }
 
     private void formatCreateTime(Information information) {

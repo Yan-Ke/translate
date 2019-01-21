@@ -14,7 +14,7 @@ public interface ManageUserInfoRepository extends JpaRepository<ManageUserInfo,I
 
     long countById(Integer id);
 
-    Page<ManageUserInfo> findAll(Pageable pageable);
+    Page<ManageUserInfo> findAllByAccountNot(String account,Pageable pageable);
 
     long countByAccount(String account);
 

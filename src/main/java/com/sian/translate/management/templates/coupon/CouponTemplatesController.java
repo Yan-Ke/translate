@@ -50,7 +50,7 @@ public class CouponTemplatesController {
         }
 
 
-        return new ModelAndView("/html/coupon/index.html", map);
+        return new ModelAndView("html/coupon/index.html", map);
     }
 
     @RequestMapping("/coupon/grant")
@@ -80,13 +80,13 @@ public class CouponTemplatesController {
 
 
 
-        return new ModelAndView("/html/coupon/grant.html", map);
+        return new ModelAndView("html/coupon/grant.html", map);
     }
 
     @RequestMapping("/coupon/add")
     public ModelAndView add(Map<String, Object> map) {
 
-        return new ModelAndView("/html/coupon/add.html", map);
+        return new ModelAndView("html/coupon/add.html", map);
     }
     @RequestMapping("/coupon/edit")
     public ModelAndView edit(Integer id, Map<String, Object> map) {
@@ -99,7 +99,7 @@ public class CouponTemplatesController {
             }
         }
 
-        return new ModelAndView("/html/coupon/edit.html", map);
+        return new ModelAndView("html/coupon/edit.html", map);
     }
 
     @RequestMapping("/coupon/record")
@@ -124,7 +124,7 @@ public class CouponTemplatesController {
             map.put("name", "");
         }
 
-        return new ModelAndView("/html/coupon/record.html", map);
+        return new ModelAndView("html/coupon/record.html", map);
     }
 
 }

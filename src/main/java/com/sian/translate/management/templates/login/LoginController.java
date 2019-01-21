@@ -9,7 +9,7 @@ public class LoginController {
 
     @RequestMapping("/login")
     public String login(){
-        return"/html/login/index.html";
-//        return"/html/test.html";
+        return"html/login/index.html";
+//        return"html/test.html";
     }
 }

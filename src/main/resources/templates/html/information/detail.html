@@ -69,7 +69,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="form-group  admin-mt20">
+                <div id="author_parent"  class="form-group  admin-mt20">
                     <label class="col-sm-2 control-label">
                      作者
                      <span class="white">*</span>
@@ -78,7 +78,23 @@
                         <input  th:value="${information.author}" id="author" class="form-control" type="text"  placeholder="请输入文章作者，不填写则默认为藏语翻译宝">
                     </div>
                 </div>
-                <div class="form-group  admin-mt20">
+                <div style="display: none" id="location_parent" class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
+                        位置
+                        <span>*</span>
+                    </label>
+                    <div class="col-sm-7">
+                        <select id="location" class="form-control " name="language">
+                            <option value="0">请选择所在位置</option>
+                            <option value="1">首页</option>
+                            <option value="2">词库翻译结果页</option>
+                            <option value="3">在线翻译页</option>
+                            <option value="4">离线资源</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div  class="form-group  admin-mt20">
                     <label class="col-sm-2 control-label">
                      封面
                      <span>*</span>
@@ -104,7 +120,7 @@
                         <input  th:value="${information.url}"id="url" class="form-control" type="text"  placeholder="请输入外部链接地址，填写后将不可访问下方内容">
                     </div>
                 </div>
-                <div class="form-group  admin-mt20">
+                <div id="content_parent" class="form-group  admin-mt20">
                     <label class="col-sm-2 control-label">
                      内容
                      <span class="white">*</span>
@@ -127,6 +143,71 @@
                         </script>
                     </div>
                 </div>
+
+                <div class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
+                        排序
+                        <span class="white">*</span>
+                    </label>
+                    <div class="col-sm-7">
+                        <input   th:value="${information.infomationOrder}"  id="order" class="form-control" type="text"  placeholder="数字越大，排序越靠前">
+                    </div>
+                </div>
+
+                <div id="lookCount_parent" class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
+                        阅读数
+                        <span class="white">*</span>
+                    </label>
+                    <div class="col-sm-7">
+                        <input   th:value="${information.lookCount}" id="lookCount" class="form-control" type="text"  placeholder="虚拟阅读数，不填为0">
+                    </div>
+                </div>
+
+                <div id="zan_parent" class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
+                        点赞数
+                        <span class="white">*</span>
+                    </label>
+                    <div class="col-sm-7">
+                        <input   th:value="${information.zan}" id="zan" class="form-control" type="text"  placeholder="虚拟点赞数，不填为0">
+                    </div>
+                </div>
+
+                <div id="recommend" style="display:none;" class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
+                        是否推荐
+                        <span class="white">*</span>
+                    </label>
+                    <div class="col-sm-7 admin-mt5" >
+                        <label for="recommend_yes" class="admin-mr15">
+                            <input  id="recommend_yes" checked="checked" type="radio" name="recommend"  value="1">
+                            <span>是</span>
+                        </label>
+                        <label for="recommend_not">
+                            <input  id="recommend_not" type="radio" name="recommend" value="0">
+                            <span>否</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
+                        状态
+                        <span class="white">*</span>
+                    </label>
+                    <div class="col-sm-7 admin-mt5" >
+                        <label for="yes" class="admin-mr15">
+                            <input  id="yes" checked="checked" type="radio" name="show"  value="1">
+                            <span>显示</span>
+                        </label>
+                        <label for="not">
+                            <input  id="not" type="radio" name="show" value="0">
+                            <span>隐藏</span>
+                        </label>
+                    </div>
+                </div>
+
                 <div class="form-group  admin-mt30">
                     <div class="col-sm-7 col-sm-offset-2">
                         <button class="btn btn-primary" type="button" id="submit">保存</button>
@@ -163,6 +244,10 @@
 <script th:inline="javascript">
 
     var id = [[${information.id}]] ;
+    var type = [[${information.type}]] ;
+    var isShow = [[${information.isShow}]] ;
+    var recommend = [[${information.recommend}]] ;
+    var advLocation = [[${information.advLocation}]] ;
 
 
     var imgUrl='';
@@ -184,7 +269,6 @@
             }
         });
     });
-    var type = 0;
 
     //点击保存
     $('#submit').click(function () {
@@ -193,6 +277,28 @@
         var url = $('#url').val();
        var content =  UE.getEditor('container').getContent()
 
+        var order = $('#order').val();
+        var lookCount = $('#lookCount').val();
+        var zan = $('#zan').val();
+        var status = $("input[name='show']:checked").val();
+        var recommend = $("input[name='show']:checked").val();
+
+
+        if (order == null){
+            order =0;
+        }
+        if (lookCount == null){
+            lookCount =0;
+        }
+        if (zan == null){
+            zan =0;
+        }
+
+        var  advLocation = 0;
+
+        if (type == 1){
+            advLocation=  $("#location option:selected").val();
+        }
 
         $.ajax({
             url: "/manage/information/editInformotion",
@@ -203,7 +309,13 @@
                 "author": author,
                 "url": url,
                 "type": type,
+                "order": order,
+                "lookCount": lookCount,
+                "zan": zan,
+                "isShow": status,
                 "image": imgUrl,
+                "advLocation": advLocation,
+                "recommend": recommend,
             },
             dataType: 'json',
             type: 'post',
@@ -223,14 +335,57 @@
         })
     });
 
+    if (isShow == 1){
+        $("input[id='yes']").prop("checked", true);
+    } else{
+        $("input[id='not']").prop("checked", true);
+    }
+
+    if (recommend == 1){
+        $("input[id='recommend_yes']").prop("checked", true);
+    } else{
+        $("input[id='recommend_not']").prop("checked", true);
+    }
+
+    $("#location_parent").find("option[value="+advLocation+"]").attr("selected",true);
+
+
+    if (type == 0) {
+        document.getElementById("content_parent").style.display="block";
+        document.getElementById("lookCount_parent").style.display="block";
+        document.getElementById("zan_parent").style.display="block";
+        document.getElementById("author_parent").style.display="block";
+        document.getElementById("location_parent").style.display="none";
+        document.getElementById("recommend").style.display="none";
+
+    }else{
+        document.getElementById("content_parent").style.display="none";
+        document.getElementById("lookCount_parent").style.display="none";
+        document.getElementById("zan_parent").style.display="none";
+        document.getElementById("author_parent").style.display="none";
+        document.getElementById("location_parent").style.display="block";
+        document.getElementById("recommend").style.display="block";
+    }
 
     $('.type').on('click','span',function(){
         $('.type>span').removeClass('active');
         $(this).addClass('active');
         if ($(this).text() == "文章") {
+            document.getElementById("content_parent").style.display="block";
+            document.getElementById("lookCount_parent").style.display="block";
+            document.getElementById("zan_parent").style.display="block";
+            document.getElementById("author_parent").style.display="block";
+            document.getElementById("location_parent").style.display="none";
+            document.getElementById("recommend").style.display="none";
             type = 0;
         }else{
             type = 1;
+            document.getElementById("content_parent").style.display="none";
+            document.getElementById("lookCount_parent").style.display="none";
+            document.getElementById("zan_parent").style.display="none";
+            document.getElementById("author_parent").style.display="none";
+            document.getElementById("location_parent").style.display="block";
+            document.getElementById("recommend").style.display="block";
         }
     });
 </script>

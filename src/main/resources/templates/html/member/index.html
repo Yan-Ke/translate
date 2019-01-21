@@ -57,13 +57,24 @@
                         <span class="font-s12 admin-mr15">非vip会员</span>
                     </a>
 
-
-
-
                 </div>
+
+
                 <div class="col-sm-4" style="padding-left:0">
+
+                    <div class="col-sm-4" style="padding-right: 0;padding-left: 0">
+                        <select id="searchType" class="form-control "  name="type">
+                            <!--<option value="0">请选择搜索类型</option>-->
+                            <option value="1">昵称/手机号</option>
+                            <option value="2">月</option>
+                            <option value="3">季</option>
+                            <option value="4">半年</option>
+                            <option value="5">年</option>
+                        </select>
+                    </div>
+
                     <div class="input-group">
-                        <input type="text" id="search" name="search" placeholder="输入会员昵称或手机号码" class=" form-control" th:value = ${paramName}>
+                        <input type="text" id="search" name="search" placeholder="会员昵称或手机号码" class=" form-control" th:value = ${paramName}>
                         <span class="input-group-btn">
                            <button id="searchBtn" type="submit" class="btn  btn-primary"> 查找</button>
                            <button id="exportExcel" type="submit" class="btn "
@@ -132,30 +143,30 @@
                 <ul class="pagination">
 
                     <li th:class="${indexPage==1}?'disabled' : ''"><a
-                            th:class="${indexPage==1}?'btn disabled' : ''" th:href="@{/manage/member/list(page= ${indexPage-1},paramName=${paramName},isMember=${isMember})}">上一页</a>
+                            th:class="${indexPage==1}?'btn disabled' : ''" th:href="@{/manage/member/list(page= ${indexPage-1},paramName=${paramName},isMember=${isMember},month=${month})}">上一页</a>
                     </li>
                     <li th:if="${indexPage-3 >=1}"><a
-                            th:href="@{/manage/member/list(page= ${indexPage-3},paramName=${paramName},isMember=${isMember})}"
+                            th:href="@{/manage/member/list(page= ${indexPage-3},paramName=${paramName},isMember=${isMember},month=${month})}"
                             th:text="${indexPage -3}">1</a></li>
                     <li th:if="${indexPage-2 >=1}"><a
-                            th:href="@{/manage/member/list(page= ${indexPage-2},paramName=${paramName},isMember=${isMember})}"
+                            th:href="@{/manage/member/list(page= ${indexPage-2},paramName=${paramName},isMember=${isMember},month=${month})}"
                             th:text="${indexPage -2}">1</a></li>
                     <li th:if="${indexPage-1 >=1}"><a
-                            th:href="@{/manage/member/list(page= ${indexPage-1},paramName=${paramName},isMember=${isMember})}"
+                            th:href="@{/manage/member/list(page= ${indexPage-1},paramName=${paramName},isMember=${isMember},month=${month})}"
                             th:text="${indexPage -1}">1</a></li>
                     <li class="active"><a href="#" th:text="${indexPage}">1</a></li>
                     <li th:if="${indexPage+1 <=totalPage}"><a
-                            th:href="@{/manage/member/list(page= ${indexPage+1},paramName=${paramName},isMember=${isMember})}"
+                            th:href="@{/manage/member/list(page= ${indexPage+1},paramName=${paramName},isMember=${isMember},month=${month})}"
                             th:text="${indexPage +1}">1</a></li>
                     <li th:if="${indexPage+2 <=totalPage}"><a
-                            th:href="@{/manage/member/list(page= ${indexPage+2},paramName=${paramName},isMember=${isMember})}"
+                            th:href="@{/manage/member/list(page= ${indexPage+2},paramName=${paramName},isMember=${isMember},month=${month})}"
                             th:text="${indexPage +2}">1</a></li>
                     <li th:if="${indexPage+3 <=totalPage}"><a
-                            th:href="@{/manage/member/list(page= ${indexPage+3},paramName=${paramName},isMember=${isMember})}"
+                            th:href="@{/manage/member/list(page= ${indexPage+3},paramName=${paramName},isMember=${isMember},month=${month})}"
                             th:text="${indexPage +3}">1</a></li>
 
                     <li th:class="${indexPage==totalPage || totalPage < 1}?'disabled' : ''"><a
-                            th:class="${indexPage==totalPage || totalPage < 1}?'btn disabled' : ''" th:href="@{/manage/member/list(page= ${indexPage+1},paramName=${paramName},isMember=${isMember})}">下一页</a>
+                            th:class="${indexPage==totalPage || totalPage < 1}?'btn disabled' : ''" th:href="@{/manage/member/list(page= ${indexPage+1},paramName=${paramName},isMember=${isMember},month=${month})}">下一页</a>
                     </li>
                 </ul>
                 <br>
@@ -215,23 +226,65 @@
 
     var isMember = [[${isMember}]];
     var paramName = [[${paramName}]];
+    var month = [[${month}]];
+
+    if (paramName != null && paramName != '') {
+        $("#searchType").find("option[value=1]").attr("selected",true);
+    }else if(month == 1){
+        $("#searchType").find("option[value=2]").attr("selected",true);
+    }else if(month == 3){
+        $("#searchType").find("option[value=3]").attr("selected",true);
+    }else if(month == 6){
+        $("#searchType").find("option[value=4]").attr("selected",true);
+    }else if(month == 6){
+        $("#searchType").find("option[value=5]").attr("selected",true);
+    }
+
 
     //点击提交
     $('#searchBtn').click(function () {
         var paramName = $('#search').val();
-        window.location.href = "/manage/member/list" + "?paramName=" + paramName + "&isMember=" + isMember;
+
+
+
+        var type=  $("#searchType option:selected").val();
+        var month = 0;
+        if(type != 1){
+            paramName  = "";
+            if (type == 2){
+                month = 1;
+            }else if (type == 3){
+                month = 3;
+            }else if (type == 4){
+                month = 6;
+            }else if (type == 5){
+                month = 12;
+            }
+        }
+
+
+        window.location.href = "/manage/member/list" + "?paramName=" + paramName + "&isMember=" + isMember + "&month=" + month;
     });
 
     //点击导出
     $('#exportExcel').click(function () {
 
-        var testName = $('#search').val();
-
-        if (paramName == null ){
-            paramName ='';
+        var type=  $("#searchType option:selected").val();
+        var month = 0;
+        if(type != 1){
+            paramName  = "";
+            if (type == 2){
+                month = 1;
+            }else if (type == 3){
+                month = 3;
+            }else if (type == 4){
+                month = 6;
+            }else if (type == 5){
+                month = 12;
+            }
         }
 
-        window.location.href = '/manage/excel/exportmemberUserInfo?param='+paramName+'&isMember='+isMember;
+        window.location.href = '/manage/excel/exportmemberUserInfo?param='+paramName+'&isMember='+isMember+ "&month=" + month;
     });
 
 

@@ -1,12 +1,15 @@
 package com.sian.translate.management.aspect;
 
 import com.sian.translate.VO.ResultVO;
+import com.sian.translate.hint.enums.HintMessageEnum;
 import com.sian.translate.management.log.enity.ManageLog;
 import com.sian.translate.management.log.repositiory.ManageLogRepositiory;
+import com.sian.translate.management.user.entity.ManageResource;
 import com.sian.translate.management.user.entity.ManageUserInfo;
 import com.sian.translate.management.user.repository.ManageUserInfoRepository;
 import com.sian.translate.management.user.service.ManageUserService;
 import com.sian.translate.utlis.CommonUtlis;
+import com.sian.translate.utlis.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -16,6 +19,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.mvc.method.annotation.ExtendedServletRequestDataBinder;
@@ -23,10 +27,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ExtendedServletRequ
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Aspect
 @Component
@@ -41,12 +42,17 @@ public class HttpAspect {
     @Autowired
     ManageUserInfoRepository manageUserInfoRepository;
 
+    @Autowired
+     ManageUserService manageUserService;
+
     /**
      * 定义AOP扫描路径
      * 第一个注解只扫描aopTest方法
      */
-    @Pointcut("execution(* com.sian.translate.management.*.service.*.*(..))")
+    @Pointcut("execution(* com.sian.translate.management.*.service.*.*(..)) && !execution(* com.sian.translate.management.user.service.*.getManageUserInfo(..))")
     public void log(){}
+
+
 
     /**
      * 记录HTTP请求开始时的日志
@@ -60,16 +66,101 @@ public class HttpAspect {
 
         Integer userId = (Integer) session.getAttribute(ManageUserService.SESSION_KEY);
 
+        String requestURI = request.getRequestURI();
+
+        String name = "";
+
+        /**会员**/
+        if (requestURI.contains("/manage/member/editUserInfo")){
+            name = "编辑会员";
+        }else if (requestURI.contains("/manage/member/addMemberConfig")){
+            name = "编辑资费";
+        }
+
+        /**词典**/
+        else if (requestURI.contains("/manage/dictionary/deleteDictionaryr")){
+            name = "删除词典";
+        }else if (requestURI.contains("/manage/dictionary/addDictionary")){
+            name = "新增词典";
+        }else if (requestURI.contains("/manage/dictionary/addThesaurus")){
+            name = "新增词条";
+        }else if (requestURI.contains("/manage/dictionary/editThesaurus")){
+            name = "编辑词条";
+        }else if (requestURI.contains("/manage/dictionary/deleteThesaurus")){
+            name = "删除词条";
+        }else if (requestURI.contains("/manage/excel/importDictionary")){
+            name = "导入词条";
+        }
+
+        /**优惠券**/
+        else if (requestURI.contains("/manage/coupon/deleteCoupon")){
+            name = "删除优惠券";
+        } else if (requestURI.contains("/manage/coupon/addCoupon")){
+            name = "新增优惠券";
+        }else if (requestURI.contains("/manage/coupon/editCoupon")){
+            name = "编辑优惠券";
+        }else if (requestURI.contains("/manage/coupon/grantCoupon")){
+            name = "发放优惠券";
+        }
+
+
+        /**系统设置--管理员**/
+        else if (requestURI.contains("/manage/user/deleteManageUser")){
+            name = "删除管理员";
+        } else if (requestURI.contains("/manage/user/editManageUser")){
+            name = "编辑管理员";
+        } else if (requestURI.contains("/manage/user/addManageUser")){
+            name = "新增管理员";
+        }
+
+        /**系统设置--角色管理**/
+        else if (requestURI.contains("/manage/user/deleteRole")){
+            name = "删除角色";
+        } else if (requestURI.contains("/manage/user/editRole")){
+            name = "编辑角色";
+        } else if (requestURI.contains("/manage/user/addRole")){
+            name = "新增角色";
+        }
+
+        /**系统设置--反馈处理**/
+        else if (requestURI.contains("/manage/system/handleFeedback")){
+            name = "反馈处理";
+        }
+
+        /**系统设置--文档中心**/
+        else if (requestURI.contains("/manage/system/deleteFile")){
+            name = "删除文档";
+        } else if (requestURI.contains("/manage/system/editFile")){
+            name = "编辑文档";
+        } else if (requestURI.contains("/manage/system/addFile")){
+            name = "新增文档";
+        }
+
+        /**系统设置--资讯中心**/
+        else if (requestURI.contains("/manage/information/deleteInformotion")){
+            name = "删除文档";
+        } else if (requestURI.contains("/manage/information/editInformotion")){
+            name = "编辑文档";
+        } else if (requestURI.contains("/manage/information/addInformation")){
+            name = "新增文档";
+        }
+
+
+        if (!StringUtils.isEmpty(name)){
+            boolean authority = isAuthority(session, userId, name);
+
+            if (!authority){
+                return ResultVOUtil.error(HintMessageEnum.NOT_AUTHORITY.getMessage());
+            }
+        }
+
         Object proceed = joinPoint.proceed();
         ResultVO resultVO = (ResultVO) proceed;
 
         if (userId != null){
-
-
             Optional<ManageUserInfo> byId = manageUserInfoRepository.findById(userId);
 
             if (byId.isPresent() && resultVO.getCode() == 0){
-                String requestURI = request.getRequestURI();
                 //类型 1删除 2修改 3新增 4其他
                 int type = 4;
                 if (requestURI.contains("delete")){
@@ -109,6 +200,30 @@ public class HttpAspect {
 //        log.info("class={} and method name = {}",joinPoint.getSignature().getDeclaringTypeName(),joinPoint.getSignature().getName());
 //        //参数
 //        log.info("参数={}",joinPoint.getArgs());
+    }
+
+    private boolean isAuthority(HttpSession session, Integer userId, String name) {
+        boolean authority = false;
+        ResultVO result = manageUserService.getManageUserInfo(userId, session);
+        if (result != null){
+            ManageUserInfo data = (ManageUserInfo) result.getData();
+            List<ManageResource> manageResourceList = data.getManageResourceList();
+
+            if (manageResourceList != null && manageResourceList.size() > 0){
+                for (ManageResource manageResource : manageResourceList) {
+                    if (manageResource.getResourceName().equals(name)){
+                        authority = true;
+                    }
+                }
+            }
+
+            //admin具有所有权限
+            if(data.getAccount().equals("admin")){
+                authority = true;
+            }
+
+        }
+        return authority;
     }
 
     public String getParm(JoinPoint joinPoint) {

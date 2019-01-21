@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
-
 @Slf4j
 public class UserServiceImplTest extends TranslateApplicationTests {
 
@@ -20,7 +18,7 @@ public class UserServiceImplTest extends TranslateApplicationTests {
 
     @Test
     public void login() {
-        ResultVO login = userService.login("", "", "1");
+        ResultVO login = userService.login("", "", "1","de");
         log.info("result={}",login);
     }
 }

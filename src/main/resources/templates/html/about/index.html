@@ -36,7 +36,7 @@
                 <div class="form-group  admin-mt20">
                     <label class="col-sm-2 control-label">
                         客服热线
-                        <span class="white">*</span>
+                        <span>*</span>
                     </label>
                     <div class="col-sm-7">
                         <input   th:value= "${systemConfig.field}" id="field" class="form-control" type="text"  placeholder="请输入客服热线电话">
@@ -44,8 +44,35 @@
                 </div>
                 <div class="form-group  admin-mt20">
                     <label class="col-sm-2 control-label">
+                        新增邮箱
+                        <span>*</span>
+                    </label>
+                    <div class="col-sm-7">
+                        <input id="email" th:value= "${systemConfig.email}"  class="form-control" type="text"  placeholder="请输入客服热线电话">
+                    </div>
+                </div>
+                <div class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
+                        新增QQ
+                        <span>*</span>
+                    </label>
+                    <div class="col-sm-7">
+                        <input  id="qq"  th:value= "${systemConfig.qq}" class="form-control" type="text"  placeholder="请输入联系QQ">
+                    </div>
+                </div>
+                <div class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
+                        微信
+                        <span>*</span>
+                    </label>
+                    <div class="col-sm-7">
+                        <input  id="weixin" th:value= "${systemConfig.weixin}"  class="form-control" type="text"  placeholder="请输入联系微信号">
+                    </div>
+                </div>
+                <div class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
                         关于我们
-                        <span class="white">*</span>
+                        <span>*</span>
                     </label>
                     <div class="col-sm-7">
                         <!-- 加载编辑器的容器 -->
@@ -103,6 +130,9 @@
 
 
         var field = $('#field').val();
+        var email = $('#email').val();
+        var qq = $('#qq').val();
+        var weixin = $('#weixin').val();
         var content =  UE.getEditor('container').getPlainTxt();
 
         $.ajax({
@@ -110,6 +140,9 @@
             data: {
                 "type": type,
                 "field": field,
+                "email": email,
+                "qq": qq,
+                "weixin": weixin,
                 "content": content,
             },
             dataType: 'json',

@@ -13,19 +13,34 @@ import com.sian.translate.management.user.service.ManageUserService;
 import com.sian.translate.member.enity.MemberConfig;
 import com.sian.translate.member.repository.MemberConfigRepository;
 import com.sian.translate.member.repository.MemberPayRecordRepository;
+import com.sian.translate.user.entity.UserEducation;
 import com.sian.translate.user.entity.UserInfo;
+import com.sian.translate.user.repository.UserEducationRepository;
 import com.sian.translate.user.repository.UserInfoRepository;
 import com.sian.translate.utlis.CommonUtlis;
+import com.sian.translate.utlis.ImageUtlis;
 import com.sian.translate.utlis.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
@@ -54,9 +69,15 @@ public class ManageMemberServiceImpl implements ManageMemberService {
     @PersistenceContext
     private EntityManager entityManager;
 
+    @Autowired
+    UserEducationRepository educationRepository;
+
+    @Autowired
+    ManageUserService manageUserService;
+
 
     @Override
-    public ResultVO getMemberList(Integer isMember, String param, Integer page, Integer size, HttpSession session) {
+    public ResultVO getMemberList(Integer isMember, String param,Integer month, Integer page, Integer size, HttpSession session) {
 
         String languageType = "0";
 
@@ -72,67 +93,55 @@ public class ManageMemberServiceImpl implements ManageMemberService {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), languageType));
         }
 
+        Sort sort = new Sort(Sort.Direction.DESC,"registrationTime");
 
-        boolean isParam = false;
-        if (!StringUtils.isEmpty(param)) {
-            param = "%" + param + "%";
-            isParam = true;
-        }
+        Pageable pageable = PageRequest.of(page-1, size, sort);
+
+        String finalParam = param;
+        Page<UserInfo> userInfoPage = userInfoRepository.findAll(new Specification<UserInfo>() {
+            @Override
+            public Predicate toPredicate(Root<UserInfo> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {
+
+                List<Predicate> predicate = new ArrayList<>();
+
+                if (isMember != null && isMember >= 0) {
+                    if (isMember == 0) {
+                        predicate.add(criteriaBuilder.isNull(root.get("memberEndTime")));
+                    }
+                    if (isMember == 1) {
+                        predicate.add(criteriaBuilder.greaterThanOrEqualTo(root.<Date>get("memberEndTime"), new Date()));
+                    }
+                    if (isMember == 2) {
+                        predicate.add(criteriaBuilder.isNotNull(root.get("memberEndTime")));
+                        predicate.add(criteriaBuilder.lessThan(root.<Date>get("memberEndTime"), new Date()));
+                    }
+                }
+
+                if (!StringUtils.isEmpty(finalParam)) {
+
+                    Predicate predicate1 = criteriaBuilder.like(root.get("nickName"), "%" + finalParam + "%");
+                    predicate1 = criteriaBuilder.or(criteriaBuilder.like(root.get("phone"), "%" + finalParam + "%"), predicate1);
+
+                    predicate.add(predicate1);
+
+                }
+
+                if (month != null && month > 0){
+                    predicate.add(criteriaBuilder.equal(root.get("memberMonth"), month));
+                }
 
 
-        if (page < 1) {
-            page = 1;
-        }
-        if (size < 1) {
-            size = 1;
-        }
-        List<UserInfo> content; // 数据列表
-        int totalElements; //总条数
-
-        if (isMember == 0) {
-            if (isParam) {
-                totalElements = (int) userInfoRepository.countAllUnmemberByPhoneOrNickName(param);
-                content = userInfoRepository.findAllUnmemberUsersByPhoneOrNickName((page - 1) * size, size, param);
-            } else {
-                totalElements = (int) userInfoRepository.countAllUnmembers();
-                content = userInfoRepository.findAllUnmemberUsers((page - 1) * size, size);
+                return criteriaBuilder.and(predicate.toArray(new Predicate[predicate.size()]));
             }
-        } else if (isMember == 1) {
-            if (isParam) {
-                totalElements = (int) userInfoRepository.countAllMembersByPhoneOrNickName(param);
-                content = userInfoRepository.findAllMemberUsersByPhoneOrNickName((page - 1) * size, size, param);
-            } else {
-                totalElements = (int) userInfoRepository.countAllMembers();
-                content = userInfoRepository.findAllMemberUsers((page - 1) * size, size);
-            }
-        } else if (isMember == 2) {
-            if (isParam) {
-                totalElements = (int) userInfoRepository.countOverdueMembersByPhoneOrNickName(param);
-                content = userInfoRepository.findOverdueUnmemberUsersByPhoneOrNickName((page - 1) * size, size, param);
-            } else {
-                totalElements = (int) userInfoRepository.countOverdueMembers();
-                content = userInfoRepository.findOverdueUnmemberUsers((page - 1) * size, size);
-            }
-        } else {
-            if (isParam) {
-                totalElements = (int) userInfoRepository.countAllByPhoneOrNickName(param);
-                content = userInfoRepository.findAllByPhoneOrNickName((page - 1) * size, size, param);
-            } else {
-                totalElements = (int) userInfoRepository.count();
-                content = userInfoRepository.findAll((page - 1) * size, size);
-            }
-        }
+        }, pageable);
 
-
-        int totalPages = totalElements % size == 0 ? totalElements / size : totalElements / size + 1;// 总页数
-        content.stream().forEach(user -> setUserIsMember(user));
 
         PageInfoDTO pageInfoDto = new PageInfoDTO();
         pageInfoDto.setPage(page);
         pageInfoDto.setSize(size);
-        pageInfoDto.setTotalElements(totalElements);
-        pageInfoDto.setTotalPages(totalPages);
-        pageInfoDto.setList(content);
+        pageInfoDto.setTotalElements((int) userInfoPage.getTotalElements());
+        pageInfoDto.setTotalPages(userInfoPage.getTotalPages());
+        pageInfoDto.setList(userInfoPage.getContent());
 
         return ResultVOUtil.success(pageInfoDto);
     }
@@ -330,7 +339,6 @@ public class ManageMemberServiceImpl implements ManageMemberService {
             dataQuery.setParameter("payEndDate", payEndDate);
             countQuery.setParameter("payEndDate", payEndDate);
             totalQuery.setParameter("payEndDate", payEndDate);
-
         }
 
         List resultList = totalQuery.getResultList();
@@ -397,6 +405,98 @@ public class ManageMemberServiceImpl implements ManageMemberService {
 
         return ResultVOUtil.success(pageInfoDto);
 
+    }
+
+    @Override
+    public ResultVO editUserInfo(MultipartFile file, UserInfo userInfo, String languageType,HttpSession session, HttpServletRequest request) {
+
+
+
+
+        Integer userId = (Integer) session.getAttribute(ManageUserService.SESSION_KEY);
+
+        if (StringUtils.isEmpty(userId)) {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.NOT_LOGIN.getCode(), languageType));
+        }
+
+
+
+        Optional<ManageUserInfo> manageUserInfoOptional = manageUserInfoRepository.findById(userId);
+
+        if (!manageUserInfoOptional.isPresent()) {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), languageType));
+        }
+
+
+
+
+        if (StringUtils.isEmpty(userInfo.getId())) {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
+        }
+
+        Optional<UserInfo> userInfoOptional = userInfoRepository.findById(userInfo.getId());
+        if (!userInfoOptional.isPresent()) {
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), languageType));
+        }
+        UserInfo resultUserInfo = userInfoOptional.get();
+
+
+        if (!StringUtils.isEmpty(userInfo.getNickName())) {
+            resultUserInfo.setNickName(userInfo.getNickName());
+        }
+
+        if (!StringUtils.isEmpty(userInfo.getPhone())) {
+            resultUserInfo.setPhone(userInfo.getPhone());
+        }
+        resultUserInfo.setUserStatus(userInfo.getUserStatus());
+
+        if (userInfo.getSex() != null) {
+            resultUserInfo.setSex(userInfo.getSex());
+        }
+        if (userInfo.getAge() != null) {
+            resultUserInfo.setAge(userInfo.getAge());
+        }
+
+        if (!StringUtils.isEmpty(userInfo.getEducationId())) {
+
+            Optional<UserEducation> byId = educationRepository.findById(userInfo.getEducationId());
+
+            if (byId.isPresent()) {
+                UserEducation userEducation = byId.get();
+                resultUserInfo.setEducationId(userInfo.getEducationId());
+                if (languageType.equals("0")) {
+                    resultUserInfo.setEducation(userEducation.getEducationName());
+                } else {
+                    resultUserInfo.setEducation(userEducation.getZangEducationName());
+                }
+            }
+
+        }
+
+        if (file != null && !file.isEmpty()) {
+            try {
+                HashMap<String, String> map = ImageUtlis.loadImageAndcompressImg(file,request);
+                if (map.isEmpty()) {
+                    return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_FORMAT_ERROR.getCode(), languageType));
+                }
+                resultUserInfo.setHeadSmallImage(map.get("smallFile"));
+                resultUserInfo.setHeadBigImage(map.get("bigFile"));
+                resultUserInfo.setOrignalImage(map.get("orignalFile"));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_FORMAT_ERROR.getCode(), languageType));
+            }
+        }
+
+        setUserIsMember(resultUserInfo);
+
+        resultUserInfo.setUpdateTime(new Date());
+        userInfoRepository.save(resultUserInfo);
+
+        String logmsg = "编辑<"+resultUserInfo.getNickName()+">用户资料";
+
+        return ResultVOUtil.success(resultUserInfo,logmsg);
     }
 
     @Override

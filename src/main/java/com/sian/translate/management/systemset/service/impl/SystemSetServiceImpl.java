@@ -33,6 +33,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.io.IOException;
@@ -228,12 +229,13 @@ public class SystemSetServiceImpl implements SystemSetService {
     }
 
     @Override
-    public ResultVO uploadImage(MultipartFile file) {
+    public ResultVO uploadImage(MultipartFile file, HttpServletRequest request) {
         String imagePath = "";
 
         if (file != null && !file.isEmpty()){
             try {
-                imagePath = ImageUtlis.loadImage(file);
+
+                imagePath = ImageUtlis.loadImage(file,request);
             } catch (IOException e) {
                 e.printStackTrace();
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_FORMAT_ERROR.getCode(), "0"));
@@ -369,7 +371,7 @@ public class SystemSetServiceImpl implements SystemSetService {
 
     @Transactional
     @Override
-    public ResultVO editFile(Integer id, Integer type, String languageType, String field, String content, Integer status, Integer order, HttpSession session) {
+    public ResultVO editFile(Integer id, Integer type, String languageType, String field, String content, Integer status, Integer order, String email, String qq, String weixin, HttpSession session) {
         Integer userId = (Integer) session.getAttribute(ManageUserService.SESSION_KEY);
 
         if (StringUtils.isEmpty(userId)) {
@@ -400,12 +402,24 @@ public class SystemSetServiceImpl implements SystemSetService {
         }
 
         if (StringUtils.isEmpty(field)){
-            if (type == 1){
+            if (type != 1){
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.FILE_FILED_NOT_EMPTY.getCode(), languageType));
             }else {
                 return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ABOUT_ME_PHONE_NOT_EMPTY.getCode(), languageType));
             }
         }
+        if (type == 1){
+            if (StringUtils.isEmpty(email)) {
+                return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.EMAIL_NOT_EMPTY.getCode(), languageType));
+            }
+            if (StringUtils.isEmpty(qq)) {
+                return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.QQ_NOT_EMPTY.getCode(), languageType));
+            }
+            if (StringUtils.isEmpty(weixin)) {
+                return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.WEIXIN_NOT_EMPTY.getCode(), languageType));
+            }
+        }
+
         if (content == null || content.trim().equals("")){
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.FILE_CONTENT_NOT_EMPTY.getCode(), languageType));
         }
@@ -414,6 +428,9 @@ public class SystemSetServiceImpl implements SystemSetService {
         if (type == 1){
             systemConfig = new SystemConfig();
             systemConfig.setCreateUser(userId);
+            systemConfig.setEmail(email);
+            systemConfig.setQq(qq);
+            systemConfig.setWeixin(weixin);
             systemConfig.setCreateTime(new Date());
             systemConfigRepositpory.deleteAllByType(1);
         }else{

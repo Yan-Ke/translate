@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /***
@@ -31,8 +32,9 @@ public class BannerManageController {
                        @RequestParam(value = "url", required = false) String url,
                        @RequestParam(value = "type", required = false) Integer type,
                        @RequestParam(value = "file", required = false) MultipartFile file,
+                       HttpServletRequest request,
                        HttpSession session) {
-        return bannerManageService.addBanner(content, url, type,file,session);
+        return bannerManageService.addBanner(content, url, type,file,request,session);
     }
 
     /****
@@ -47,8 +49,9 @@ public class BannerManageController {
                        @RequestParam(value = "url", required = false) String url,
                        @RequestParam(value = "type", required = false) Integer type,
                        @RequestParam(value = "file", required = false) MultipartFile file,
+                        HttpServletRequest request,
                        HttpSession session) {
-        return bannerManageService.editBanner(bannerId,content, url, type,file,session);
+        return bannerManageService.editBanner(bannerId,content, url, type,file,request,session);
     }
 
     /****

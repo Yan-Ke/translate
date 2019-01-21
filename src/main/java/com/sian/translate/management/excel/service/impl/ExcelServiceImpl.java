@@ -61,7 +61,7 @@ public class ExcelServiceImpl implements ExcelService {
     ManageUserService manageUserService;
 
     @Override
-    public ResultVO exportmemberUserInfo(Integer isMember, HttpServletResponse response, Integer page, Integer size, String param, HttpSession session) throws Exception {
+    public ResultVO exportmemberUserInfo(Integer isMember, HttpServletResponse response,Integer month, Integer page, Integer size, String param, HttpSession session) throws Exception {
 
 
         if (page == -1) {
@@ -69,7 +69,7 @@ public class ExcelServiceImpl implements ExcelService {
             page = 1;
             size = (int) count;
         }
-        ResultVO memberListResultVO = manageMemberService.getMemberList(isMember, param, page, size, session);
+        ResultVO memberListResultVO = manageMemberService.getMemberList(isMember, param, month,page, size, session);
         if (memberListResultVO.getCode() != 0) {
             return memberListResultVO;
         }

@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +32,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -55,10 +57,14 @@ public class UserServiceImpl implements UserService {
     @Autowired
     SystemConfigRepositpory systemConfigRepositpory;
 
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
+
+    static final String USER_DEVICE = "user_device_";
 
 
     @Override
-    public ResultVO editUserInfo(MultipartFile file, UserInfo userInfo, String type) {
+    public ResultVO editUserInfo(MultipartFile file, UserInfo userInfo, String type, HttpServletRequest request) {
 
 
         if (StringUtils.isEmpty(userInfo.getId())) {
@@ -106,7 +112,7 @@ public class UserServiceImpl implements UserService {
 
         if (file != null && !file.isEmpty()) {
             try {
-                HashMap<String, String> map = ImageUtlis.loadImageAndcompressImg(file);
+                HashMap<String, String> map = ImageUtlis.loadImageAndcompressImg(file,request);
                 if (map.isEmpty()) {
                     return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.IMG_FORMAT_ERROR.getCode(), type));
                 }
@@ -137,7 +143,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public ResultVO login(String phone, String code, String type) {
+    public ResultVO login(String phone, String code, String type,String deviceId) {
 
         if (StringUtils.isEmpty(phone))
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PHONE_NOT_EMPTY.getCode(), type));
@@ -147,6 +153,7 @@ public class UserServiceImpl implements UserService {
         UserInfo userInfo = userInfoRepository.findByPhone(phone);
         if (userInfo == null) {
             userInfo = new UserInfo();
+            userInfo.setPhone(phone);
             userInfo.setNickName(phone);
             userInfo.setSex(0);
             userInfo.setAge(0);
@@ -155,14 +162,17 @@ public class UserServiceImpl implements UserService {
             userInfo.setUpdateTime(new Date());
             userInfo.setUserStatus(0);
         } else {
-            if (userInfo.getUserStatus() == 1) {
+            if (userInfo.getUserStatus() != null && userInfo.getUserStatus() == 1) {
                 ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_PROHIBIT.getCode(), type));
             }
         }
 
         setUserIsMember(userInfo);
+        userInfo.setDeviceId(deviceId);
         userInfo.setLoginTime(new Date());
-        userInfoRepository.save(userInfo);
+
+        UserInfo save = userInfoRepository.save(userInfo);
+        stringRedisTemplate.opsForValue().set(USER_DEVICE+save.getId(), deviceId);
 
 //        userInfo.setPassword(password);
         return ResultVOUtil.success(userInfo);
@@ -181,7 +191,24 @@ public class UserServiceImpl implements UserService {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), type));
         }
 
+
+
         UserInfo userInfo = userInfoOptional.get();
+
+        if (!StringUtils.isEmpty(userInfo.getEducationId())){
+            Optional<UserEducation> byId = educationRepository.findById(userInfo.getEducationId());
+
+            if (byId.isPresent()){
+                UserEducation userEducation = byId.get();
+                if (type != null && type.equals("1")){
+                    userInfo.setEducation(userEducation.getZangEducationName());
+                }else {
+                    userInfo.setEducation(userEducation.getEducationName());
+                }
+            }
+
+
+        }
         setUserIsMember(userInfo);
 
         return ResultVOUtil.success(userInfo);
@@ -218,7 +245,7 @@ public class UserServiceImpl implements UserService {
      * @param content
      **/
     @Override
-    public ResultVO feedback(String languageType, Integer userId, String content, MultipartFile[] files) {
+    public ResultVO feedback(String languageType, Integer userId, String content, MultipartFile[] files, HttpServletRequest request) {
 
         if (userId == null) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
@@ -245,7 +272,7 @@ public class UserServiceImpl implements UserService {
                     for (int i = 0; i < files.length; i++) {
                         MultipartFile file = files[i];
                         // 保存文件
-                        images += ImageUtlis.loadImage(file) + ",";
+                        images += ImageUtlis.loadImage(file,request) + ",";
 
                     }
                 }
@@ -310,11 +337,29 @@ public class UserServiceImpl implements UserService {
 
         int count = userInfoRepository.countByPhone(userInfo.getPhone());
 
+
+        if (!StringUtils.isEmpty(userInfo.getQqOpenid())){
+            int qqCount = userInfoRepository.countByQqOpenid(userInfo.getQqOpenid());
+
+            if (qqCount > 0){
+                return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.QQ_IS_BAND.getCode(), languageType));
+            }
+        }
+
+        if (!StringUtils.isEmpty(userInfo.getWeixinOpenid())){
+            int weixinCount = userInfoRepository.countByWeixinOpenid(userInfo.getWeixinOpenid());
+
+            if (weixinCount > 0){
+                return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.WEIXIN_IS_BAND.getCode(), languageType));
+            }
+        }
+
+
         if (count > 0) {
             return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.PHONE_USEED.getCode(), languageType));
         }
 
-        if (StringUtils.isEmpty(userInfo.getNickName())) {
+        if (StringUtils.isEmpty(userInfo.getNickName())){
             userInfo.setNickName(userInfo.getPhone());
         }
 
@@ -330,7 +375,11 @@ public class UserServiceImpl implements UserService {
         userInfo.setIsMember(0);
         userInfo.setUserStatus(0);
         userInfo.setLoginTime(new Date());
-        userInfoRepository.save(userInfo);
+        userInfo.setDeviceId(userInfo.getDeviceId());
+
+        UserInfo save = userInfoRepository.save(userInfo);
+        stringRedisTemplate.opsForValue().set(USER_DEVICE+save.getId(), userInfo.getDeviceId());
+
         return ResultVOUtil.success(userInfo);
 
 
@@ -344,7 +393,7 @@ public class UserServiceImpl implements UserService {
      * @param languageType
      **/
     @Override
-    public ResultVO thridLogin(String weixinOpenid, String qqOpenid, String languageType) {
+    public ResultVO thridLogin(String weixinOpenid, String qqOpenid, String languageType,String deviceId) {
 
 
         if (!StringUtils.isEmpty(qqOpenid)) {
@@ -367,7 +416,10 @@ public class UserServiceImpl implements UserService {
                 }
                 setUserIsMember(userInfo);
                 userInfo.setLoginTime(new Date());
-                userInfoRepository.save(userInfo);
+                userInfo.setDeviceId(deviceId);
+                UserInfo save = userInfoRepository.save(userInfo);
+                stringRedisTemplate.opsForValue().set(USER_DEVICE+save.getId(), deviceId);
+
                 return ResultVOUtil.success(userInfo);
             }
         }
@@ -571,6 +623,48 @@ public class UserServiceImpl implements UserService {
         return ResultVOUtil.success(pageInfoDTO);
     }
 
+    /**
+     * 客户端轮询检测用户是其他地方登陆
+     *
+     * @param languageType
+     * @param userId
+     * @param deviceId
+     **/
+    @Override
+    public ResultVO checkLogin(String languageType, Integer userId, String deviceId) {
+
+        if (userId == null){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.ID_NOT_EMPTY.getCode(), languageType));
+        }
+
+        if (StringUtils.isEmpty(deviceId)){
+            return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.DEVICE_ID_NOT_EMPTY.getCode(), languageType));
+        }
+
+        String nowDeviceId = stringRedisTemplate.opsForValue().get(USER_DEVICE + userId);
+
+        if (StringUtils.isEmpty(nowDeviceId)){
+            Optional<UserInfo> byId = userInfoRepository.findById(userId);
+
+            if (!byId.isPresent()){
+                return ResultVOUtil.error(hintMessageService.getHintMessage(HintMessageEnum.USER_NOT_EXIST.getCode(), languageType));
+            }
+            UserInfo userInfo = byId.get();
+            nowDeviceId = userInfo.getDeviceId();
+        }
+
+        if (nowDeviceId == null){
+            nowDeviceId = "";
+        }
+
+        if (nowDeviceId.equals(deviceId)){
+            return ResultVOUtil.success(0);
+        }else {
+            return ResultVOUtil.success(1);
+        }
+
+    }
+
     private void setUserIsMember(UserInfo userInfo) {
         if (userInfo.getMemberBeginTime() != null
                 && userInfo.getMemberEndTime() != null) {
@@ -584,7 +678,6 @@ public class UserServiceImpl implements UserService {
         } else {
             userInfo.setIsMember(0);
             userInfo.setVipIcon(CommonUtlis.VIPICON0);
-
         }
     }
 

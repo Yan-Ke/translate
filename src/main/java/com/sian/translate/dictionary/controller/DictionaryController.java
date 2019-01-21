@@ -5,6 +5,8 @@ import com.sian.translate.dictionary.service.DictionaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 @RestController
 @RequestMapping("/dictionary")
 public class DictionaryController {
@@ -24,8 +26,9 @@ public class DictionaryController {
     ResultVO translate(@RequestParam(value = "languageType", required = false) String languageType,
                        @RequestParam(value = "userId", required = false) Integer userId,
                        @RequestParam(value = "type", required = false) Integer type,
-                       @RequestParam(value = "content", required = false) String content) {
-        return dictionaryService.translate(languageType, userId, type, content);
+                       @RequestParam(value = "content", required = false) String content,
+                       @RequestParam(value = "dictionaryId", required = false) Integer dictionaryId) {
+        return dictionaryService.translate(languageType, userId, type, content,dictionaryId);
     }
 
 
@@ -58,9 +61,12 @@ public class DictionaryController {
     ResultVO collectionDictionary(@RequestParam(value = "languageType", required = false) String languageType,
                                   @RequestParam(value = "userId", required = false) Integer userId,
                                   @RequestParam(value = "type", required = false) Integer type,
+                                  @RequestParam(value = "dictionaryId", required = false) Integer dictionaryId,
                                   @RequestParam(value = "content", required = false) String content,
-                                  @RequestParam(value = "translateContent", required = false) String translateContent) {
-        return dictionaryService.collectionDictionary(languageType, userId, type, content, translateContent);
+                                  @RequestParam(value = "translateContent", required = false) String translateContent,
+                                  @RequestParam(value = "isWord", required = false) Integer isWord) {
+
+        return dictionaryService.collectionDictionary(languageType, userId, type, dictionaryId,content,translateContent,isWord);
     }
 
     /*****
@@ -93,6 +99,19 @@ public class DictionaryController {
         return dictionaryService.getAllDictionary(languageType,type, userId);
     }
 
+    /****
+     * 获取词典的所有记录(离线下载)
+     * @param languageType
+     * @return
+     */
+    @GetMapping(value = "/downThesaurus", produces = "application/json;charset=UTF-8")
+    ResultVO downThesaurus(@RequestParam(value = "languageType", required = false) String languageType,
+                           @RequestParam(value = "id", required = false,defaultValue = "0") Integer id,
+                           @RequestParam(value = "userId", required = false) Integer userId, HttpServletResponse response) {
+
+        return dictionaryService.downThesaurus(id,userId,languageType,response);
+
+    }
 
 
 

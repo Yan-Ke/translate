@@ -273,7 +273,9 @@ public class CommonUtlis {
         }
         // ipAddress = this.getRequest().getRemoteAddr();
 
-        return ipAddress;
+//        return ipAddress;
+        return "39.104.188.55";
+
     }
 
     public static String uploadImg(MultipartFile file,
@@ -306,7 +308,7 @@ public class CommonUtlis {
         ueditor.setState("SUCCESS");
         ueditor.setTitle(fileName);
         ueditor.setOriginal(fileName);
-        ueditor.setUrl("/ueditor/jsp/upload/image" + File.separator + fileName);
+        ueditor.setUrl("http://39.104.188.55:8001/ueditor/jsp/upload/image" + File.separator + fileName);
         System.out.println(JSON.toJSONString(ueditor));
         return JSON.toJSONString(ueditor);
     }

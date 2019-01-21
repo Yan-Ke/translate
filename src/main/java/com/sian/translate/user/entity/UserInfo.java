@@ -80,6 +80,8 @@ public class UserInfo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date loginTime;
 
+    /**设备id**/
+    private  String deviceId ;
 
     @Transient
     @JsonIgnore

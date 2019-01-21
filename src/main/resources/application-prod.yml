@@ -4,21 +4,35 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
-    password: 123
-    url: jdbc:mysql://127.0.0.1:3306/translate?characterEncoding=utf-8&useSell=false&serverTimezone=GMT%2B8
+    password: Yanke_1988
+#    url: jdbc:mysql://127.0.0.1:3306/translate?characterEncoding=utf-8&useSell=false&serverTimezone=GMT%2B8&
+    url: jdbc:mysql://localhost:3306/translate?sessionVariables=sql_mode='NO_ENGINE_SUBSTITUTION'&jdbcCompliantTruncation=false&characterEncoding=utf-8&useSell=false&serverTimezone=GMT%2B8&
+
   jpa:
     show-sql: true
   servlet:
     multipart:
       max-file-size: 5MB
-server:
-  port: 8080
 
+ue:
+  config-file: static/ueditor/jsp/config.json #resources目录下配置文件的位置
+  server-url: /ueditor.do #服务器统一请求接口路径
+  url-prefix: /file/ #"/"结尾
+  physical-path: /tranlate/img #存储文件的绝对路径 必须使用标准路径"/"作为分隔符 默认为"/"即当前项目所在磁盘根目录
+server:
+  port: 8001
+  servlet:
+    session:
+      timeout: PT2H
 file:
   port: ${server.port}
-  rootPath: "E:"
-  sonPath: /img/
+  rootPath: "/root"
+  sonPath: /tranlate/img/
 pay:
+  #商品描述 需传入应用市场上的APP名字-实际商品名称
+  body: 翻译—会员充值
+  #附加数据，在查询API和支付通知中原样返回，该字段主要用于商户携带订单的自定义数据 例如:深圳分店
+  attach: 翻译
   #支付宝配置
   zhifubao:
     #支付宝应用id 商户号
@@ -30,16 +44,37 @@ pay:
     #支付同步返回地址
     ali_return_url:
     #支付异步通知地址
-    ali_notify_url:
+    ali_notify_url: http://79376n.natappfree.cc/order/aliNotify
     #产品码
     product_no:
-    #超时时间
-    time_express: 15m
+    #该笔订单允许的最晚付款时间，逾期将关闭交易。取值范围：1m～15d。m-分钟，h-小时，d-天，1c-当天（1c-当天的情况下，无论交易何时创建，都在0点关闭）。 该参数数值不接受小数点， 如 1.5h，可转换为 90m。
+    #注：若为空，则默认为15d。
+    time_express: 30m
     #支付网关
     url: https://openapi.alipaydev.com/gateway.do
     #加密方式
     sign_type: RSA
 
+  #微信支付相关配置
+  weixin:
+    #应用id
+    appid:
+    #商户号
+    mchId:
+    #api密钥
+    key:
+    #连接超时时间 毫秒
+    connectTimeoutMs: 8000
+    #读超时时间 毫秒
+    readTimeoutMs: 10000
+    #微信支付回调地址
+    weixin_notify_url: http://79376n.natappfree.cc/order/weixinNotify
 
 
 
+
+
+
+
+logging:
+  path: log

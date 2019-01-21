@@ -53,6 +53,8 @@
                     <th>标题</th>
                     <th class="text-center">类型</th>
                     <th class="text-center">状态</th>
+                    <th class="text-center">阅读数</th>
+                    <th class="text-center">点赞数</th>
                     <th>发布时间</th>
                     <th class="col-xs-2 text-center">操作</th>
                 </tr>
@@ -62,15 +64,16 @@
 
                     <td th:text="${information.id}"></td>
                     <td th:text="${information.title}"></td>
-                    <td th:text="${information.type}==1?'广告':'文章'"></td>
-                    <td th:text="${information.isShow}==1?'显示':'隐藏'"></td>
+                    <td class="text-center" th:text="${information.type}==1?'广告':'文章'"></td>
+                    <td class="text-center" th:text="${information.isShow}==1?'显示':'隐藏'"></td>
+                    <td class="text-center" th:text="${information.lookCount}"></td>
+                    <td class="text-center" th:text="${information.zan}"></td>
+
                     <td th:text="${information.createTime}"></td>
 
                     <td class="text-center">
                         <a th:href="@{'/manage/information/detail?id=' + ${information.id}}" class="color-primary admin-mr15">编辑</a>
                         <a th:onclick="'javascript:deleteInformation(\''+${information.id}+'\');'" class="color-danger">删除</a>
-
-
                     </td>
                 </tr>
 
@@ -190,6 +193,8 @@
                         window.location.href = '/manage/information/list?page='+page+'&title='+title;
                         // setTimeout(function () {
                         // }, 2000);
+                    }else {
+                        layer.msg(res.msg);
                     }
                 }
             })

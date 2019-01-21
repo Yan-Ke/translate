@@ -58,8 +58,26 @@ public class Information {
 //    @JsonIgnore  //返回时排除掉这个字段
     private  Integer isShow;
 
+    /**阅读量**/
+    private  Integer lookCount;
+    /**赞数量**/
+    private  Integer zan;
+
+    /**是否赞 0 没有赞 1已经赞过**/
+    @Transient
+    private  Integer isZan;
+
 
     @Transient
     private String createTimeString;
+
+
+    /** 广告位置 1首页2词库翻译页3在线翻译页4离线资源**/
+    private  Integer advLocation;
+
+    /**是否推荐 0 不是 1是**/
+    private  Integer recommend;
+
+
 
 }

@@ -2,12 +2,14 @@ package com.sian.translate.management.user.controller;
 
 import com.sian.translate.VO.ResultVO;
 import com.sian.translate.management.user.service.ManageUserService;
+import com.sian.translate.utlis.RandomValidateCodeUtil;
 import com.sian.translate.utlis.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 @Slf4j
@@ -105,7 +107,7 @@ public class ManageUserController {
                            @RequestParam(value = "phone", required = false) String phone,
                            @RequestParam(value = "password", required = false) String password,
                            @RequestParam(value = "status", required = false) Integer status,
-                           @RequestParam(value = "image", required = false) MultipartFile image,
+                           @RequestParam(value = "image", required = false) String image,
                            HttpSession session) {
         ResultVO resultVO = manageUserService.addManageUser(roleId, account, userName, phone, password, status, image, session);
         return resultVO;
@@ -168,7 +170,14 @@ public class ManageUserController {
     @PostMapping(value = "/login", produces = "application/json;charset=UTF-8")
     ResultVO login(@RequestParam(value = "account", required = false) String account,
                    @RequestParam(value = "password", required = false) String password,
+                   @RequestParam(value = "verifycode", required = false) String verifycode,
                    HttpSession session) {
+
+        if (!checkVerify(verifycode,session)){
+            return ResultVOUtil.error("验证码错误");
+        }
+
+
         ResultVO resultVO = manageUserService.login(account, password, session);
         return resultVO;
     }
@@ -177,8 +186,9 @@ public class ManageUserController {
      *  获取用户信息
      * @return
      */
-    @GetMapping(value = "/login", produces = "application/json;charset=UTF-8")
+    @GetMapping(value = "/getManageUserInfo", produces = "application/json;charset=UTF-8")
     ResultVO getManageUserInfo(@RequestParam(value = "id", required = false) Integer id,HttpSession session) {
+
         ResultVO resultVO = manageUserService.getManageUserInfo(id, session);
         return resultVO;
     }
@@ -196,5 +206,42 @@ public class ManageUserController {
         return ResultVOUtil.success();
     }
 
+
+    /**
+     * 生成验证码
+     */
+    @RequestMapping(value = "/imagecode")
+    public void getVerify(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            response.setContentType("image/jpeg");//设置相应类型,告诉浏览器输出的内容为图片
+            response.setHeader("Pragma", "No-cache");//设置响应头信息，告诉浏览器不要缓存此内容
+            response.setHeader("Cache-Control", "no-cache");
+            response.setDateHeader("Expire", 0);
+            RandomValidateCodeUtil randomValidateCode = new RandomValidateCodeUtil();
+            randomValidateCode.getRandcode(request, response);//输出验证码图片方法
+        } catch (Exception e) {
+        }
+    }
+
+
+    /**
+     * 验证码效验
+     */
+    public boolean checkVerify(String inputStr, HttpSession session) {
+        try{
+            //从session中获取随机数
+            String random = (String) session.getAttribute(RandomValidateCodeUtil.RANDOMCODEKEY);
+            if (random == null) {
+                return false;
+            }
+            if (random.equals(inputStr)) {
+                return true;
+            } else {
+                return false;
+            }
+        }catch (Exception e){
+            return false;
+        }
+    }
 
 }

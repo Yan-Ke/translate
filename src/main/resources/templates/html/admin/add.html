@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head>
     <meta charset="utf-8">
@@ -41,27 +41,8 @@
                      <span>*</span>
                     </label>
                     <div class="col-sm-7">
-                        <select class="form-control "  name="role">
+                        <select id="roleSelect" class="form-control "  name="role">
                            <option value="0">请选择所属角色</option>
-                           <option value="1">藏汉</option>
-                           <option value="2">藏英</option>
-                           <option value="3">藏日</option>
-                           <option value="4">藏梵</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group  admin-mt20">
-                    <label class="col-sm-2 control-label">
-                     所属角色
-                     <span>*</span>
-                    </label>
-                    <div class="col-sm-7">
-                        <select class="form-control "  name="role">
-                           <option value="0">请选择所属角色</option>
-                           <option value="1">藏汉</option>
-                           <option value="2">藏英</option>
-                           <option value="3">藏日</option>
-                           <option value="4">藏梵</option>
                         </select>
                     </div>
                 </div>
@@ -71,7 +52,7 @@
                      <span>*</span>
                     </label>
                     <div class="col-sm-7">
-                        <input   class="form-control" type="text"  placeholder="请输入管理员用户名，4-12数字或字母组合">
+                        <input  id="account" class="form-control" type="text"  placeholder="请输入管理员用户名，4-12数字或字母组合">
                     </div>
                 </div>
                 <div class="form-group  admin-mt20">
@@ -80,7 +61,7 @@
                         <span>*</span>
                     </label>
                     <div class="col-sm-7">
-                        <input   class="form-control" type="text"  placeholder="请输入管理员真实姓名">
+                        <input   id="username" class="form-control" type="text"  placeholder="请输入管理员真实姓名">
                     </div>
                 </div>
                 <div class="form-group  admin-mt20">
@@ -106,7 +87,7 @@
                         <span class="white">*</span>
                     </label>
                     <div class="col-sm-7 admin-mt5">
-                        <input   class="form-control" type="text"  placeholder="请输入管理员手机号码">
+                        <input  id="phone"  class="form-control" type="text"  placeholder="请输入管理员手机号码">
                     </div>
                 </div>
                 <div class="form-group  admin-mt20">
@@ -115,7 +96,7 @@
                         <span class="white">*</span>
                     </label>
                     <div class="col-sm-7 admin-mt5">
-                        <input   class="form-control" type="text"  placeholder="6-12位数字或字母组合，区分大小写，默认123456">
+                        <input  id="password"  class="form-control" type="text"  placeholder="6-12位数字或字母组合，区分大小写，默认123456">
                     </div>
                 </div>
                 <div class="form-group  admin-mt20">
@@ -164,7 +145,11 @@
 <script src="../../layer/layer.js"></script>
 <script src="../../layui/layui.js"></script>
 <!--高德地图api-->
-<script>
+<script th:inline="javascript">
+
+
+    var manageUserRoleList = [[${manageUserRoleList}]];
+
     var imgUrl='';
     layui.use('upload', function(){
         var upload = layui.upload;
@@ -172,17 +157,70 @@
         //执行实例
         var uploadInst = upload.render({
             elem: '#upload' //绑定元素
-            ,url: "" //上传接口
+            ,url: "/manage/system/uploadImage" //上传接口
             ,done: function(res){
-                var obj=res['url'];
+                var obj=res.data;
                 imgUrl=obj;
-                $('#LAY_demo_upload').attr('src',res.url).css({display:'block'});
+                $('#LAY_demo_upload').attr('src',imgUrl ).css({display:'block'});
             }
             ,error: function(res){
                 //请求异常回调
                 console.log(res);
             }
         });
+    });
+
+    //点击保存
+    $('#submit').click(function () {
+
+
+        var roleId=  $("#roleSelect option:selected").val();
+        var account = $('#account').val();
+        var userName = $('#username').val();
+        var phone = $('#phone').val();
+        var password = $('#password').val();
+        var status = $("input[type='radio']:checked").val();
+
+
+        $.ajax({
+            url: "/manage/user/addManageUser",
+            data: {
+                "roleId": roleId,
+                "account": account,
+                "userName": userName,
+                "phone": phone,
+                "password": password,
+                "status": status,
+                "image": imgUrl,
+            },
+            dataType: 'json',
+            type: 'post',
+            success: function (res) {
+                console.log(res)
+                if (res.code == 0) {
+                    layer.msg("保存成功");
+                    window.location.href = '/manage/system/adminIndex'
+                } else {
+                    // $('#verifycode_img').attr('src','/captcha?seed='+Math.random());
+                    layer.msg(res.msg);
+                }
+            },
+            err: function (res) {
+                console.log(res);
+            }
+        })
+    });
+
+    $(function () {
+
+        for(var j = 0,len = manageUserRoleList.length; j < len; j++){
+            var manageUserRole =  manageUserRoleList[j];
+            var id = manageUserRole.id;
+            var name = manageUserRole.roleName;
+            $("#roleSelect").append("<option value="+id+">"+name+"</option>");
+        }
+        console.log(manageUserInfo.role)
+        $("#roleSelect").find("option[value="+manageUserInfo.role+"]").attr("selected",true);
     });
     
 </script>

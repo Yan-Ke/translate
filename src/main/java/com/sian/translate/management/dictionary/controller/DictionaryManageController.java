@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /***
@@ -27,11 +28,11 @@ public class DictionaryManageController {
      */
     @PostMapping(value = "/addDictionary", produces = "application/json;charset=UTF-8")
     ResultVO addDictionary(@RequestParam(value = "name", required = false) String name,
-                            @RequestParam(value = "type", required = false) Integer type,
-                            @RequestParam(value = "isMemberVisible", required = false, defaultValue = "0") Integer isMemberVisible,
-                            @RequestParam(value = "image", required = false) String image,
-                            HttpSession session) {
-        return dictionaryManageService.addDictionaryr(name, type, isMemberVisible, image, session);
+                           @RequestParam(value = "type", required = false) Integer type,
+                           @RequestParam(value = "isMemberVisible", required = false, defaultValue = "0") Integer isMemberVisible,
+                           @RequestParam(value = "image", required = false) String image,
+                           HttpSession session,HttpServletRequest request) {
+        return dictionaryManageService.addDictionaryr(name, type, isMemberVisible, image, session,request);
     }
 
 
@@ -44,7 +45,7 @@ public class DictionaryManageController {
 
     @PostMapping(value = "/deleteDictionaryr", produces = "application/json;charset=UTF-8")
     ResultVO deleteDictionaryr(@RequestParam(value = "id", required = false) Integer id,
-                             HttpSession session) {
+                               HttpSession session) {
         return dictionaryManageService.deleteDictionaryr(id, session);
     }
 
@@ -54,7 +55,7 @@ public class DictionaryManageController {
      * @return
      */
     @GetMapping(value = "/getAllDictionary", produces = "application/json;charset=UTF-8")
-    ResultVO getAllDictionary(HttpSession session){
+    ResultVO getAllDictionary(HttpSession session) {
         return dictionaryManageService.getAllDictionary(session);
     }
 
@@ -72,8 +73,8 @@ public class DictionaryManageController {
                              @RequestParam(value = "type", required = false) Integer type,
                              @RequestParam(value = "isMemberVisible", required = false, defaultValue = "0") Integer isMemberVisible,
                              @RequestParam(value = "file", required = false) MultipartFile image,
-                             HttpSession session) {
-        return dictionaryManageService.editDictionaryr(id, name, type, isMemberVisible, image, session);
+                             HttpSession session, HttpServletRequest request) {
+        return dictionaryManageService.editDictionaryr(id, name, type, isMemberVisible, image, session,request);
     }
 
     /****
@@ -88,7 +89,7 @@ public class DictionaryManageController {
                               @RequestParam(value = "page", required = false, defaultValue = "-1") Integer page,
                               @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
                               HttpSession session) {
-        return dictionaryManageService.getThesaurusList(id,name,page,size, session);
+        return dictionaryManageService.getThesaurusList(id, name, page, size, session);
     }
 
     /****
@@ -98,11 +99,12 @@ public class DictionaryManageController {
      */
 
     @PostMapping(value = "/addThesaurus", produces = "application/json;charset=UTF-8")
-        ResultVO addThesaurus(@RequestParam(value = "id", required = false) Integer id,
+    ResultVO addThesaurus(@RequestParam(value = "id", required = false) Integer id,
                           @RequestParam(value = "contentOne", required = false) String contentOne,
                           @RequestParam(value = "contentTwo", required = false) String contentTwo,
+                          @RequestParam(value = "image", required = false) String image,
                           HttpSession session) {
-        return dictionaryManageService.addThesaurus(id, contentOne, contentTwo, session);
+        return dictionaryManageService.addThesaurus(id, contentOne, contentTwo,image, session);
     }
 
 

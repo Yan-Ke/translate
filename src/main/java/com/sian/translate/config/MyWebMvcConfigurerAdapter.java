@@ -47,6 +47,9 @@ public class MyWebMvcConfigurerAdapter extends WebMvcConfigurerAdapter {
         addInterceptor.excludePathPatterns(loginUrl);
         addInterceptor.excludePathPatterns("/manage/user/login");
         addInterceptor.excludePathPatterns("/manage/user/quitLogin");
+        addInterceptor.excludePathPatterns("/manage/user/imagecode");
+        addInterceptor.excludePathPatterns("/manage/user/checkcode");
+
         //拦截所有路径
         addInterceptor.addPathPatterns("/manage/**");
     }

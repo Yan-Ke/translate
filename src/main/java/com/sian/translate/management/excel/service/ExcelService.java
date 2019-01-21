@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public interface ExcelService {
 
-    ResultVO exportmemberUserInfo(Integer isMember, HttpServletResponse response, Integer page, Integer size, String param,HttpSession session)throws Exception;
+    ResultVO exportmemberUserInfo(Integer isMember, HttpServletResponse response, Integer month,Integer page, Integer size, String param,HttpSession session)throws Exception;
 
     ResultVO importDictionary(Integer id,MultipartFile file, HttpSession session)throws IOException;
 

@@ -38,10 +38,10 @@
                 <div class="form-group  admin-mt20">
                     <label class="col-sm-2 control-label">
                      所属词典
-                     <span th:text="${dictionaryName}" class="white">*</span>
+                     <span  class="white">*</span>
                     </label>
                     <div class="col-sm-7">
-                        <p class="form-control-static">汉藏词典</p>
+                        <p th:text="${dictionaryName}" class="form-control-static"></p>
                     </div>
                 </div>
                 <div class="form-group  admin-mt20">
@@ -60,6 +60,24 @@
                         <input   id="contentTwo" th:placeholder="'请输入'+${contentTwoName}+'词条'"  class="form-control" type="text" value=""  >
                     </div>
                 </div>
+                <div class="form-group  admin-mt20">
+                    <label class="col-sm-2 control-label">
+                        图片
+                        <span>*</span>
+                    </label>
+                    <div class="col-sm-7">
+                        <button type="button" class="btn btn-primary " id="upload">
+                            <i class="layui-icon"></i>上传图片
+                        </button>
+                        <input class="layui-upload-file" type="file" name="file">
+
+                        <div class="m-t">
+                            <img  id="LAY_demo_upload" width="180"  data-sign="0" src="../../image/not.jpg">
+                        </div>
+                        <p class="m-t">建议尺寸：120*120</p>
+                    </div>
+                </div>
+
                 <div class="form-group  admin-mt30">
                     <div class="col-sm-7 col-sm-offset-2">
                         <button class="btn btn-primary" type="button" id="submit">保存</button>
@@ -97,6 +115,26 @@
     var type = [[${type}]];
     var dictionaryName = [[${dictionaryName}]];
 
+    var imgUrl='';
+    layui.use('upload', function(){
+        var upload = layui.upload;
+
+        //执行实例
+        var uploadInst = upload.render({
+            elem: '#upload' //绑定元素
+            ,url: "/manage/system/uploadImage" //上传接口
+            ,done: function(res){
+                var obj=res.data;
+                imgUrl=obj;
+                $('#LAY_demo_upload').attr('src',imgUrl ).css({display:'block'});
+            }
+            ,error: function(res){
+                //请求异常回调
+                console.log(res);
+            }
+        });
+    });
+
     //点击保存
     $('#submit').click(function () {
         var contentOne = $('#contentOne').val();
@@ -109,6 +147,8 @@
                 "id": id,
                 "contentOne": contentOne,
                 "contentTwo": contentTwo,
+                "image": imgUrl,
+
             },
             dataType: "json",
             type: 'post',
@@ -119,6 +159,8 @@
                     window.location.href = '/manage/dictionary/thesaurus?id='+id+"&type="+type+"&dictionaryName="+dictionaryName;
                     // setTimeout(function () {
                     // }, 2000);
+                }else {
+                    layer.msg(res.msg);
                 }
             }
         })

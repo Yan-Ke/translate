@@ -2,6 +2,9 @@ package com.sian.translate.user.repository;
 
 
 import com.sian.translate.user.entity.UserInfo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -19,9 +22,17 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Integer> {
      */
     UserInfo findByPhone(String phone);
 
+    Page<UserInfo> findAll(Specification<UserInfo> specification, Pageable pageable);
+
+
 
     /***通过手机查找该用户数量**/
     int countByPhone(String phone);
+
+    int countByWeixinOpenid(String weixinOpenid);
+
+    int countByQqOpenid(String qqOpenid);
+
 
     /***通过qqopenid获取用户信息**/
     UserInfo findByQqOpenid(String qqOpenid);

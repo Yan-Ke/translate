@@ -120,6 +120,8 @@
                     window.location.href = '/manage/dictionary/thesaurus?id='+id+"&type="+type+"&dictionaryName="+dictionaryName;
                     // setTimeout(function () {
                     // }, 2000);
+                }else {
+                    layer.msg(res.msg);
                 }
             }
         })

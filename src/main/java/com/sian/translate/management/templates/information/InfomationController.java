@@ -8,7 +8,6 @@ import com.sian.translate.information.repository.InformationRepository;
 import com.sian.translate.management.information.service.InformationManageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -31,7 +30,7 @@ public class InfomationController {
     @RequestMapping("/information/list")
     public ModelAndView list(@RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
                               @RequestParam(value = "size", required = false, defaultValue = "20") Integer size,
-                              @RequestParam(value = "title", required = false) String title,
+                              @RequestParam(value = "title", required = false,defaultValue = "") String title,
                               HttpSession session, Map<String, Object> map) {
 
         ResultVO informotionList = informationManageService.getInformotionList(title, page, size, session);
@@ -40,17 +39,16 @@ public class InfomationController {
         map.put("informationList", informationList);
         map.put("indexPage", pageInfoDTO.getPage());
         map.put("totalPage", pageInfoDTO.getTotalPages());
-        if (!StringUtils.isEmpty(title)){
-            map.put("title", title);
-        }
+        map.put("title", title);
 
-        return new ModelAndView("/html/information/index.html", map);
+
+        return new ModelAndView("html/information/index.html", map);
     }
 
     @RequestMapping("/information/add")
     public ModelAndView add(Map<String, Object> map) {
 
-        return new ModelAndView("/html/information/add.html", map);
+        return new ModelAndView("html/information/add.html", map);
     }
 
     @RequestMapping("/information/detail")
@@ -61,6 +59,6 @@ public class InfomationController {
             map.put("information", byId.get());
         }
 
-        return new ModelAndView("/html/information/detail.html", map);
+        return new ModelAndView("html/information/detail.html", map);
     }
 }

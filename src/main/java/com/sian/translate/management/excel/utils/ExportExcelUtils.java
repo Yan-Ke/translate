@@ -8,19 +8,51 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xssf.usermodel.extensions.XSSFCellBorder.BorderSide;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.Color;
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
 
 
 public class ExportExcelUtils {
+
+
+    public static void downloadTXT(HttpServletResponse response, String fileName, String content) {
+
+        response.setContentType("text/plain");
+
+        try {
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        ServletOutputStream outputStream = null;
+        BufferedOutputStream buffer = null;
+
+        try {
+            outputStream = response.getOutputStream();
+            buffer = new BufferedOutputStream(outputStream);
+            buffer.write(content.getBytes("UTF-8"));
+            buffer.flush();
+            buffer.close();
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
     public static void exportExcel(HttpServletResponse response, String fileName, ExcelData data) throws Exception {
         // 告诉浏览器用什么软件可以打开此文件
         response.setHeader("content-Type", "application/vnd.ms-excel");
         // 下载文件的默认名称
-        response.setHeader("Content-Disposition", "attachment;filename="+URLEncoder.encode(fileName, "utf-8"));
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "utf-8"));
         exportExcel(data, response.getOutputStream());
     }
 
